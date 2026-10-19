@@ -1,0 +1,216 @@
+/* =====================================================================
+   ParkDodo 後台 UI 基礎樣式（HTML5 / 原生 CSS，不依賴框架）
+   風格：微科技人文感 — 米白紙感底、墨藍、單一青綠重點色；
+         標題襯線體、內文黑體、數據等寬字。
+   對應設計稿：《ParkDodo 停車管理系統改版》八個畫面
+   ===================================================================== */
+
+
+/* ---------- 1. Design tokens ---------- */
+:root {
+  /* 底色與表面 */
+  --pd-ground: #F6F4EF;         /* 頁面底（米白紙感） */
+  --pd-surface: #FFFFFF;        /* 卡片 */
+  --pd-surface-sunk: #FBFAF7;   /* 表格 hover、預留區塊 */
+  --pd-line: #E3DED4;           /* 卡片框線 */
+  --pd-line-soft: #EDE9E1;      /* 分隔線、進度條底 */
+  --pd-line-input: #D6D0C4;     /* 輸入框、次要按鈕框 */
+
+  /* 文字（皆已檢查對比 ≥ 4.5:1，於 #FFFFFF 與 #F6F4EF 上） */
+  --pd-ink: #1E2A32;            /* 主文字 */
+  --pd-ink-2: #3D4850;          /* 次要內文 */
+  --pd-muted: #5B6670;          /* 標籤、說明文字 */
+
+  /* 側欄 / 深色 */
+  --pd-night: #17232B;          /* 側欄底 */
+  --pd-night-2: #22323C;        /* 側欄選中、hover */
+  --pd-night-ink: #E8E4DA;
+  --pd-night-muted: #9FB0BA;
+
+  /* 品牌重點色：青綠（全站只用這一個重點色） */
+  --pd-accent: #0F766E;
+  --pd-accent-hover: #115E59;
+  --pd-accent-tint: #E6F2F0;
+
+  /* 語意色（只在有意義時出現） */
+  --pd-warn: #B45309;  --pd-warn-ink: #8A4208;  --pd-warn-tint: #FBF0E4;  --pd-warn-line: #E9C9A3;
+  --pd-danger: #B42318; --pd-danger-ink: #8F1F14; --pd-danger-tint: #FBEAE8;
+  --pd-info-ink: #344275; --pd-info-tint: #EEF0F7;   /* 月租、處理中 */
+  --pd-neutral-tint: #F1EEE7;
+
+  /* 圖表色（依明度排序，可分辨色弱） */
+  --pd-chart-1: #0F766E; --pd-chart-2: #2E8C82; --pd-chart-3: #7FB8B1;
+  --pd-chart-4: #B9DCD7; --pd-chart-5: #D9A35E;
+  --pd-chart-ink: #1E2A32; --pd-chart-ink-2: #9FB0BA;
+
+  /* 字型 */
+  --pd-font-sans: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+  --pd-font-serif: "Noto Serif TC", "PMingLiU", serif;
+  --pd-font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
+
+  /* 字級 */
+  --pd-fs-display: 30px;   /* 頁面問候、首頁標題 */
+  --pd-fs-h1: 28px;        /* 頁面標題 */
+  --pd-fs-h2: 20px;        /* 區塊標題 */
+  --pd-fs-h3: 18px;        /* 卡片標題 */
+  --pd-fs-body: 15px;
+  --pd-fs-sm: 14px;
+  --pd-fs-label: 13px;
+  --pd-fs-metric: 40px;    /* KPI 大數字 */
+  --pd-fs-metric-sm: 28px;
+
+  /* 間距（4 的倍數） */
+  --pd-s1: 4px; --pd-s2: 8px; --pd-s3: 12px; --pd-s4: 16px;
+  --pd-s5: 20px; --pd-s6: 24px; --pd-s8: 32px; --pd-s10: 40px;
+
+  /* 圓角 */
+  --pd-r-sm: 10px;  /* 按鈕、輸入框 */
+  --pd-r-md: 14px;  /* 卡片 */
+  --pd-r-lg: 16px;  /* 手機卡片 */
+  --pd-r-pill: 999px;
+
+  /* 尺寸 */
+  --pd-touch: 44px;         /* 最小點擊高度 */
+  --pd-touch-mobile: 52px;  /* 手機主要按鈕 */
+  --pd-sidebar: 264px;
+}
+
+/* 即時監控等長時間觀看畫面使用深色主題：<body class="pd-theme-night"> */
+.pd-theme-night {
+  --pd-ground: #121C22; --pd-surface: #1A262E; --pd-line: #2A3A44; --pd-line-soft: #22323C;
+  --pd-line-input: #3A4B55; --pd-ink: #E8E4DA; --pd-ink-2: #C9D1D6; --pd-muted: #9FB0BA;
+  --pd-accent-tint: #173A36; --pd-warn-tint: #3B2A17; --pd-warn-ink: #F2C48D; --pd-warn-line: #8A5A22;
+}
+
+/* ---------- 2. Base ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--pd-ground); color: var(--pd-ink);
+  font-family: var(--pd-font-sans); font-size: var(--pd-fs-body); line-height: 1.6;
+}
+a { color: var(--pd-accent); }
+a:hover { color: var(--pd-accent-hover); }
+:focus-visible { outline: 3px solid color-mix(in srgb, var(--pd-accent) 45%, transparent); outline-offset: 2px; }
+.pd-serif { font-family: var(--pd-font-serif); }
+.pd-mono { font-family: var(--pd-font-mono); letter-spacing: .02em; font-variant-numeric: tabular-nums; }
+.pd-label { font-size: var(--pd-fs-label); color: var(--pd-muted); }
+.pd-sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; border: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ---------- 3. Layout ---------- */
+.pd-app { min-height: 100vh; display: flex; flex-wrap: wrap; }
+.pd-sidebar {
+  flex: 1 1 var(--pd-sidebar); max-width: 280px; background: var(--pd-night); color: var(--pd-night-ink);
+  padding: var(--pd-s6) var(--pd-s4); display: flex; flex-direction: column; gap: var(--pd-s6);
+}
+.pd-main { flex: 999 1 560px; min-width: 0; padding: 28px var(--pd-s8) var(--pd-s10); display: flex; flex-direction: column; gap: var(--pd-s6); }
+.pd-page-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: var(--pd-s3); }
+.pd-page-title { margin: 6px 0 0; font-family: var(--pd-font-serif); font-size: var(--pd-fs-h1); font-weight: 700; }
+.pd-section-title { margin: 0; font-family: var(--pd-font-serif); font-size: var(--pd-fs-h2); font-weight: 700; }
+.pd-grid { display: grid; gap: var(--pd-s4); }
+.pd-grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.pd-grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.pd-grid-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.pd-grid-5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.pd-span-2 { grid-column: span 2; }
+@media (max-width: 1100px) { .pd-grid-4, .pd-grid-5 { grid-template-columns: repeat(2, minmax(0, 1fr)); } .pd-grid-3 { grid-template-columns: 1fr; } .pd-span-2 { grid-column: auto; } }
+@media (max-width: 720px)  { .pd-grid-2, .pd-grid-4, .pd-grid-5 { grid-template-columns: 1fr; } .pd-sidebar { max-width: none; } .pd-main { padding: var(--pd-s5) var(--pd-s4); } }
+
+/* ---------- 4. Navigation ---------- */
+.pd-nav-link {
+  display: flex; align-items: center; gap: var(--pd-s3); min-height: var(--pd-touch); padding: 10px 14px;
+  border-radius: var(--pd-r-sm); color: #C9D1D6; text-decoration: none; font-size: var(--pd-fs-body);
+}
+.pd-nav-link:hover, .pd-nav-link[aria-current="page"] { background: var(--pd-night-2); color: #FFFFFF; }
+.pd-nav-link svg { width: 18px; height: 18px; flex: none; }
+.pd-nav-badge { margin-left: auto; font-family: var(--pd-font-mono); font-size: 12px; background: var(--pd-warn); color: #FFF; padding: 2px 8px; border-radius: var(--pd-r-pill); }
+
+.pd-nav-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+@media (max-width: 720px) {
+  .pd-sidebar { padding: 12px; gap: 12px; min-width: 0; width: 100%; }
+  .pd-nav-list { flex-direction: row; overflow-x: auto; scrollbar-width: none; min-width: 0; max-width: 100%; }
+  .pd-nav-link { white-space: nowrap; }
+  .pd-sidebar-foot { display: none; }
+}
+
+/* ---------- 5. Card ---------- */
+.pd-card { background: var(--pd-surface); border: 1px solid var(--pd-line); border-radius: var(--pd-r-md); padding: var(--pd-s5) 22px; }
+.pd-card--warn { background: #FFFBF5; border-color: var(--pd-warn-line); }
+.pd-card--reserved { background: var(--pd-surface-sunk); border-style: dashed; }   /* 預留、未啟用模組 */
+.pd-card--selected { border-color: var(--pd-accent); background: #F3F8F7; }
+
+/* KPI */
+.pd-metric-value { font-family: var(--pd-font-mono); font-size: var(--pd-fs-metric); font-weight: 600; line-height: 1.1; }
+.pd-metric-delta { font-family: var(--pd-font-mono); font-size: 13px; }
+.pd-delta-good { color: var(--pd-accent-hover); }
+.pd-delta-bad { color: var(--pd-danger); }
+
+/* ---------- 6. Buttons ---------- */
+.pd-btn {
+  font: inherit; font-size: var(--pd-fs-sm); min-height: var(--pd-touch); padding: 0 18px; border-radius: var(--pd-r-sm);
+  border: 1px solid var(--pd-line-input); background: var(--pd-surface); color: var(--pd-ink); cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--pd-s2); text-decoration: none;
+}
+.pd-btn:hover { background: var(--pd-neutral-tint); }
+.pd-btn--primary { background: var(--pd-accent); border-color: var(--pd-accent); color: #FFF; }
+.pd-btn--primary:hover { background: var(--pd-accent-hover); }
+.pd-btn--danger { background: var(--pd-danger); border-color: var(--pd-danger); color: #FFF; }
+.pd-btn--block { width: 100%; }
+.pd-btn--lg { min-height: var(--pd-touch-mobile); font-size: 16px; border-radius: var(--pd-r-lg); }
+.pd-btn[disabled] { opacity: .5; cursor: not-allowed; }
+
+/* 分段切換（日／週／月／季） */
+.pd-segmented { display: inline-flex; background: var(--pd-line-soft); border-radius: 12px; padding: 4px; gap: 4px; }
+.pd-segmented button { font: inherit; font-size: var(--pd-fs-sm); min-height: 40px; min-width: 56px; border: 0; border-radius: 9px; background: transparent; color: var(--pd-muted); cursor: pointer; }
+.pd-segmented button[aria-pressed="true"] { background: var(--pd-surface); color: var(--pd-ink); font-weight: 500; }
+
+/* ---------- 7. Chips / status ---------- */
+.pd-chip { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; padding: 4px 10px; border-radius: var(--pd-r-pill); background: var(--pd-neutral-tint); color: var(--pd-ink-2); }
+.pd-chip--ok      { background: var(--pd-accent-tint); color: var(--pd-accent-hover); }  /* 正常、在場、有效、臨停 */
+.pd-chip--info    { background: var(--pd-info-tint);   color: var(--pd-info-ink); }       /* 月租、處理中 */
+.pd-chip--warn    { background: var(--pd-warn-tint);   color: var(--pd-warn-ink); }       /* 待處理、即將到期、特殊 */
+.pd-chip--danger  { background: var(--pd-danger-tint); color: var(--pd-danger-ink); }     /* 緊急 */
+.pd-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; background: currentColor; }
+
+/* ---------- 8. Forms ---------- */
+.pd-field { display: flex; flex-direction: column; gap: 6px; }
+.pd-field > label { font-size: var(--pd-fs-label); color: var(--pd-muted); }
+.pd-input, .pd-select, .pd-textarea {
+  font: inherit; font-size: var(--pd-fs-sm); min-height: var(--pd-touch); width: 100%;
+  border: 1px solid var(--pd-line-input); border-radius: var(--pd-r-sm); padding: 0 12px; background: var(--pd-surface); color: var(--pd-ink);
+}
+.pd-textarea { padding: 10px 12px; resize: vertical; }
+.pd-input--plate { font-family: var(--pd-font-mono); font-size: 16px; letter-spacing: .04em; text-transform: uppercase; }
+
+/* ---------- 9. Table ---------- */
+.pd-table-wrap { overflow-x: auto; position: relative; }
+.pd-table { width: 100%; border-collapse: collapse; }
+.pd-table th { font-size: 13px; font-weight: 500; color: var(--pd-muted); text-align: left; padding: 12px 16px; border-bottom: 1px solid var(--pd-line); white-space: nowrap; }
+.pd-table td { font-size: var(--pd-fs-sm); padding: 14px 16px; border-bottom: 1px solid #EFEBE3; white-space: nowrap; }
+.pd-table tbody tr:hover td { background: var(--pd-surface-sunk); }
+.pd-table .pd-num { font-family: var(--pd-font-mono); text-align: right; }
+
+/* ---------- 10. Parking-specific ---------- */
+.pd-plate { font-family: var(--pd-font-mono); font-weight: 600; letter-spacing: .04em; }
+.pd-plate-box { border-radius: var(--pd-r-sm); background: var(--pd-ground); border: 1px solid var(--pd-line); padding: 10px; text-align: center; }
+.pd-plate-box .pd-plate { font-size: 22px; display: block; margin-top: 4px; }
+.pd-camera {
+  aspect-ratio: 16 / 9; border-radius: var(--pd-r-sm); background: #26343D; color: #C9D1D6; font-size: 12px;
+  display: flex; align-items: flex-end; padding: 12px; overflow: hidden; position: relative;
+}
+.pd-camera img, .pd-camera video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.pd-live-badge { position: absolute; right: 12px; bottom: 12px; font-family: var(--pd-font-mono); font-size: 12px; background: rgba(0,0,0,.45); color: #FFF; padding: 4px 8px; border-radius: 6px; }
+.pd-meter { height: 6px; border-radius: var(--pd-r-pill); background: var(--pd-line-soft); overflow: hidden; }
+.pd-meter > span { display: block; height: 100%; background: var(--pd-accent); }
+
+/* ---------- 11. Dialog ---------- */
+.pd-dialog { border: 1px solid var(--pd-line); border-radius: var(--pd-r-md); padding: 26px; width: min(460px, calc(100vw - 32px)); background: var(--pd-surface); color: var(--pd-ink); }
+.pd-dialog::backdrop { background: rgba(23, 35, 43, .45); }
+.pd-choice-grid { display: flex; flex-wrap: wrap; gap: var(--pd-s2); }
+.pd-choice { font: inherit; font-size: var(--pd-fs-sm); min-height: 40px; padding: 0 14px; border-radius: var(--pd-r-sm); border: 1px solid var(--pd-line-input); background: var(--pd-surface); color: var(--pd-ink); cursor: pointer; }
+.pd-choice[aria-pressed="true"] { background: var(--pd-accent); border-color: var(--pd-accent); color: #FFF; }
+
+/* ---------- 12. Motion ---------- */
+@media (prefers-reduced-motion: no-preference) {
+  .pd-btn, .pd-nav-link, .pd-choice, .pd-segmented button { transition: background-color .15s ease, color .15s ease, border-color .15s ease; }
+}

@@ -1,0 +1,12 @@
+/* 頁面層級補充樣式（共用元件見 src/styles/parkdodo-ui.css） */
+.pd-mock-banner { font-size: 12px; text-align: center; padding: 6px 12px; background: var(--pd-warn-tint); color: var(--pd-warn-ink); width: 100%; }
+.pd-incident-item { display: flex; gap: 12px; align-items: flex-start; width: 100%; text-align: left; font: inherit; padding: 14px 16px; border-radius: 12px; cursor: pointer; color: var(--pd-ink); background: var(--pd-surface); border: 1px solid transparent; }
+.pd-incident-item:hover { background: var(--pd-surface-sunk); }
+.pd-incident-item[aria-current="true"] { border-color: var(--pd-accent); background: #F3F8F7; }
+.pd-bar-chart { display: flex; align-items: flex-end; gap: 6px; border-bottom: 1px solid var(--pd-line); }
+.pd-bar { flex: 1; min-width: 0; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; position: relative; }
+.pd-bar-label { position: absolute; bottom: -22px; left: 0; right: 0; text-align: center; font-size: 11px; white-space: nowrap; color: var(--pd-muted); font-family: var(--pd-font-mono); }
+.pd-swatch { width: 10px; height: 10px; border-radius: 3px; display: inline-block; vertical-align: -1px; margin-right: 4px; }
+.pd-heat { display: grid; grid-template-columns: 40px repeat(24, minmax(0, 1fr)); gap: 4px; }
+.pd-heat-cell { height: 22px; border-radius: 4px; }
+.pd-split { display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start; }
