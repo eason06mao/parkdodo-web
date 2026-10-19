@@ -8,7 +8,11 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "db:up": "node scripts/db.mjs up",
+    "db:migrate": "node scripts/db.mjs migrate",
+    "db:test": "node scripts/db.mjs test",
+    "db:reset": "node scripts/db.mjs reset"
   },
   "engines": {
     "node": ">=20"

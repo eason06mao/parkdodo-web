@@ -62,7 +62,19 @@ npm run lint        # ESLint
 npm run build       # 正式建置
 ```
 
-資料表測試（需要 PostgreSQL 16）：
+## 本機測試資料庫（Docker）
+
+需要 Docker Desktop。資料庫只綁定 `127.0.0.1:5432`。
+
+```bash
+cp .env.example .env.local   # Windows：copy .env.example .env.local
+npm run db:up        # 啟動 PostgreSQL 16
+npm run db:migrate   # 在 parkdodo_dev 建立 53 張資料表
+npm run db:test      # 用暫時的 pdtest 資料庫跑約束測試，最後應顯示 ALL CONSTRAINT TESTS PASSED
+npm run db:reset     # 清空本機資料重來
+```
+
+不用 Docker、自己裝 PostgreSQL 16 的話，也可以手動執行：
 
 ```bash
 createdb pdtest

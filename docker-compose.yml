@@ -1,0 +1,25 @@
+# ParkDodo 本機測試環境：PostgreSQL 16
+# 只綁定 127.0.0.1，區網其他電腦連不到。正式／雲端環境不要用這份設定。
+services:
+  db:
+    image: postgres:16
+    container_name: parkdodo-db
+    environment:
+      POSTGRES_USER: parkdodo
+      POSTGRES_PASSWORD: ${PG_PASSWORD:-parkdodo_dev_only}
+      POSTGRES_DB: parkdodo_dev
+      TZ: Asia/Taipei
+      PGTZ: Asia/Taipei
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./db:/db:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U parkdodo -d parkdodo_dev"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  pgdata:
