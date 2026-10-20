@@ -5,8 +5,8 @@
 //   npm run db:reset    刪掉所有本機資料，重新啟動（只影響本機）
 import { spawnSync } from "node:child_process";
 
-const MIGRATIONS = ["/db/migrations/0001_v2_core.sql"];
-const TESTS = ["/db/tests/0001_constraints_test.sql"];
+const MIGRATIONS = ["/db/migrations/0001_v2_core.sql", "/db/migrations/0002_tenancy_licensing.sql"];
+const TESTS = ["/db/tests/0001_constraints_test.sql", "/db/tests/0002_tenancy_test.sql"];
 
 function run(args, { quiet = false } = {}) {
   const r = spawnSync("docker", args, { stdio: quiet ? "pipe" : "inherit", encoding: "utf8" });
@@ -24,6 +24,31 @@ function must(args) {
 
 const psql = (db, file) =>
   must(["compose", "exec", "-T", "db", "psql", "-q", "-v", "ON_ERROR_STOP=1", "-U", "parkdodo", "-d", db, "-f", file]);
+
+function query(db, sql) {
+  const r = spawnSync("docker", ["compose", "exec", "-T", "db", "psql", "-tAq", "-v", "ON_ERROR_STOP=1", "-U", "parkdodo", "-d", db, "-c", sql], { encoding: "utf8" });
+  if (r.status !== 0) { console.error(r.stderr); process.exit(r.status ?? 1); }
+  return r.stdout.trim();
+}
+
+// 只執行還沒跑過的 migration，紀錄在 schema_migrations
+function migrate(db) {
+  query(db, "CREATE TABLE IF NOT EXISTS schema_migrations (version TEXT PRIMARY KEY, applied_at TIMESTAMPTZ NOT NULL DEFAULT now())");
+  // 舊版腳本已建好 0001 但沒有紀錄：補記，避免重跑
+  if (query(db, "SELECT count(*) FROM schema_migrations") === "0" && query(db, "SELECT to_regclass('public.organizations') IS NOT NULL") === "t") {
+    query(db, "INSERT INTO schema_migrations (version) VALUES ('0001_v2_core')");
+  }
+  let applied = 0;
+  for (const f of MIGRATIONS) {
+    const version = f.split("/").pop().replace(/\.sql$/, "");
+    if (query(db, `SELECT count(*) FROM schema_migrations WHERE version = '${version}'`) !== "0") continue;
+    psql(db, f);
+    query(db, `INSERT INTO schema_migrations (version) VALUES ('${version}')`);
+    console.log(`已套用 ${version}`);
+    applied++;
+  }
+  console.log(applied ? "資料表更新完成。" : "資料表已是最新，不需要更新。");
+}
 
 function waitHealthy() {
   for (let i = 0; i < 40; i++) {
@@ -43,8 +68,7 @@ switch (cmd) {
     break;
   case "migrate":
     waitHealthy();
-    for (const f of MIGRATIONS) psql("parkdodo_dev", f);
-    console.log("資料表建立完成。");
+    migrate("parkdodo_dev");
     break;
   case "test":
     waitHealthy();
@@ -52,6 +76,7 @@ switch (cmd) {
     must(["compose", "exec", "-T", "db", "createdb", "-U", "parkdodo", "pdtest"]);
     for (const f of MIGRATIONS) psql("pdtest", f);
     for (const f of TESTS) psql("pdtest", f);
+    console.log("全部資料表測試通過。");
     must(["compose", "exec", "-T", "db", "dropdb", "-U", "parkdodo", "pdtest"]);
     break;
   case "reset":

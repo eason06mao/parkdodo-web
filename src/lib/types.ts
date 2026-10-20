@@ -1,4 +1,5 @@
 // 與《ParkDodo V2 總規格 F 版》資料表對應的前端型別（只列畫面會用到的欄位）
+import type { OrgType, RoleBinding } from "./permissions";
 
 export type ChipTone = "ok" | "info" | "warn" | "danger" | "neutral";
 
@@ -120,4 +121,88 @@ export interface CashKioskStatus {
   bills: { label: string; count: number }[];
   coins: { label: string; count: number }[];
   paper: "充足" | "偏低" | "用完";
+}
+
+// ---------- 組織、站點管理、帳號（對應 organizations、sites、site_licenses、edge_gateways、devices、users） ----------
+
+export interface Organization {
+  id: string;
+  type: OrgType;
+  name: string;
+  taxId?: string;
+  contactName?: string;
+  status: "pending" | "active" | "suspended" | "terminated";
+}
+
+export type OperationType = "hq_owned" | "operator" | "franchise" | "licensed";
+export type CollectionMode = "hq_collect" | "own_merchant";
+export type SiteStatus = "planning" | "trial" | "active" | "paused" | "closed";
+export type LicensePlan = "basic" | "standard" | "pro";
+
+export interface SiteLicense {
+  licenseNo: string;
+  plan: LicensePlan;
+  maxLanes: number;
+  startsOn: string;
+  endsOn: string;
+  graceDays: number;
+  status: "trial" | "active" | "suspended" | "expired" | "cancelled";
+}
+
+export interface EdgeGatewayInfo {
+  name: string;
+  model?: string;
+  serialNo?: string;
+  agentVersion?: string;
+  status: "provisioning" | "online" | "offline" | "retired";
+  lastSeenAt?: string;
+}
+
+export interface DeviceInfo {
+  id: string;
+  laneCode?: string;
+  type: "lpr_camera" | "led_voice_card" | "barrier" | "radar" | "exit_display" | "kiosk" | "intercom" | "printer" | "ups";
+  vendor?: string;
+  model?: string;
+  ip?: string;
+  rs485Address?: number;
+  status: "online" | "offline" | "unknown";
+}
+
+export interface SiteRecord {
+  id: string;
+  code: string;
+  name: string;
+  orgId: string;
+  operationType: OperationType;
+  collectionMode: CollectionMode;
+  status: SiteStatus;
+  city: string;
+  district?: string;
+  address: string;
+  totalSpaces: number;
+  lanes: { code: string; name: string; direction: "entry" | "exit" }[];
+  edge?: EdgeGatewayInfo;
+  devices: DeviceInfo[];
+  license?: SiteLicense; // 總部自營站不需要授權
+  openedAt?: string;
+}
+
+export interface AccountRecord {
+  id: string;
+  name: string;
+  email: string;
+  status: "invited" | "active" | "locked" | "disabled";
+  mfa: boolean;
+  lastLoginAt?: string;
+  bindings: RoleBinding[];
+}
+
+export interface AuditEntry {
+  at: string;
+  actor: string;
+  action: string;
+  target: string;
+  orgId?: string;
+  reason?: string;
 }

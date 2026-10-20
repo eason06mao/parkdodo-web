@@ -32,8 +32,26 @@ NEXT_PUBLIC_FEATURE_CASH_KIOSK=true npm run dev
 | `/console/sessions` | 車輛進出紀錄 |
 | `/console/monthly` | 月租管理 |
 | `/console/analytics` | 營收與車輛戰情板（日／週／月／季＋自訂日期） |
+| `/console/sites` | 場站與設備（站點清單、組織清單） |
+| `/console/sites/new` | 新增站點（僅總部；4 步驟） |
+| `/console/sites/[id]` | 站點設定：基本資料、經營與收款、軟體授權、工控機配對、車道與設備 |
+| `/console/accounts` | 帳號權限：邀請帳號、角色與範圍、稽核紀錄 |
 | `/m/gate` | 手機版遠端開閘 |
 | `POST /api/gate-commands` | 遠端開閘 Mock API（只驗證欄位，不控制設備） |
+| `POST /api/sites` | 新增站點 Mock API（非總部回 403） |
+| `POST /api/accounts` | 邀請帳號 Mock API（越權回 403） |
+
+## 權限與預覽身分
+
+上方黃色列的「預覽身分」可以切換成總部管理員、總部營運、系統客戶管理員、系統客戶現場人員，
+用來確認每個角色看到的選單與按鈕。這個切換只存在 Mock 版，正式版會移除。
+
+- 新增站點、配對工控機、開立授權、變更經營組織與收款方式：只限總部。
+- 系統客戶與加盟主：可以改自己站點的名稱與設定、管理自己組織的帳號，但不能給出比自己大的權限。
+- 只負責特定站點的人，只能為那些站點建立帳號。
+- 規則寫在 `src/lib/permissions.ts`（畫面用）與 `db/migrations/0002_tenancy_licensing.sql`（資料庫觸發器＋RLS，真正把關）。
+
+Mock 版新增的站點與帳號只存在記憶體，重新啟動 `npm run dev` 後會消失。
 
 ## 專案結構
 
@@ -69,8 +87,8 @@ npm run build       # 正式建置
 ```bash
 cp .env.example .env.local   # Windows：copy .env.example .env.local
 npm run db:up        # 啟動 PostgreSQL 16
-npm run db:migrate   # 在 parkdodo_dev 建立 53 張資料表
-npm run db:test      # 用暫時的 pdtest 資料庫跑約束測試，最後應顯示 ALL CONSTRAINT TESTS PASSED
+npm run db:migrate   # 只套用還沒跑過的 migration（0001 核心、0002 多租戶與授權）
+npm run db:test      # 用暫時的 pdtest 資料庫跑全部約束測試，應顯示 ALL CONSTRAINT TESTS PASSED 與 ALL TENANCY TESTS PASSED
 npm run db:reset     # 清空本機資料重來
 ```
 
@@ -94,4 +112,5 @@ cd edge/FkProtocol.Tests && dotnet run
 2. 登入改為伺服器端驗證＋MFA，`/console` 加上權限檢查。
 3. 即時監控與例外清單改用 WebSocket 更新。
 4. 接上統一金流 PAYUNi 沙箱與電子發票。
-5. 尚未實作的頁面：財務與發票、場站與設備、帳號權限、官網。
+5. 尚未實作的頁面：財務與發票、官網。
+6. 其他頁面（總覽、監控、紀錄等）改接 API 後，依登入者的站點範圍過濾資料。
