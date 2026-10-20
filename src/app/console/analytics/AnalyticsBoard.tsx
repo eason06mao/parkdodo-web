@@ -67,13 +67,14 @@ export function AnalyticsBoard() {
         <Chip>示意資料・上線後接 daily_site_metrics</Chip>
       </div>
 
-      <section aria-label="關鍵指標" className="pd-grid pd-grid-5" style={{ gap: 14 }}>
+      <section aria-label="關鍵指標" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))", gap: 14 }}>
         {kpis.map((k) => (
-          <div key={k.label} className="pd-card" style={{ padding: "18px 20px" }}>
+          <div key={k.label} className="pd-card" style={{ padding: "18px 20px", containerType: "inline-size", minWidth: 0 }}>
             <div className="pd-label">{k.label}</div>
-            <div style={{ marginTop: 8, display: "flex", alignItems: "baseline", gap: 6 }}>
+            <div style={{ marginTop: 8, display: "flex", alignItems: "baseline", gap: 6, whiteSpace: "nowrap" }}>
               {k.pre && <span className="pd-label">{k.pre}</span>}
-              <span className="pd-mono" style={{ fontSize: "clamp(20px, 1.9vw, var(--pd-fs-metric-sm))", fontWeight: 600, overflowWrap: "anywhere" }}>{k.value}</span>
+              {/* 字級跟著卡片寬度縮放（cqi），數字永遠維持一行 */}
+              <span className="pd-mono" style={{ fontSize: "clamp(20px, 13cqi, var(--pd-fs-metric-sm))", fontWeight: 600 }}>{k.value}</span>
               {k.unit && <span className="pd-label">{k.unit}</span>}
             </div>
             <div className={`pd-metric-delta ${k.good ? "pd-delta-good" : "pd-delta-bad"}`} style={{ marginTop: 8 }}>{k.delta}</div>
