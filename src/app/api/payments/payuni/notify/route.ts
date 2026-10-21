@@ -6,8 +6,9 @@ import { PayuniCryptoError } from "@/lib/payments/payuni/crypto";
 // 規則（F 版規格「支付模組與狀態機」）：
 //   1. 先驗 HashInfo、解密、比對 MerID；任何一項失敗回 400，不更新訂單。
 //   2. 用 MerTradeNo 找 payment_orders，比對金額；同一通知重送要冪等（payment_transactions 以 TradeNo 唯一）。
-//   3. 不直接相信通知內的狀態：呼叫 trade/query 確認後才把訂單轉為 paid，並建立出場授權。
-//   4. 狀態碼對照與要回給 PAYUNi 的回應內容「待文件確認」，確認前只記錄、不轉 paid。
+//   3. 文件規定「交易結果請以 NotifyURL 為主」：HashInfo 驗證通過、金額與訂單相符時，以 mapResult() 的結果轉換狀態；
+//      paid → 建立出場授權；unknown（UNKNOWN／待確認）→ 15 分鐘後發動交易查詢。ReturnURL 只顯示結果，不入帳。
+//   4. 要回給 PAYUNi 的回應內容「待文件確認」，目前回 200 OK。
 export async function POST(req: Request) {
   const cfg = loadPayuniConfig();
   if (!cfg) return NextResponse.json({ error: "payuni_not_configured" }, { status: 503 });
@@ -15,8 +16,8 @@ export async function POST(req: Request) {
   const form = Object.fromEntries((await req.formData()).entries()) as Record<string, string>;
   try {
     const { outerStatus, data } = parseCallback(cfg, form);
-    // TODO(待文件確認)：依 data.TradeStatus 等欄位對應 payment_orders 狀態；確認前只記錄。
-    console.info("[payuni notify]", { outerStatus, merTradeNo: data.MerTradeNo, tradeNo: data.TradeNo, amount: data.TradeAmt });
+    // TODO(接資料庫)：以 data.MerTradeNo 取 payment_orders，呼叫 mapResult(data, { merTradeNo, amount }) 後在同一交易內轉狀態。
+    console.info("[payuni notify]", { outerStatus, merTradeNo: data.MerTradeNo, tradeNo: data.TradeNo, amount: data.TradeAmt, tradeStatus: data.TradeStatus });
     return new NextResponse("OK", { status: 200 });
   } catch (e) {
     const reason = e instanceof PayuniCryptoError ? e.message : "invalid";
