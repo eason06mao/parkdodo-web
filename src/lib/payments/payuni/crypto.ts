@@ -30,18 +30,41 @@ export function httpBuildQuery(params: Params): string {
     .join("&");
 }
 
-/** 等同 PHP parse_str（一層） */
-export function parseStr(qs: string): Record<string, string> {
-  const out: Record<string, string> = {};
+/** 解密後的資料：一般為字串；交易查詢的 Result 為陣列（PHP parse_str 的巢狀格式） */
+export type PayuniValue = string | PayuniValue[] | { [k: string]: PayuniValue };
+export type PayuniData = Record<string, PayuniValue>;
+
+/** 等同 PHP parse_str：支援 a[0][b]=x 巢狀鍵；連續數字鍵 0..n-1 轉成陣列（與 PHP json_encode 一致） */
+export function parseStr(qs: string): PayuniData {
+  const root: Record<string, unknown> = {};
+  const dec = (x: string) => decodeURIComponent(x.replace(/\+/g, " "));
   for (const part of qs.split("&")) {
     if (!part) continue;
     const i = part.indexOf("=");
-    const dec = (x: string) => decodeURIComponent(x.replace(/\+/g, " "));
-    const k = dec(i < 0 ? part : part.slice(0, i));
-    out[k] = i < 0 ? "" : dec(part.slice(i + 1));
+    const rawKey = dec(i < 0 ? part : part.slice(0, i));
+    const value = i < 0 ? "" : dec(part.slice(i + 1));
+    const m = rawKey.match(/^([^[]+)((?:\[[^\]]*\])*)$/);
+    const path = m ? [m[1], ...[...m[2].matchAll(/\[([^\]]*)\]/g)].map((x) => x[1])] : [rawKey];
+    let node = root;
+    path.forEach((k, idx) => {
+      if (k === "__proto__" || k === "constructor" || k === "prototype") return;
+      if (idx === path.length - 1) { node[k] = value; return; }
+      if (typeof node[k] !== "object" || node[k] === null) node[k] = {};
+      node = node[k] as Record<string, unknown>;
+    });
   }
-  return out;
+  const toArrays = (v: unknown): PayuniValue => {
+    if (typeof v !== "object" || v === null) return v as string;
+    const o = v as Record<string, unknown>;
+    const keys = Object.keys(o);
+    const isList = keys.length > 0 && keys.every((k, n) => k === String(n));
+    return isList ? keys.map((k) => toArrays(o[k])) : Object.fromEntries(keys.map((k) => [k, toArrays(o[k])]));
+  };
+  return toArrays(root) as PayuniData;
 }
+
+/** 取字串欄位（巢狀值回傳 undefined） */
+export const str = (d: PayuniData | undefined, k: string): string | undefined => (typeof d?.[k] === "string" ? (d[k] as string) : undefined);
 
 // PHP openssl 會把不足的金鑰補 \0、過長截斷；IV 原樣使用（GCM 允許任意長度）
 const keyBuf = (k: string) => { const b = Buffer.alloc(32); Buffer.from(k.trim(), "utf8").copy(b); return b; };
@@ -54,7 +77,7 @@ export function encrypt(params: Params, keys: PayuniKeys): string {
   return Buffer.from(`${ct.toString("base64")}:::${tag.toString("base64")}`, "utf8").toString("hex");
 }
 
-export function decrypt(encryptInfo: string, keys: PayuniKeys): Record<string, string> {
+export function decrypt(encryptInfo: string, keys: PayuniKeys): PayuniData {
   if (!/^[0-9a-fA-F]+$/.test(encryptInfo) || encryptInfo.length % 2) throw new PayuniCryptoError("EncryptInfo 不是 hex 字串");
   const raw = Buffer.from(encryptInfo, "hex").toString("utf8");
   const sep = raw.indexOf(":::");
@@ -74,7 +97,7 @@ export function hashInfo(encryptInfo: string, keys: PayuniKeys): string {
 }
 
 /** 驗證 HashInfo（固定時間比較），通過才解密 */
-export function verifyAndDecrypt(body: { EncryptInfo?: string; HashInfo?: string }, keys: PayuniKeys): Record<string, string> {
+export function verifyAndDecrypt(body: { EncryptInfo?: string; HashInfo?: string }, keys: PayuniKeys): PayuniData {
   if (!body.EncryptInfo || !body.HashInfo) throw new PayuniCryptoError("缺少 EncryptInfo 或 HashInfo");
   const expected = Buffer.from(hashInfo(body.EncryptInfo, keys));
   const got = Buffer.from(body.HashInfo.toUpperCase());

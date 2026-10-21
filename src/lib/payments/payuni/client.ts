@@ -1,9 +1,9 @@
 // 統一金流 PAYUNi 串接（伺服器端）。
-// 依據：PAYUNi 開發專區《整合式支付頁 UNiPaypage (UPP)》Ver 2.0（2026-10-21 取得）與官方 PHP SDK v1.2.4。
+// 依據：PAYUNi 開發專區《整合式支付頁 UNiPaypage (UPP)》Ver 2.0、《交易查詢》Ver 2.0、《多筆交易查詢》Ver 1.0（2026-10-21／22 取得）與官方 PHP SDK v1.2.4。
 //   測試區 https://sandbox-api.payuni.com.tw/api/<路徑>，正式區 https://api.payuni.com.tw/api/<路徑>（TLS 1.2 以上）
 //   外層參數：MerID、Version、EncryptInfo、HashInfo。UPP 的 Version 固定 2.0。
-// 標「待文件確認」的部分（交易查詢、請退款、Notify 回應內容）需取得對應文件頁後再啟用，不可猜。
-import { encrypt, hashInfo, verifyAndDecrypt, type Params, type PayuniKeys } from "./crypto";
+// 標「待文件確認」的部分（請退款、Notify 回應內容）需取得對應文件頁後再啟用，不可猜。
+import { encrypt, hashInfo, str, verifyAndDecrypt, type Params, type PayuniData, type PayuniKeys } from "./crypto";
 
 export type PayuniEnv = "sandbox" | "production";
 
@@ -62,59 +62,93 @@ export function buildUppForm(cfg: PayuniConfig, order: {
   };
 }
 
-// ---------- 回傳結果對應（UPP Ver 2.0「返回參數」） ----------
+// ---------- 回傳結果對應（UPP Ver 2.0「返回參數」、交易查詢 Ver 2.0） ----------
 
-export const TRADE_STATUS = { "0": "取號成功", "1": "已付款", "2": "付款失敗", "3": "付款取消", "8": "訂單待確認" } as const;
+export const TRADE_STATUS: Record<string, string> = {
+  "0": "取號成功", "1": "已付款", "2": "付款失敗", "3": "付款取消", "4": "交易逾期", "8": "訂單待確認", "9": "未付款",
+};
 export const PAYMENT_TYPE: Record<string, string> = {
   "1": "信用卡", "2": "ATM轉帳", "3": "超商代碼", "5": "超商取貨付款", "6": "愛金卡", "7": "AFTEE",
-  "9": "LINE Pay", "10": "宅配到付", "11": "街口支付",
+  "8": "退貨代收", "9": "LINE Pay", "10": "宅配到付", "11": "街口支付",
 };
 
-/** 對應到 payment_orders 狀態（F 版規格的狀態機）。只有「確定」的結果才給 paid／failed，其餘一律 unknown 交給交易查詢。 */
+/** 對應到 payment_orders 狀態（F 版規格的狀態機）。只有「確定」的結果才給 paid／failed，其餘一律 unknown，稍後再查。 */
 export type OrderOutcome =
   | { kind: "paid"; tradeNo: string; amount: number; paymentType: string }
   | { kind: "failed"; reason: string }
-  | { kind: "pending"; reason: string }   // 取號成功（ATM／超商），停車繳費不應出現
-  | { kind: "unknown"; reason: string };  // UNKNOWN、UNAPPROVED、訂單待確認：15 分鐘後發動交易查詢
+  | { kind: "pending"; reason: string }                       // 取號成功或未付款：停車繳費不開 ATM／超商，正常不會出現
+  | { kind: "unknown"; reason: string; retryAfterMin: number }; // UNKNOWN、待確認、查詢資料未完整：之後發動交易查詢
 
-export function mapResult(data: Record<string, string>, expected: { merTradeNo: string; amount: number }): OrderOutcome {
-  if (data.MerTradeNo !== expected.merTradeNo) throw new Error("MerTradeNo 不符");
-  const status = (data.Status ?? "").toUpperCase();
-  if (status === "UNKNOWN" || status === "UNAPPROVED") return { kind: "unknown", reason: data.Message || status };
-  if (status !== "SUCCESS") return { kind: "failed", reason: data.Message || status || "付款失敗" };
-  switch (data.TradeStatus) {
+/** UPP 的 NotifyURL／ReturnURL 結果 */
+export function mapResult(data: PayuniData, expected: { merTradeNo: string; amount: number }): OrderOutcome {
+  return mapTrade(data, expected, 15);
+}
+
+/** 交易查詢的一筆 Result。DataSource=B（處理中未完整）時 10 分鐘後再查。 */
+export function mapQueryResult(row: PayuniData, expected: { merTradeNo: string; amount: number }): OrderOutcome {
+  if (str(row, "Status") === "SUCCESS" && str(row, "DataSource") === "B") {
+    if (str(row, "MerTradeNo") !== expected.merTradeNo) throw new Error("MerTradeNo 不符");
+    return { kind: "unknown", reason: "查詢資料處理中未完整", retryAfterMin: 10 };
+  }
+  return mapTrade(row, expected, 10);
+}
+
+function mapTrade(d: PayuniData, expected: { merTradeNo: string; amount: number }, retryAfterMin: number): OrderOutcome {
+  if (str(d, "MerTradeNo") !== expected.merTradeNo) throw new Error("MerTradeNo 不符");
+  const status = (str(d, "Status") ?? "").toUpperCase();
+  const message = str(d, "Message");
+  if (status === "UNKNOWN" || status === "UNAPPROVED") return { kind: "unknown", reason: message || status, retryAfterMin };
+  if (status !== "SUCCESS") return { kind: "failed", reason: message || status || "付款失敗" };
+  const ts = str(d, "TradeStatus");
+  switch (ts) {
     case "1": {
-      const amount = Number(data.TradeAmt);
-      if (amount !== expected.amount) throw new Error(`金額不符：PAYUNi ${data.TradeAmt}，訂單 ${expected.amount}`);
-      return { kind: "paid", tradeNo: data.TradeNo, amount, paymentType: PAYMENT_TYPE[data.PaymentType] ?? data.PaymentType };
+      const amount = Number(str(d, "TradeAmt"));
+      if (amount !== expected.amount) throw new Error(`金額不符：PAYUNi ${str(d, "TradeAmt")}，訂單 ${expected.amount}`);
+      const pt = str(d, "PaymentType") ?? "";
+      return { kind: "paid", tradeNo: str(d, "TradeNo") ?? "", amount, paymentType: PAYMENT_TYPE[pt] ?? pt };
     }
-    case "2": return { kind: "failed", reason: "付款失敗" };
-    case "3": return { kind: "failed", reason: "付款取消" };
-    case "0": return { kind: "pending", reason: "取號成功，尚未繳費" };
-    default: return { kind: "unknown", reason: `訂單狀態 ${data.TradeStatus ?? "未提供"}` };
+    case "2": case "3": case "4": return { kind: "failed", reason: TRADE_STATUS[ts] };
+    case "0": case "9": return { kind: "pending", reason: TRADE_STATUS[ts] };
+    default: return { kind: "unknown", reason: `訂單狀態 ${ts ? TRADE_STATUS[ts] ?? ts : "未提供"}`, retryAfterMin };
   }
 }
 
-/** 幕後 API（交易查詢、請退款等）：回傳已驗證 HashInfo 並解密的結果 */
-async function callApi(cfg: PayuniConfig, path: string, inner: Params, version?: string) {
+/** 幕後 API（交易查詢、請退款等）：Http Post，header 帶 user-agent「payuni」；回傳已驗證 HashInfo 並解密的結果 */
+async function callApi(cfg: PayuniConfig, path: string, inner: Params, version: string) {
   const res = await fetch(apiBase(cfg.env) + path, {
     method: "POST",
-    headers: { "content-type": "application/x-www-form-urlencoded" },
+    headers: { "content-type": "application/x-www-form-urlencoded", "user-agent": "payuni" },
     body: new URLSearchParams(envelope(cfg, inner, version)),
     signal: AbortSignal.timeout(15_000),
   });
   const body = (await res.json()) as { Status?: string; MerID?: string; EncryptInfo?: string; HashInfo?: string; Message?: string };
-  if (!body.EncryptInfo) return { status: body.Status ?? `HTTP_${res.status}`, data: null as Record<string, string> | null, raw: body };
+  if (!body.EncryptInfo) return { status: body.Status ?? `HTTP_${res.status}`, data: null as PayuniData | null, raw: body };
+  if (body.MerID && body.MerID !== cfg.merId) throw new Error("MerID 不符");
   return { status: body.Status ?? "", data: verifyAndDecrypt(body, cfg), raw: { Status: body.Status, MerID: body.MerID } };
 }
 
-/** 交易查詢（trade/query）：以我們的訂單編號查。回傳欄位與版本號待「交易查詢」文件頁確認。 */
-export const queryTrade = (cfg: PayuniConfig, merTradeNo: string) => callApi(cfg, "trade/query", { MerTradeNo: merTradeNo });
+/** 取出查詢結果的 Result 陣列 */
+export function queryRows(data: PayuniData | null): PayuniData[] {
+  const r = data?.Result;
+  if (Array.isArray(r)) return r.filter((x): x is PayuniData => typeof x === "object" && !Array.isArray(x));
+  if (r && typeof r === "object") return [r as PayuniData];
+  return [];
+}
+
+/** 交易查詢（trade/query，Version 2.0）：以我們的訂單編號查 */
+export const queryTrade = (cfg: PayuniConfig, merTradeNo: string) =>
+  callApi(cfg, "trade/query", { MerTradeNo: merTradeNo }, "2.0");
+
+/** 多筆交易查詢（trade/finite_query，Version 1.0）：每日對帳用，最多 100 筆、限三個月內 */
+export function queryTrades(cfg: PayuniConfig, merTradeNos: string[]) {
+  if (merTradeNos.length === 0 || merTradeNos.length > 100) throw new Error("一次查詢 1 到 100 筆");
+  return callApi(cfg, "trade/finite_query", { QueryType: "1", QueryNo: merTradeNos.join(",") }, "1.0");
+}
 
 /** 驗證 NotifyURL／ReturnURL 收到的資料；MerID 必須是我們的商店 */
 export function parseCallback(cfg: PayuniConfig, form: Record<string, string>) {
   const data = verifyAndDecrypt(form, cfg);
   if (form.MerID && form.MerID !== cfg.merId) throw new Error("MerID 不符");
-  if (data.MerID && data.MerID !== cfg.merId) throw new Error("MerID 不符");
+  if (str(data, "MerID") && str(data, "MerID") !== cfg.merId) throw new Error("MerID 不符");
   return { outerStatus: form.Status ?? "", data };
 }

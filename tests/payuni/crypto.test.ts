@@ -3,6 +3,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
+import { classifyError } from "../../src/lib/payments/payuni/errors";
 import { decrypt, encrypt, hashInfo, httpBuildQuery, verifyAndDecrypt } from "../../src/lib/payments/payuni/crypto";
 
 const v = JSON.parse(readFileSync(new URL("./vectors.json", import.meta.url), "utf8"));
@@ -32,7 +33,7 @@ test("金鑰錯誤時拒絕", () => {
   assert.throws(() => decrypt(c.encryptInfo, { hashKey: "x".repeat(32), hashIV: v.iv }), /解密失敗/);
 });
 
-import { buildUppForm, mapResult, parseCallback } from "../../src/lib/payments/payuni/client";
+import { buildUppForm, mapQueryResult, mapResult, parseCallback, queryRows } from "../../src/lib/payments/payuni/client";
 
 test("UPP 表單：測試區網址、外層四個欄位、可被自己解回", () => {
   const cfg = { env: "sandbox" as const, merId: "ABC", ...keys };
@@ -83,4 +84,43 @@ test("回呼的 MerID 不是我們的商店時拒絕", () => {
 test("金額必須是正整數", () => {
   const cfg = { env: "sandbox" as const, merId: "ABC", ...keys };
   assert.throws(() => buildUppForm(cfg, { merTradeNo: "x", amount: 12.5, prodDesc: "停車費", returnUrl: "", notifyUrl: "" }), /正整數/);
+});
+
+// ---------- 交易查詢（Ver 2.0）：Result 陣列 ----------
+const vq = JSON.parse(readFileSync(new URL("./vectors-query.json", import.meta.url), "utf8"));
+test("查詢結果：巢狀 Result 陣列解析與官方 SDK 相同", () => {
+  assert.deepEqual(verifyAndDecrypt({ EncryptInfo: vq.encryptInfo, HashInfo: vq.hashInfo }, keys), vq.decrypted);
+});
+test("查詢結果：DataSource=A、已付款 → paid", () => {
+  const rows = queryRows(verifyAndDecrypt({ EncryptInfo: vq.encryptInfo, HashInfo: vq.hashInfo }, keys));
+  assert.equal(rows.length, 2);
+  assert.deepEqual(mapQueryResult(rows[0], { merTradeNo: "PD0001", amount: 120 }), { kind: "paid", tradeNo: "1700000000001", amount: 120, paymentType: "信用卡" });
+});
+test("查詢結果：DataSource=B → 10 分鐘後再查", () => {
+  const rows = queryRows(verifyAndDecrypt({ EncryptInfo: vq.encryptInfo, HashInfo: vq.hashInfo }, keys));
+  assert.deepEqual(mapQueryResult(rows[1], { merTradeNo: "PD0002", amount: 30 }), { kind: "unknown", reason: "查詢資料處理中未完整", retryAfterMin: 10 });
+});
+test("查詢結果：交易逾期 → failed；未付款 → pending", () => {
+  const b = { Status: "SUCCESS", MerTradeNo: "PD0003", DataSource: "A", TradeAmt: "30" };
+  assert.deepEqual(mapQueryResult({ ...b, TradeStatus: "4" }, { merTradeNo: "PD0003", amount: 30 }), { kind: "failed", reason: "交易逾期" });
+  assert.equal(mapQueryResult({ ...b, TradeStatus: "9" }, { merTradeNo: "PD0003", amount: 30 }).kind, "pending");
+});
+test("parse_str 不會被 __proto__ 鍵污染", () => {
+  const cfg = { env: "sandbox" as const, merId: "ABC", ...keys };
+  const f = buildUppForm(cfg, { merTradeNo: "PD0009", amount: 30, prodDesc: "x", returnUrl: "https://e.com", notifyUrl: "https://e.com" });
+  const d = parseCallback(cfg, { EncryptInfo: f.fields.EncryptInfo, HashInfo: f.fields.HashInfo }).data;
+  assert.equal(({} as Record<string, unknown>).polluted, undefined);
+  assert.equal(d.MerTradeNo, "PD0009");
+});
+
+// ---------- 錯誤代碼分類 ----------
+
+test("錯誤代碼分類", () => {
+  assert.equal(classifyError("UPP01007").kind, "duplicate");
+  assert.equal(classifyError("UPP02048").kind, "expired");
+  assert.equal(classifyError("UPP05003").kind, "declined");
+  assert.equal(classifyError("UPP02029").kind, "config");
+  assert.equal(classifyError("DEF01007").kind, "config");
+  assert.equal(classifyError("UPP01001").kind, "retry");
+  assert.equal(classifyError("CRD00001").kind, "declined");
 });
