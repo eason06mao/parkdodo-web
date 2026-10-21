@@ -1,0 +1,63 @@
+{
+    "key": "12345678901234567890123456789012",
+    "iv": "1234567890123456",
+    "cases": [
+        {
+            "input": {
+                "MerID": "ABC",
+                "MerTradeNo": "PD20261021000001",
+                "TradeAmt": 120,
+                "Timestamp": 1792500000,
+                "ProdDesc": "停車費 中航站",
+                "ReturnURL": "https:\/\/example.com\/pay\/return?a=1&b=2",
+                "NotifyURL": "https:\/\/example.com\/api\/notify"
+            },
+            "query": "MerID=ABC&MerTradeNo=PD20261021000001&TradeAmt=120&Timestamp=1792500000&ProdDesc=%E5%81%9C%E8%BB%8A%E8%B2%BB+%E4%B8%AD%E8%88%AA%E7%AB%99&ReturnURL=https%3A%2F%2Fexample.com%2Fpay%2Freturn%3Fa%3D1%26b%3D2&NotifyURL=https%3A%2F%2Fexample.com%2Fapi%2Fnotify",
+            "encryptInfo": "47396636346f66735853653367396942344f587a3775696b34752b596a4a644f6c3367525a4a4372315658676d6355556a4d436a41695239773545764f3251334b37534f4e5065577648387535424749615679796c754d64765877536b5472517970435152706571546f5441552b6e687171302f537a7a4a79345a70585a567964524e7a744a444373366b7579364f5135776d4439464834672b5954327975776c5a5a71626559324a634e4f79646e336d53686a77444b4e7362787839392b685830722b56733450524a6b6350654e4d6b74346f6b304b6b34456a5a6a4d3442487363333662702b7858414b36415870317a6f3944333142715751464b3869574575505a6c674a5a6551423569556f4d757763686f614d51674c6b6f636a4e7554346749796268366d783372576c4d67644d4f754947784b4f2b4e6b4d4c6f2f412b57756e4773613062687051534f37704f513d3a3a3a4f46785666786d586536354442532f6f764e4b3937673d3d",
+            "hashInfo": "9F7BDDF5DA71E93CBBEBC3BE681C24773FC7A7F8E7C8D23784AE746AB0FF3618",
+            "decrypted": {
+                "MerID": "ABC",
+                "MerTradeNo": "PD20261021000001",
+                "TradeAmt": "120",
+                "Timestamp": "1792500000",
+                "ProdDesc": "停車費 中航站",
+                "ReturnURL": "https:\/\/example.com\/pay\/return?a=1&b=2",
+                "NotifyURL": "https:\/\/example.com\/api\/notify"
+            }
+        },
+        {
+            "input": {
+                "MerID": "ABC",
+                "TradeNo": "16614190477810373246",
+                "Timestamp": 1792500001
+            },
+            "query": "MerID=ABC&TradeNo=16614190477810373246&Timestamp=1792500001",
+            "encryptInfo": "47396636346f667358536533673847573839586b776550386e6261543765644e6e6e6f54597065683156586a6e735957696444524a43783077364d324c6a52324a4c576657617a4f365478717455303d3a3a3a4f7537592b502b6247796247525a74644c42527130513d3d",
+            "hashInfo": "FA18DE7B5CEA55AF619A9F3BD47C547383E29E8D3CE0739E615B9C8816506523",
+            "decrypted": {
+                "MerID": "ABC",
+                "TradeNo": "16614190477810373246",
+                "Timestamp": "1792500001"
+            }
+        },
+        {
+            "input": {
+                "MerID": "ABC",
+                "Note": "a b*c~d+e%f=g&h'i\"j",
+                "Empty": "",
+                "Zero": 0,
+                "Emoji": "車"
+            },
+            "query": "MerID=ABC&Note=a+b%2Ac%7Ed%2Be%25f%3Dg%26h%27i%22j&Empty=&Zero=0&Emoji=%E8%BB%8A",
+            "encryptInfo": "47396636346f6673585365336739754c357453383771656a69624c6b762f5a4c346934435a2b4c387756666c7a3941582b594853516e4e78672b4a314a6e77304b2b364f4a664f4c7258566e6f7961644a674b346e2f647434434e497944665433397261594a48714261593d3a3a3a5648487744674c51426a596b724e424e6b6f4d536b773d3d",
+            "hashInfo": "826E353F96161B860AA65F780AE10BAE4158116B6753110C4D71C098B247C1E5",
+            "decrypted": {
+                "MerID": "ABC",
+                "Note": "a b*c~d+e%f=g&h'i\"j",
+                "Empty": "",
+                "Zero": "0",
+                "Emoji": "車"
+            }
+        }
+    ]
+}

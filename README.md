@@ -114,3 +114,13 @@ cd edge/FkProtocol.Tests && dotnet run
 4. 接上統一金流 PAYUNi 沙箱與電子發票。
 5. 尚未實作的頁面：財務與發票、官網。
 6. 其他頁面（總覽、監控、紀錄等）改接 API 後，依登入者的站點範圍過濾資料。
+
+## 統一金流 PAYUNi（測試區）
+
+1. 到 https://sandbox.payuni.com.tw 註冊測試帳號、新增商店，在「商店清單 → 串接設定」取得商店代號、Hash Key、Hash IV。
+2. 填進 `.env.local`（`PAYUNI_ENV=sandbox`、`PAYUNI_MER_ID`、`PAYUNI_HASH_KEY`、`PAYUNI_HASH_IV`）。金鑰不要貼到聊天或寫進程式。
+3. `npm run payuni:check`：對測試區查一筆不存在的訂單，確認金鑰正確（不建立交易、不扣款）。
+4. `npm run test:payuni`：加解密與官方 PHP SDK 產生的測試向量逐位元組比對。
+
+程式在 `src/lib/payments/payuni/`；背景通知端點 `POST /api/payments/payuni/notify`。
+狀態碼對應與退款需對照統一金流串接文件後再啟用（程式內標「待文件確認」）。
