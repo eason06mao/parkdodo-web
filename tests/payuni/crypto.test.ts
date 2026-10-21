@@ -124,3 +124,18 @@ test("錯誤代碼分類", () => {
   assert.equal(classifyError("UPP01001").kind, "retry");
   assert.equal(classifyError("CRD00001").kind, "declined");
 });
+
+// ---------- 統一金流開發專區公布的範例（Node.js 範例、PHP 範例頁，2026-10-22 取得） ----------
+// 範例頁的密文在 PDF 中被截斷，因此比對開頭；Node.js 範例另公布完整 SHA256，可證明整串 EncryptInfo 一致。
+const docKeys = { hashKey: "12345678901234567890123456789012", hashIV: "1234567890123456" };
+test("官方 Node.js 範例：EncryptInfo 開頭與 SHA256 完全一致", () => {
+  const e = encrypt({ MerID: "AAA", MerTradeNO: "BBB", Prod: "商品說明" }, docKeys);
+  assert.ok(e.startsWith("47396636346f66735853533167396942344f587a3775696b34732b596e70452b675270564f73536b7753446c6a4d77526d4e3"));
+  assert.equal(hashInfo(e, docKeys), "E97180D78C8378D64A188D292938B9D2717034F292B626019B01DF160AEFC0B7");
+  assert.deepEqual(decrypt(e, docKeys), { MerID: "AAA", MerTradeNO: "BBB", Prod: "商品說明" });
+});
+test("官方 PHP 範例：EncryptInfo 開頭一致，解密為 MerID=AAA&MerTradeNo=BBB", () => {
+  const e = encrypt({ MerID: "AAA", MerTradeNo: "BBB" }, docKeys);
+  assert.ok(e.startsWith("47396636346f66735853533167396942344f587a3775696b34752b596e70452b3a3a3a4373354a5a5143306"));
+  assert.deepEqual(decrypt(e, docKeys), { MerID: "AAA", MerTradeNo: "BBB" });
+});
