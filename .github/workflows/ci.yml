@@ -60,3 +60,40 @@ jobs:
           psql -v ON_ERROR_STOP=1 -f db/tests/0002_tenancy_test.sql | tee t2.log
           grep -q "ALL CONSTRAINT TESTS PASSED" t1.log
           grep -q "ALL TENANCY TESTS PASSED" t2.log
+
+  # main 合併後、兩項檢查都通過才部署測試站。尚未設定 GCP 變數時自動略過。
+  deploy-staging:
+    name: 部署測試站
+    needs: [web, database]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.GCP_PROJECT_ID != ''
+    runs-on: ubuntu-latest
+    concurrency: staging
+    permissions:
+      contents: read
+      id-token: write   # 用 Workload Identity 登入 Google Cloud，不存放任何金鑰檔
+    env:
+      REGION: asia-east1
+      IMAGE: asia-east1-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/parkdodo/web:${{ github.sha }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_DEPLOY_SA }}
+      - uses: google-github-actions/setup-gcloud@v2
+      - name: 建置並上傳映像檔
+        run: |
+          gcloud auth configure-docker asia-east1-docker.pkg.dev --quiet
+          docker build -t "$IMAGE" .
+          docker push "$IMAGE"
+      - name: 部署到 Cloud Run（台灣）
+        run: |
+          gcloud run deploy parkdodo-staging \
+            --image "$IMAGE" --region "$REGION" \
+            --service-account "parkdodo-run@${{ vars.GCP_PROJECT_ID }}.iam.gserviceaccount.com" \
+            --allow-unauthenticated \
+            --min-instances 0 --max-instances 2 --memory 512Mi --cpu 1 \
+            --set-secrets STAGING_BASIC_AUTH=staging-basic-auth:latest \
+            --set-env-vars PAYUNI_ENV=sandbox \
+            --quiet
+          echo "測試站網址：$(gcloud run services describe parkdodo-staging --region "$REGION" --format='value(status.url)')" >> "$GITHUB_STEP_SUMMARY"

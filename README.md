@@ -124,3 +124,10 @@ cd edge/FkProtocol.Tests && dotnet run
 
 程式在 `src/lib/payments/payuni/`；背景通知端點 `POST /api/payments/payuni/notify`。
 狀態碼對應與退款需對照統一金流串接文件後再啟用（程式內標「待文件確認」）。
+
+## 測試站（Google Cloud Run，台灣）
+
+- `main` 合併、GitHub 自動檢查通過後，自動部署到 Cloud Run 服務 `parkdodo-staging`（asia-east1）。
+- 測試站整站有門禁帳密（`STAGING_BASIC_AUTH`，存在 Secret Manager）；只有統一金流背景通知 `/api/payments/payuni/notify` 不需門禁。
+- 沒人使用時自動關機（min-instances 0），第一次打開會慢幾秒。
+- 第一次設定：在 Google Cloud Shell 執行 `bash scripts/gcp-staging-setup.sh <專案ID>`，再把印出的三個值填到 GitHub 的 Actions Variables。不需要也不會產生任何金鑰檔。
