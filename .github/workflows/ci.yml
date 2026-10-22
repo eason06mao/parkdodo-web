@@ -1,0 +1,62 @@
+# 每次推送或開 PR 時自動檢查：型別、Lint、金流加解密測試、資料表約束測試、正式建置
+name: 自動檢查
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  web:
+    name: 程式檢查與建置
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: 型別檢查
+        run: npm run typecheck
+      - name: Lint
+        run: npm run lint
+      - name: 統一金流加解密測試
+        run: npm run test:payuni
+      - name: 正式建置
+        run: npm run build
+
+  database:
+    name: 資料表約束測試
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: parkdodo
+          POSTGRES_PASSWORD: ci_only
+          POSTGRES_DB: pdtest
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U parkdodo -d pdtest"
+          --health-interval 3s --health-timeout 3s --health-retries 20
+    env:
+      PGHOST: localhost
+      PGUSER: parkdodo
+      PGPASSWORD: ci_only
+      PGDATABASE: pdtest
+    steps:
+      - uses: actions/checkout@v4
+      - name: 建立資料表
+        run: |
+          psql -v ON_ERROR_STOP=1 -q -f db/migrations/0001_v2_core.sql
+          psql -v ON_ERROR_STOP=1 -q -f db/migrations/0002_tenancy_licensing.sql
+      - name: 約束測試
+        run: |
+          psql -v ON_ERROR_STOP=1 -f db/tests/0001_constraints_test.sql | tee t1.log
+          psql -v ON_ERROR_STOP=1 -f db/tests/0002_tenancy_test.sql | tee t2.log
+          grep -q "ALL CONSTRAINT TESTS PASSED" t1.log
+          grep -q "ALL TENANCY TESTS PASSED" t2.log
