@@ -27,6 +27,8 @@ jobs:
         run: npm run lint
       - name: 統一金流加解密測試
         run: npm run test:payuni
+      - name: 電子發票格式測試
+        run: npm run test:invoice
       - name: 正式建置
         run: npm run build
 
