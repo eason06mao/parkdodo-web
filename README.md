@@ -38,6 +38,8 @@ NEXT_PUBLIC_FEATURE_CASH_KIOSK=true npm run dev
 | `/console/accounts` | 帳號權限：邀請帳號、角色與範圍、稽核紀錄 |
 | `/pay?site=TXG001` | 車主掃碼繳費：查車牌 → 確認金額 → 選電子發票 → 付款（Mock） |
 | `/console/sites/[id]/rates` | 費率設定：免費短停、計費單位、單價、精度、當日上限、促銷檔期、試算 |
+| `/console/accounts/roles` | 角色管理：系統預設角色（唯讀）、自訂角色清單、已封存角色 |
+| `/console/accounts/roles/new`、`/[code]` | 新增／編輯自訂角色：逐項勾選功能、敏感功能標示、變更差異、封存 |
 | `/console/sessions/manual` | 人工補登入場：找不到入場紀錄時補登，系統算出應付金額 |
 | `/m/gate` | 手機版遠端開閘 |
 | `POST /api/gate-commands` | 遠端開閘 Mock API（只驗證欄位，不控制設備） |
@@ -52,7 +54,10 @@ NEXT_PUBLIC_FEATURE_CASH_KIOSK=true npm run dev
 - 新增站點、配對工控機、開立授權、變更經營組織與收款方式：只限總部。
 - 系統客戶與加盟主：可以改自己站點的名稱與設定、管理自己組織的帳號，但不能給出比自己大的權限。
 - 只負責特定站點的人，只能為那些站點建立帳號。
-- 規則寫在 `src/lib/permissions.ts`（畫面用）與 `db/migrations/0002_tenancy_licensing.sql`（資料庫觸發器＋RLS，真正把關）。
+- 自訂角色：有全組織「建立與修改自訂角色」權限的管理員可以自訂角色、逐項開放功能。只能放自己有的權限；
+  「僅總部」權限不能放進加盟主或系統客戶的角色；平台管理一律不能放進自訂角色。站點範圍在指派帳號時設定。
+  還有人在用的角色不能封存；封存後不能再指派。預覽身分「系統客戶夜班（自訂角色）」可以看效果。
+- 規則寫在 `src/lib/permissions.ts`（畫面用）與 `db/migrations/0002`、`0003`（資料庫觸發器＋RLS，真正把關）。
 
 Mock 版新增的站點與帳號只存在記憶體，重新啟動 `npm run dev` 後會消失。
 
@@ -90,8 +95,8 @@ npm run build       # 正式建置
 ```bash
 cp .env.example .env.local   # Windows：copy .env.example .env.local
 npm run db:up        # 啟動 PostgreSQL 16
-npm run db:migrate   # 只套用還沒跑過的 migration（0001 核心、0002 多租戶與授權）
-npm run db:test      # 用暫時的 pdtest 資料庫跑全部約束測試，應顯示 ALL CONSTRAINT TESTS PASSED 與 ALL TENANCY TESTS PASSED
+npm run db:migrate   # 只套用還沒跑過的 migration（0001 核心、0002 多租戶與授權、0003 自訂角色）
+npm run db:test      # 用暫時的 pdtest 資料庫跑全部約束測試，應顯示 ALL CONSTRAINT TESTS PASSED、ALL TENANCY TESTS PASSED、ALL CUSTOM ROLE TESTS PASSED
 npm run db:reset     # 清空本機資料重來
 ```
 
