@@ -14,7 +14,8 @@
     "db:test": "node scripts/db.mjs test",
     "db:reset": "node scripts/db.mjs reset",
     "test:payuni": "tsx --test tests/payuni/crypto.test.ts",
-    "payuni:check": "tsx scripts/payuni-check.ts"
+    "payuni:check": "tsx scripts/payuni-check.ts",
+    "test:invoice": "tsx --test tests/invoice/invoice.test.ts"
   },
   "engines": {
     "node": ">=20"
