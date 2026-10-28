@@ -1,5 +1,7 @@
 // Mock：組織、站點管理、帳號、稽核紀錄。名稱與 Email 皆為示範用。
 // 新增的站點與帳號只存在記憶體，重新啟動開發伺服器後會消失。
+import type { RateSchedule } from "../billing/fee";
+import { DEFAULT_PLAN } from "../billing/fee";
 import type { Principal } from "../permissions";
 import type { AccountRecord, AuditEntry, Organization, SiteRecord } from "../types";
 
@@ -64,9 +66,16 @@ export const mockPersonas: (Principal & { label: string })[] = [
   { id: "u-lic-staff", name: "示範客戶 A 現場", label: "系統客戶現場人員", isHq: false, bindings: [{ orgId: "org-lic-a", role: "licensee_staff", siteId: "site-002" }] },
 ];
 
+const seed_rateSchedules: Record<string, RateSchedule & { version: number; updatedAt: string; updatedBy: string }> = {
+  "site-001": { base: { ...DEFAULT_PLAN }, promotions: [], version: 1, updatedAt: "2026-10-20T10:00:00+08:00", updatedBy: "示範總部管理員" },
+  "site-002": { base: { ...DEFAULT_PLAN, unitPrice: 20, dailyCap: 150 }, promotions: [], version: 1, updatedAt: "2026-10-20T15:10:00+08:00", updatedBy: "示範總部管理員" },
+};
+
 // 頁面與 API 在開發模式可能各自載入一次這個模組，用 globalThis 讓它們共用同一份記憶體資料
-const store = globalThis as unknown as { __pdTenancy?: { organizations: Organization[]; siteRecords: SiteRecord[]; accounts: AccountRecord[]; auditEntries: AuditEntry[] } };
+const store = globalThis as unknown as { __pdTenancy?: { organizations: Organization[]; siteRecords: SiteRecord[]; accounts: AccountRecord[]; auditEntries: AuditEntry[]; rateSchedules: typeof seed_rateSchedules } };
 store.__pdTenancy ??= {
   organizations: seed_organizations, siteRecords: seed_siteRecords, accounts: seed_accounts, auditEntries: seed_auditEntries,
+  rateSchedules: seed_rateSchedules,
 };
-export const { organizations, siteRecords, accounts, auditEntries } = store.__pdTenancy;
+store.__pdTenancy.rateSchedules ??= seed_rateSchedules;
+export const { organizations, siteRecords, accounts, auditEntries, rateSchedules } = store.__pdTenancy;
