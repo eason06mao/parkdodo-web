@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
-import { quote, validatePlan, type CapWindow, type Precision, type Promotion, type RatePlan, type RateSchedule } from "@/lib/billing/fee";
+import { quote, validatePlan, type CapWindow, type OverstayMode, type Precision, type PromoMode, type Promotion, type RatePlan, type RateSchedule } from "@/lib/billing/fee";
 
 const toLocalInput = (iso: string) => {
   const d = new Date(iso);
@@ -106,6 +106,36 @@ export function RatesEditor({ siteId, initial, canEdit }: { siteId: string; init
               <span className="pd-label">{plan.dailyCap === null ? "未設定：不封頂" : "跨日的計費單位歸屬於它開始的那一天，不會多收"}</span></div>
           </fieldset>
           {planError && <p role="alert" style={{ margin: "12px 0 0", color: "var(--pd-danger)" }}>{planError}</p>}
+        </section>
+
+        <section className="pd-card" aria-labelledby="adv-h">
+          <h2 id="adv-h" className="pd-serif" style={{ margin: "0 0 14px", fontSize: 18 }}>進階規則</h2>
+          <fieldset disabled={!canEdit} style={{ border: 0, padding: 0, margin: 0, display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 18 }}>
+            <fieldset style={{ border: 0, padding: 0, margin: 0 }}>
+              <legend style={{ fontWeight: 500, marginBottom: 8 }}>跨促銷檔期怎麼計價</legend>
+              {([
+                ["entry_time", "整趟用入場時的費率（預設）", "入場時在檔期內，整趟都是促銷價；入場時不在檔期內，整趟原價"],
+                ["segmented", "依時段分段計價", "每個計費單位用它開始時的單價，檔期內的時段才用促銷價"],
+              ] as [PromoMode, string, string][]).map(([v, t, d]) => (
+                <label key={v} style={{ display: "flex", gap: 10, alignItems: "flex-start", minHeight: 44, marginBottom: 6 }}>
+                  <input type="radio" name="promoMode" checked={plan.promoMode === v} onChange={() => set("promoMode", v)} style={{ marginTop: 4 }} />
+                  <span><span style={{ display: "block" }}>{t}</span><span className="pd-label">{d}</span></span>
+                </label>
+              ))}
+            </fieldset>
+            <fieldset style={{ border: 0, padding: 0, margin: 0 }}>
+              <legend style={{ fontWeight: 500, marginBottom: 8 }}>付款後超時離場怎麼補收</legend>
+              {([
+                ["recalc_from_entry", "從入場重算、補收差額（預設）", "例：已付 30 元、實際停 101 分（4 單位 120 元）→ 補 90 元"],
+                ["from_grace_end", "從寬限期結束起另計", "寬限期結束後的時間另算，不再給免費時間"],
+              ] as [OverstayMode, string, string][]).map(([v, t, d]) => (
+                <label key={v} style={{ display: "flex", gap: 10, alignItems: "flex-start", minHeight: 44, marginBottom: 6 }}>
+                  <input type="radio" name="overstayMode" checked={plan.overstayMode === v} onChange={() => set("overstayMode", v)} style={{ marginTop: 4 }} />
+                  <span><span style={{ display: "block" }}>{t}</span><span className="pd-label">{d}</span></span>
+                </label>
+              ))}
+            </fieldset>
+          </fieldset>
         </section>
 
         <section className="pd-card" aria-labelledby="promo-h">

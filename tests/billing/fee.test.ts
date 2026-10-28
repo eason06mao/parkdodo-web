@@ -96,3 +96,33 @@ test("費率參數檢查", () => {
   assert.match(validatePlan({ ...P, dailyCap: 10 }) ?? "", /上限/);
   assert.match(validatePlan({ ...P, unitMinutes: 0 }) ?? "", /計費單位/);
 });
+
+test("跨檔期計價（分段）：每個單位用它開始時的單價", () => {
+  const promo = { id: "p", name: "早鳥", startsAt: "2026-11-01T09:00:00+08:00", endsAt: "2026-11-01T10:30:00+08:00", overrides: { unitPrice: 10 } };
+  const entry = "2026-11-01T10:00:00+08:00", exit = "2026-11-01T11:00:00+08:00"; // 10:00、10:30 兩個單位
+  const byEntry: RateSchedule = { base: P, promotions: [promo] };
+  const seg: RateSchedule = { base: { ...P, promoMode: "segmented" }, promotions: [promo] };
+  assert.equal(quote(byEntry, entry, exit).amount, 20);  // 預設：入場在檔期內 → 兩個單位都 10 元
+  assert.equal(quote(seg, entry, exit).amount, 40);      // 分段：10:00 單位 10 元、10:30 單位 30 元
+  const lateEntry = "2026-11-01T08:40:00+08:00";        // 入場在檔期前，09:10、09:40 落在檔期內
+  assert.equal(quote(byEntry, lateEntry, "2026-11-01T10:10:00+08:00").amount, 90); // 3 單位 × 30
+  assert.equal(quote(seg, lateEntry, "2026-11-01T10:10:00+08:00").amount, 50);     // 30 + 10 + 10
+});
+
+test("超時離場（從寬限期結束起算）：不再給免費時間", () => {
+  const sch: RateSchedule = { base: { ...P, overstayMode: "from_grace_end" }, promotions: [] };
+  const s = { entryAt: T0, paidAt: m(25), paidAmount: 30 };   // 寬限到 40 分
+  assert.deepEqual(exitCheck(sch, s, m(40)), { allow: true });
+  const r = exitCheck(sch, s, m(42));                          // 超過 2 分 → 1 單位
+  assert.equal(r.allow === false && r.extra, 30);
+  const r2 = exitCheck(sch, s, m(40 + 61));                    // 超過 61 分 → 3 單位
+  assert.equal(r2.allow === false && r2.extra, 90);
+  const def: RateSchedule = { base: P, promotions: [] };       // 對照預設：停 101 分 → 4 單位 120 − 30
+  const r3 = exitCheck(def, s, m(101));
+  assert.equal(r3.allow === false && r3.extra, 90);
+});
+
+test("新設定的參數檢查", () => {
+  assert.match(validatePlan({ ...P, promoMode: "x" as never }) ?? "", /跨檔期/);
+  assert.match(validatePlan({ ...P, overstayMode: "x" as never }) ?? "", /超時/);
+});
