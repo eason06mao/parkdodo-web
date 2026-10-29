@@ -44,6 +44,7 @@ export default async function SitePage({ params }: { params: Promise<{ id: strin
           </h1>
         </div>
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+          <Link href={`/console/sites/${site.id}/rates`} className="pd-btn">費率設定</Link>
           {canEdit && <button type="button" className="pd-btn">編輯基本資料</button>}
           {isHqAdmin && <button type="button" className="pd-btn">變更營運狀態</button>}
         </div>

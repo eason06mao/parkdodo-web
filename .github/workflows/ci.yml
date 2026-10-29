@@ -29,6 +29,8 @@ jobs:
         run: npm run test:payuni
       - name: 電子發票格式測試
         run: npm run test:invoice
+      - name: 計費規則測試
+        run: npm run test:billing
       - name: 正式建置
         run: npm run build
 

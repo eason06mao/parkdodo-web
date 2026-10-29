@@ -37,6 +37,8 @@ NEXT_PUBLIC_FEATURE_CASH_KIOSK=true npm run dev
 | `/console/sites/[id]` | 站點設定：基本資料、經營與收款、軟體授權、工控機配對、車道與設備 |
 | `/console/accounts` | 帳號權限：邀請帳號、角色與範圍、稽核紀錄 |
 | `/pay?site=TXG001` | 車主掃碼繳費：查車牌 → 確認金額 → 選電子發票 → 付款（Mock） |
+| `/console/sites/[id]/rates` | 費率設定：免費短停、計費單位、單價、精度、當日上限、促銷檔期、試算 |
+| `/console/sessions/manual` | 人工補登入場：找不到入場紀錄時補登，系統算出應付金額 |
 | `/m/gate` | 手機版遠端開閘 |
 | `POST /api/gate-commands` | 遠端開閘 Mock API（只驗證欄位，不控制設備） |
 | `POST /api/sites` | 新增站點 Mock API（非總部回 403） |

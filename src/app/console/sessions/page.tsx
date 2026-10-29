@@ -21,7 +21,7 @@ export default async function SessionsPage() {
         </div>
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
           <button type="button" className="pd-btn">匯出 Excel</button>
-          <button type="button" className="pd-btn pd-btn--primary">補登入場紀錄</button>
+          <Link href="/console/sessions/manual" className="pd-btn pd-btn--primary">補登入場紀錄</Link>
         </div>
       </header>
 
