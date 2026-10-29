@@ -62,6 +62,7 @@ jobs:
           psql -v ON_ERROR_STOP=1 -q -f db/migrations/0001_v2_core.sql
           psql -v ON_ERROR_STOP=1 -q -f db/migrations/0002_tenancy_licensing.sql
           psql -v ON_ERROR_STOP=1 -q -f db/migrations/0003_custom_roles.sql
+          psql -v ON_ERROR_STOP=1 -q -f db/migrations/0004_edge_link.sql
       - name: 約束測試
         run: |
           psql -v ON_ERROR_STOP=1 -f db/tests/0001_constraints_test.sql | tee t1.log
@@ -70,6 +71,18 @@ jobs:
           grep -q "ALL CONSTRAINT TESTS PASSED" t1.log
           grep -q "ALL TENANCY TESTS PASSED" t2.log
           grep -q "ALL CUSTOM ROLE TESTS PASSED" t3.log
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: 工控機連線測試（配對、入出場、斷網補傳、遠端開閘）
+        env:
+          DATABASE_URL: postgres://parkdodo:ci_only@localhost:5432/pdedge
+        run: |
+          createdb pdedge
+          node scripts/migrate.mjs --seed
+          npm run test:edge
 
   # main 合併後、兩項檢查都通過才部署測試站。尚未設定 GCP 變數時自動略過。
   deploy-staging:
@@ -91,6 +104,16 @@ jobs:
           workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
           service_account: ${{ vars.GCP_DEPLOY_SA }}
       - uses: google-github-actions/setup-gcloud@v2
+      # 雲端資料庫：執行過 scripts/gcp-cloudsql-setup.sh、並在 GitHub Variables 設 CLOUDSQL_INSTANCE 後才啟用
+      - name: 更新雲端資料表（Cloud SQL）
+        if: vars.CLOUDSQL_INSTANCE != ''
+        run: |
+          curl -sSLo cloud-sql-proxy https://storage.googleapis.com/cloud-sql-connectors/cloud-sql-proxy/v2.14.1/cloud-sql-proxy.linux.amd64
+          chmod +x cloud-sql-proxy
+          ./cloud-sql-proxy --port 5432 "${{ vars.CLOUDSQL_INSTANCE }}" &
+          for i in $(seq 1 30); do (echo > /dev/tcp/127.0.0.1/5432) 2>/dev/null && break; sleep 1; done
+          npm ci --omit=dev --ignore-scripts
+          DATABASE_URL="$(gcloud secrets versions access latest --secret staging-database-migrate-url)" node scripts/migrate.mjs --seed
       - name: 建置並上傳映像檔
         run: |
           gcloud auth configure-docker asia-east1-docker.pkg.dev --quiet
@@ -103,7 +126,8 @@ jobs:
             --service-account "parkdodo-run@${{ vars.GCP_PROJECT_ID }}.iam.gserviceaccount.com" \
             --allow-unauthenticated \
             --min-instances 0 --max-instances 2 --memory 512Mi --cpu 1 \
-            --set-secrets STAGING_BASIC_AUTH=staging-basic-auth:latest \
-            --set-env-vars PAYUNI_ENV=sandbox \
+            --set-secrets "STAGING_BASIC_AUTH=staging-basic-auth:latest${{ vars.CLOUDSQL_INSTANCE != '' && ',DATABASE_URL=staging-database-url:latest' || '' }}" \
+            ${{ vars.CLOUDSQL_INSTANCE != '' && format('--add-cloudsql-instances {0}', vars.CLOUDSQL_INSTANCE) || '' }} \
+            --set-env-vars "PAYUNI_ENV=sandbox${{ vars.EDGE_IMAGE_BUCKET != '' && format(',EDGE_IMAGE_BUCKET={0}', vars.EDGE_IMAGE_BUCKET) || '' }}" \
             --quiet
           echo "測試站網址：$(gcloud run services describe parkdodo-staging --region "$REGION" --format='value(status.url)')" >> "$GITHUB_STEP_SUMMARY"

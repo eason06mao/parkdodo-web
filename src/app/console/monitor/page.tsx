@@ -44,7 +44,7 @@ export default async function MonitorPage() {
             </dl>
             <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, flexWrap: "wrap" }}>
               <button type="button" className="pd-btn">對講</button>
-              <RemoteOpenButton laneName={l.name} plate={l.lastPlate} />
+              <RemoteOpenButton siteId={l.siteId} laneCode={l.code} laneName={l.name} plate={l.lastPlate} />
             </div>
           </article>
         ))}

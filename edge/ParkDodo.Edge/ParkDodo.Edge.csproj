@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- ParkDodo Edge：場站工控機程式。只用 .NET 8 內建函式庫（不需要 NuGet 套件）。
+       Windows 正式版由 GitHub Actions 以 win-x64 自包含單一檔案發布（見 .github/workflows/edge.yml）。 -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AssemblyName>ParkDodo.Edge</AssemblyName>
+    <RootNamespace>ParkDodo.Edge</RootNamespace>
+    <Version>0.1.0</Version>
+    <InvariantGlobalization>false</InvariantGlobalization>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../FkProtocol/FkPacket.cs" Link="Display/FkPacket.cs" />
+    <None Include="settings.example.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="install-service.ps1" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="uninstall-service.ps1" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="README.md" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

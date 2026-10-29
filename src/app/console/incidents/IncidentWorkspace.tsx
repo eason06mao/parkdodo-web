@@ -117,7 +117,7 @@ export function IncidentWorkspace({ incidents, initialId }: { incidents: Inciden
             <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, flexWrap: "wrap", borderTop: "1px solid var(--pd-line-soft)", paddingTop: 16 }}>
               <button type="button" className="pd-btn">對講車主</button>
               {cur.plate && <button type="button" className="pd-btn">修正車牌並重新配對</button>}
-              <RemoteOpenButton laneName={cur.where.split("・")[1] ?? cur.where} plate={cur.plate} />
+              {cur.laneId && <RemoteOpenButton siteId="site-001" laneCode={cur.laneId.replace(/^lane-/, "").toUpperCase()} laneName={cur.where.split("・")[1] ?? cur.where} plate={cur.plate} />}
               <button type="button" className="pd-btn">結案</button>
             </div>
           </section>

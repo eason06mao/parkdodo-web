@@ -1,0 +1,5309 @@
+{
+ "generatedBy": "scripts/gen-fee-vectors.ts",
+ "schedules": [
+  {
+   "base": {
+    "freeMinutes": 10,
+    "unitMinutes": 30,
+    "unitPrice": 30,
+    "precision": "minute",
+    "dailyCap": null,
+    "capWindow": "calendar_day",
+    "exitGraceMinutes": 15,
+    "promoMode": "entry_time",
+    "overstayMode": "recalc_from_entry"
+   },
+   "promotions": []
+  },
+  {
+   "base": {
+    "freeMinutes": 10,
+    "unitMinutes": 30,
+    "unitPrice": 30,
+    "precision": "second",
+    "dailyCap": null,
+    "capWindow": "calendar_day",
+    "exitGraceMinutes": 15,
+    "promoMode": "entry_time",
+    "overstayMode": "recalc_from_entry"
+   },
+   "promotions": []
+  },
+  {
+   "base": {
+    "freeMinutes": 10,
+    "unitMinutes": 30,
+    "unitPrice": 20,
+    "precision": "minute",
+    "dailyCap": 150,
+    "capWindow": "calendar_day",
+    "exitGraceMinutes": 15,
+    "promoMode": "entry_time",
+    "overstayMode": "recalc_from_entry"
+   },
+   "promotions": []
+  },
+  {
+   "base": {
+    "freeMinutes": 10,
+    "unitMinutes": 30,
+    "unitPrice": 40,
+    "precision": "minute",
+    "dailyCap": 200,
+    "capWindow": "rolling_24h",
+    "exitGraceMinutes": 15,
+    "promoMode": "entry_time",
+    "overstayMode": "recalc_from_entry"
+   },
+   "promotions": []
+  },
+  {
+   "base": {
+    "freeMinutes": 0,
+    "unitMinutes": 60,
+    "unitPrice": 50,
+    "precision": "minute",
+    "dailyCap": null,
+    "capWindow": "calendar_day",
+    "exitGraceMinutes": 15,
+    "promoMode": "entry_time",
+    "overstayMode": "recalc_from_entry"
+   },
+   "promotions": []
+  },
+  {
+   "base": {
+    "freeMinutes": 10,
+    "unitMinutes": 30,
+    "unitPrice": 30,
+    "precision": "minute",
+    "dailyCap": null,
+    "capWindow": "calendar_day",
+    "exitGraceMinutes": 15,
+    "promoMode": "entry_time",
+    "overstayMode": "from_grace_end"
+   },
+   "promotions": []
+  },
+  {
+   "base": {
+    "freeMinutes": 10,
+    "unitMinutes": 30,
+    "unitPrice": 30,
+    "precision": "minute",
+    "dailyCap": null,
+    "capWindow": "calendar_day",
+    "exitGraceMinutes": 15,
+    "promoMode": "segmented",
+    "overstayMode": "recalc_from_entry"
+   },
+   "promotions": []
+  },
+  {
+   "base": {
+    "freeMinutes": 10,
+    "unitMinutes": 30,
+    "unitPrice": 30,
+    "precision": "minute",
+    "dailyCap": null,
+    "capWindow": "calendar_day",
+    "exitGraceMinutes": 15,
+    "promoMode": "entry_time",
+    "overstayMode": "recalc_from_entry"
+   },
+   "promotions": [
+    {
+     "id": "p1",
+     "name": "週末優惠",
+     "startsAt": "2026-11-07T00:00:00+08:00",
+     "endsAt": "2026-11-09T00:00:00+08:00",
+     "overrides": {
+      "unitPrice": 10,
+      "dailyCap": null
+     }
+    }
+   ]
+  },
+  {
+   "base": {
+    "freeMinutes": 10,
+    "unitMinutes": 30,
+    "unitPrice": 30,
+    "precision": "minute",
+    "dailyCap": null,
+    "capWindow": "calendar_day",
+    "exitGraceMinutes": 15,
+    "promoMode": "segmented",
+    "overstayMode": "recalc_from_entry"
+   },
+   "promotions": [
+    {
+     "id": "p1",
+     "name": "週末優惠",
+     "startsAt": "2026-11-07T00:00:00+08:00",
+     "endsAt": "2026-11-09T00:00:00+08:00",
+     "overrides": {
+      "unitPrice": 10,
+      "dailyCap": null
+     }
+    }
+   ]
+  },
+  {
+   "base": {
+    "freeMinutes": 10,
+    "unitMinutes": 30,
+    "unitPrice": 20,
+    "precision": "minute",
+    "dailyCap": 150,
+    "capWindow": "calendar_day",
+    "exitGraceMinutes": 15,
+    "promoMode": "entry_time",
+    "overstayMode": "recalc_from_entry"
+   },
+   "promotions": [
+    {
+     "id": "p1",
+     "name": "週末優惠",
+     "startsAt": "2026-11-07T00:00:00+08:00",
+     "endsAt": "2026-11-09T00:00:00+08:00",
+     "overrides": {
+      "freeMinutes": 30
+     }
+    }
+   ]
+  }
+ ],
+ "vectors": [
+  {
+   "kind": "quote",
+   "schedule": 0,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T14:47:13.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 0,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T14:48:12.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 0,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T14:57:13.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 0,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T14:58:12.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 0,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T14:58:13.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 0,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T14:58:14.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 0,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T15:17:12.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 0,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T15:17:13.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 0,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T15:17:14.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 0,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T15:47:13.000Z",
+   "amount": 60
+  },
+  {
+   "kind": "quote",
+   "schedule": 0,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T15:48:14.000Z",
+   "amount": 90
+  },
+  {
+   "kind": "quote",
+   "schedule": 0,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T16:17:13.000Z",
+   "amount": 90
+  },
+  {
+   "kind": "quote",
+   "schedule": 0,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T16:48:14.000Z",
+   "amount": 150
+  },
+  {
+   "kind": "quote",
+   "schedule": 0,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-07T00:47:13.000Z",
+   "amount": 600
+  },
+  {
+   "kind": "quote",
+   "schedule": 0,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-07T14:47:12.000Z",
+   "amount": 1440
+  },
+  {
+   "kind": "quote",
+   "schedule": 0,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-07T14:47:13.000Z",
+   "amount": 1440
+  },
+  {
+   "kind": "quote",
+   "schedule": 0,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-07T15:48:14.000Z",
+   "amount": 1530
+  },
+  {
+   "kind": "quote",
+   "schedule": 0,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-08T16:47:13.000Z",
+   "amount": 3000
+  },
+  {
+   "kind": "quote",
+   "schedule": 0,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:00:00.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 0,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:00:59.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 0,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:10:00.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 0,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:10:59.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 0,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:11:00.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 0,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:11:01.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 0,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:29:59.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 0,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:30:00.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 0,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:30:01.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 0,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T03:00:00.000Z",
+   "amount": 60
+  },
+  {
+   "kind": "quote",
+   "schedule": 0,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T03:01:01.000Z",
+   "amount": 90
+  },
+  {
+   "kind": "quote",
+   "schedule": 0,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T03:30:00.000Z",
+   "amount": 90
+  },
+  {
+   "kind": "quote",
+   "schedule": 0,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T04:01:01.000Z",
+   "amount": 150
+  },
+  {
+   "kind": "quote",
+   "schedule": 0,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T12:00:00.000Z",
+   "amount": 600
+  },
+  {
+   "kind": "quote",
+   "schedule": 0,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-08T01:59:59.000Z",
+   "amount": 1440
+  },
+  {
+   "kind": "quote",
+   "schedule": 0,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-08T02:00:00.000Z",
+   "amount": 1440
+  },
+  {
+   "kind": "quote",
+   "schedule": 0,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-08T03:01:01.000Z",
+   "amount": 1530
+  },
+  {
+   "kind": "quote",
+   "schedule": 0,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-09T04:00:00.000Z",
+   "amount": 3000
+  },
+  {
+   "kind": "quote",
+   "schedule": 0,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T15:30:30.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 0,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T15:31:29.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 0,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T15:40:30.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 0,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T15:41:29.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 0,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T15:41:30.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 0,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T15:41:31.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 0,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T16:00:29.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 0,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T16:00:30.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 0,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T16:00:31.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 0,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T16:30:30.000Z",
+   "amount": 60
+  },
+  {
+   "kind": "quote",
+   "schedule": 0,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T16:31:31.000Z",
+   "amount": 90
+  },
+  {
+   "kind": "quote",
+   "schedule": 0,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T17:00:30.000Z",
+   "amount": 90
+  },
+  {
+   "kind": "quote",
+   "schedule": 0,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T17:31:31.000Z",
+   "amount": 150
+  },
+  {
+   "kind": "quote",
+   "schedule": 0,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-09T01:30:30.000Z",
+   "amount": 600
+  },
+  {
+   "kind": "quote",
+   "schedule": 0,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-09T15:30:29.000Z",
+   "amount": 1440
+  },
+  {
+   "kind": "quote",
+   "schedule": 0,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-09T15:30:30.000Z",
+   "amount": 1440
+  },
+  {
+   "kind": "quote",
+   "schedule": 0,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-09T16:31:31.000Z",
+   "amount": 1530
+  },
+  {
+   "kind": "quote",
+   "schedule": 0,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-10T17:30:30.000Z",
+   "amount": 3000
+  },
+  {
+   "kind": "exit",
+   "schedule": 0,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "paidAt": "2026-11-06T15:47:13.000Z",
+   "paidAmount": 60,
+   "exit": "2026-11-06T15:57:13.000Z",
+   "extra": null
+  },
+  {
+   "kind": "exit",
+   "schedule": 0,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "paidAt": "2026-11-06T15:47:13.000Z",
+   "paidAmount": 60,
+   "exit": "2026-11-06T16:02:13.000Z",
+   "extra": null
+  },
+  {
+   "kind": "exit",
+   "schedule": 0,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "paidAt": "2026-11-06T15:47:13.000Z",
+   "paidAmount": 60,
+   "exit": "2026-11-06T16:02:14.000Z",
+   "extra": 30
+  },
+  {
+   "kind": "exit",
+   "schedule": 0,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "paidAt": "2026-11-06T15:47:13.000Z",
+   "paidAmount": 60,
+   "exit": "2026-11-06T16:32:13.000Z",
+   "extra": 60
+  },
+  {
+   "kind": "exit",
+   "schedule": 0,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "paidAt": "2026-11-06T16:43:53.000Z",
+   "paidAmount": 120,
+   "exit": "2026-11-06T18:07:13.000Z",
+   "extra": 90
+  },
+  {
+   "kind": "exit",
+   "schedule": 0,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "paidAt": "2026-11-07T03:00:00.000Z",
+   "paidAmount": 60,
+   "exit": "2026-11-07T03:10:00.000Z",
+   "extra": null
+  },
+  {
+   "kind": "exit",
+   "schedule": 0,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "paidAt": "2026-11-07T03:00:00.000Z",
+   "paidAmount": 60,
+   "exit": "2026-11-07T03:15:00.000Z",
+   "extra": null
+  },
+  {
+   "kind": "exit",
+   "schedule": 0,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "paidAt": "2026-11-07T03:00:00.000Z",
+   "paidAmount": 60,
+   "exit": "2026-11-07T03:15:01.000Z",
+   "extra": 30
+  },
+  {
+   "kind": "exit",
+   "schedule": 0,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "paidAt": "2026-11-07T03:00:00.000Z",
+   "paidAmount": 60,
+   "exit": "2026-11-07T03:45:00.000Z",
+   "extra": 60
+  },
+  {
+   "kind": "exit",
+   "schedule": 0,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "paidAt": "2026-11-07T03:56:40.000Z",
+   "paidAmount": 120,
+   "exit": "2026-11-07T05:20:00.000Z",
+   "extra": 90
+  },
+  {
+   "kind": "exit",
+   "schedule": 0,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "paidAt": "2026-11-08T16:30:30.000Z",
+   "paidAmount": 60,
+   "exit": "2026-11-08T16:40:30.000Z",
+   "extra": null
+  },
+  {
+   "kind": "exit",
+   "schedule": 0,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "paidAt": "2026-11-08T16:30:30.000Z",
+   "paidAmount": 60,
+   "exit": "2026-11-08T16:45:30.000Z",
+   "extra": null
+  },
+  {
+   "kind": "exit",
+   "schedule": 0,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "paidAt": "2026-11-08T16:30:30.000Z",
+   "paidAmount": 60,
+   "exit": "2026-11-08T16:45:31.000Z",
+   "extra": 30
+  },
+  {
+   "kind": "exit",
+   "schedule": 0,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "paidAt": "2026-11-08T16:30:30.000Z",
+   "paidAmount": 60,
+   "exit": "2026-11-08T17:15:30.000Z",
+   "extra": 60
+  },
+  {
+   "kind": "exit",
+   "schedule": 0,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "paidAt": "2026-11-08T17:27:10.000Z",
+   "paidAmount": 120,
+   "exit": "2026-11-08T18:50:30.000Z",
+   "extra": 90
+  },
+  {
+   "kind": "quote",
+   "schedule": 1,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T14:47:13.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 1,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T14:48:12.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 1,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T14:57:13.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 1,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T14:58:12.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 1,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T14:58:13.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 1,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T14:58:14.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 1,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T15:17:12.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 1,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T15:17:13.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 1,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T15:17:14.000Z",
+   "amount": 60
+  },
+  {
+   "kind": "quote",
+   "schedule": 1,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T15:47:13.000Z",
+   "amount": 60
+  },
+  {
+   "kind": "quote",
+   "schedule": 1,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T15:48:14.000Z",
+   "amount": 90
+  },
+  {
+   "kind": "quote",
+   "schedule": 1,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T16:17:13.000Z",
+   "amount": 90
+  },
+  {
+   "kind": "quote",
+   "schedule": 1,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T16:48:14.000Z",
+   "amount": 150
+  },
+  {
+   "kind": "quote",
+   "schedule": 1,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-07T00:47:13.000Z",
+   "amount": 600
+  },
+  {
+   "kind": "quote",
+   "schedule": 1,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-07T14:47:12.000Z",
+   "amount": 1440
+  },
+  {
+   "kind": "quote",
+   "schedule": 1,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-07T14:47:13.000Z",
+   "amount": 1440
+  },
+  {
+   "kind": "quote",
+   "schedule": 1,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-07T15:48:14.000Z",
+   "amount": 1530
+  },
+  {
+   "kind": "quote",
+   "schedule": 1,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-08T16:47:13.000Z",
+   "amount": 3000
+  },
+  {
+   "kind": "quote",
+   "schedule": 1,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:00:00.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 1,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:00:59.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 1,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:10:00.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 1,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:10:59.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 1,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:11:00.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 1,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:11:01.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 1,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:29:59.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 1,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:30:00.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 1,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:30:01.000Z",
+   "amount": 60
+  },
+  {
+   "kind": "quote",
+   "schedule": 1,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T03:00:00.000Z",
+   "amount": 60
+  },
+  {
+   "kind": "quote",
+   "schedule": 1,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T03:01:01.000Z",
+   "amount": 90
+  },
+  {
+   "kind": "quote",
+   "schedule": 1,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T03:30:00.000Z",
+   "amount": 90
+  },
+  {
+   "kind": "quote",
+   "schedule": 1,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T04:01:01.000Z",
+   "amount": 150
+  },
+  {
+   "kind": "quote",
+   "schedule": 1,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T12:00:00.000Z",
+   "amount": 600
+  },
+  {
+   "kind": "quote",
+   "schedule": 1,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-08T01:59:59.000Z",
+   "amount": 1440
+  },
+  {
+   "kind": "quote",
+   "schedule": 1,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-08T02:00:00.000Z",
+   "amount": 1440
+  },
+  {
+   "kind": "quote",
+   "schedule": 1,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-08T03:01:01.000Z",
+   "amount": 1530
+  },
+  {
+   "kind": "quote",
+   "schedule": 1,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-09T04:00:00.000Z",
+   "amount": 3000
+  },
+  {
+   "kind": "quote",
+   "schedule": 1,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T15:30:30.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 1,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T15:31:29.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 1,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T15:40:30.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 1,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T15:41:29.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 1,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T15:41:30.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 1,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T15:41:31.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 1,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T16:00:29.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 1,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T16:00:30.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 1,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T16:00:31.000Z",
+   "amount": 60
+  },
+  {
+   "kind": "quote",
+   "schedule": 1,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T16:30:30.000Z",
+   "amount": 60
+  },
+  {
+   "kind": "quote",
+   "schedule": 1,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T16:31:31.000Z",
+   "amount": 90
+  },
+  {
+   "kind": "quote",
+   "schedule": 1,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T17:00:30.000Z",
+   "amount": 90
+  },
+  {
+   "kind": "quote",
+   "schedule": 1,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T17:31:31.000Z",
+   "amount": 150
+  },
+  {
+   "kind": "quote",
+   "schedule": 1,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-09T01:30:30.000Z",
+   "amount": 600
+  },
+  {
+   "kind": "quote",
+   "schedule": 1,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-09T15:30:29.000Z",
+   "amount": 1440
+  },
+  {
+   "kind": "quote",
+   "schedule": 1,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-09T15:30:30.000Z",
+   "amount": 1440
+  },
+  {
+   "kind": "quote",
+   "schedule": 1,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-09T16:31:31.000Z",
+   "amount": 1530
+  },
+  {
+   "kind": "quote",
+   "schedule": 1,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-10T17:30:30.000Z",
+   "amount": 3000
+  },
+  {
+   "kind": "exit",
+   "schedule": 1,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "paidAt": "2026-11-06T15:47:13.000Z",
+   "paidAmount": 60,
+   "exit": "2026-11-06T15:57:13.000Z",
+   "extra": null
+  },
+  {
+   "kind": "exit",
+   "schedule": 1,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "paidAt": "2026-11-06T15:47:13.000Z",
+   "paidAmount": 60,
+   "exit": "2026-11-06T16:02:13.000Z",
+   "extra": null
+  },
+  {
+   "kind": "exit",
+   "schedule": 1,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "paidAt": "2026-11-06T15:47:13.000Z",
+   "paidAmount": 60,
+   "exit": "2026-11-06T16:02:14.000Z",
+   "extra": 30
+  },
+  {
+   "kind": "exit",
+   "schedule": 1,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "paidAt": "2026-11-06T15:47:13.000Z",
+   "paidAmount": 60,
+   "exit": "2026-11-06T16:32:13.000Z",
+   "extra": 60
+  },
+  {
+   "kind": "exit",
+   "schedule": 1,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "paidAt": "2026-11-06T16:43:53.000Z",
+   "paidAmount": 120,
+   "exit": "2026-11-06T18:07:13.000Z",
+   "extra": 90
+  },
+  {
+   "kind": "exit",
+   "schedule": 1,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "paidAt": "2026-11-07T03:00:00.000Z",
+   "paidAmount": 60,
+   "exit": "2026-11-07T03:10:00.000Z",
+   "extra": null
+  },
+  {
+   "kind": "exit",
+   "schedule": 1,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "paidAt": "2026-11-07T03:00:00.000Z",
+   "paidAmount": 60,
+   "exit": "2026-11-07T03:15:00.000Z",
+   "extra": null
+  },
+  {
+   "kind": "exit",
+   "schedule": 1,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "paidAt": "2026-11-07T03:00:00.000Z",
+   "paidAmount": 60,
+   "exit": "2026-11-07T03:15:01.000Z",
+   "extra": 30
+  },
+  {
+   "kind": "exit",
+   "schedule": 1,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "paidAt": "2026-11-07T03:00:00.000Z",
+   "paidAmount": 60,
+   "exit": "2026-11-07T03:45:00.000Z",
+   "extra": 60
+  },
+  {
+   "kind": "exit",
+   "schedule": 1,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "paidAt": "2026-11-07T03:56:40.000Z",
+   "paidAmount": 120,
+   "exit": "2026-11-07T05:20:00.000Z",
+   "extra": 90
+  },
+  {
+   "kind": "exit",
+   "schedule": 1,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "paidAt": "2026-11-08T16:30:30.000Z",
+   "paidAmount": 60,
+   "exit": "2026-11-08T16:40:30.000Z",
+   "extra": null
+  },
+  {
+   "kind": "exit",
+   "schedule": 1,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "paidAt": "2026-11-08T16:30:30.000Z",
+   "paidAmount": 60,
+   "exit": "2026-11-08T16:45:30.000Z",
+   "extra": null
+  },
+  {
+   "kind": "exit",
+   "schedule": 1,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "paidAt": "2026-11-08T16:30:30.000Z",
+   "paidAmount": 60,
+   "exit": "2026-11-08T16:45:31.000Z",
+   "extra": 30
+  },
+  {
+   "kind": "exit",
+   "schedule": 1,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "paidAt": "2026-11-08T16:30:30.000Z",
+   "paidAmount": 60,
+   "exit": "2026-11-08T17:15:30.000Z",
+   "extra": 60
+  },
+  {
+   "kind": "exit",
+   "schedule": 1,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "paidAt": "2026-11-08T17:27:10.000Z",
+   "paidAmount": 120,
+   "exit": "2026-11-08T18:50:30.000Z",
+   "extra": 90
+  },
+  {
+   "kind": "quote",
+   "schedule": 2,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T14:47:13.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 2,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T14:48:12.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 2,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T14:57:13.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 2,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T14:58:12.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 2,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T14:58:13.000Z",
+   "amount": 20
+  },
+  {
+   "kind": "quote",
+   "schedule": 2,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T14:58:14.000Z",
+   "amount": 20
+  },
+  {
+   "kind": "quote",
+   "schedule": 2,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T15:17:12.000Z",
+   "amount": 20
+  },
+  {
+   "kind": "quote",
+   "schedule": 2,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T15:17:13.000Z",
+   "amount": 20
+  },
+  {
+   "kind": "quote",
+   "schedule": 2,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T15:17:14.000Z",
+   "amount": 20
+  },
+  {
+   "kind": "quote",
+   "schedule": 2,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T15:47:13.000Z",
+   "amount": 40
+  },
+  {
+   "kind": "quote",
+   "schedule": 2,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T15:48:14.000Z",
+   "amount": 60
+  },
+  {
+   "kind": "quote",
+   "schedule": 2,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T16:17:13.000Z",
+   "amount": 60
+  },
+  {
+   "kind": "quote",
+   "schedule": 2,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T16:48:14.000Z",
+   "amount": 100
+  },
+  {
+   "kind": "quote",
+   "schedule": 2,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-07T00:47:13.000Z",
+   "amount": 210
+  },
+  {
+   "kind": "quote",
+   "schedule": 2,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-07T14:47:12.000Z",
+   "amount": 210
+  },
+  {
+   "kind": "quote",
+   "schedule": 2,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-07T14:47:13.000Z",
+   "amount": 210
+  },
+  {
+   "kind": "quote",
+   "schedule": 2,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-07T15:48:14.000Z",
+   "amount": 210
+  },
+  {
+   "kind": "quote",
+   "schedule": 2,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-08T16:47:13.000Z",
+   "amount": 380
+  },
+  {
+   "kind": "quote",
+   "schedule": 2,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:00:00.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 2,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:00:59.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 2,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:10:00.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 2,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:10:59.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 2,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:11:00.000Z",
+   "amount": 20
+  },
+  {
+   "kind": "quote",
+   "schedule": 2,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:11:01.000Z",
+   "amount": 20
+  },
+  {
+   "kind": "quote",
+   "schedule": 2,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:29:59.000Z",
+   "amount": 20
+  },
+  {
+   "kind": "quote",
+   "schedule": 2,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:30:00.000Z",
+   "amount": 20
+  },
+  {
+   "kind": "quote",
+   "schedule": 2,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:30:01.000Z",
+   "amount": 20
+  },
+  {
+   "kind": "quote",
+   "schedule": 2,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T03:00:00.000Z",
+   "amount": 40
+  },
+  {
+   "kind": "quote",
+   "schedule": 2,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T03:01:01.000Z",
+   "amount": 60
+  },
+  {
+   "kind": "quote",
+   "schedule": 2,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T03:30:00.000Z",
+   "amount": 60
+  },
+  {
+   "kind": "quote",
+   "schedule": 2,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T04:01:01.000Z",
+   "amount": 100
+  },
+  {
+   "kind": "quote",
+   "schedule": 2,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T12:00:00.000Z",
+   "amount": 150
+  },
+  {
+   "kind": "quote",
+   "schedule": 2,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-08T01:59:59.000Z",
+   "amount": 300
+  },
+  {
+   "kind": "quote",
+   "schedule": 2,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-08T02:00:00.000Z",
+   "amount": 300
+  },
+  {
+   "kind": "quote",
+   "schedule": 2,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-08T03:01:01.000Z",
+   "amount": 300
+  },
+  {
+   "kind": "quote",
+   "schedule": 2,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-09T04:00:00.000Z",
+   "amount": 450
+  },
+  {
+   "kind": "quote",
+   "schedule": 2,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T15:30:30.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 2,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T15:31:29.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 2,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T15:40:30.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 2,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T15:41:29.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 2,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T15:41:30.000Z",
+   "amount": 20
+  },
+  {
+   "kind": "quote",
+   "schedule": 2,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T15:41:31.000Z",
+   "amount": 20
+  },
+  {
+   "kind": "quote",
+   "schedule": 2,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T16:00:29.000Z",
+   "amount": 20
+  },
+  {
+   "kind": "quote",
+   "schedule": 2,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T16:00:30.000Z",
+   "amount": 20
+  },
+  {
+   "kind": "quote",
+   "schedule": 2,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T16:00:31.000Z",
+   "amount": 20
+  },
+  {
+   "kind": "quote",
+   "schedule": 2,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T16:30:30.000Z",
+   "amount": 40
+  },
+  {
+   "kind": "quote",
+   "schedule": 2,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T16:31:31.000Z",
+   "amount": 60
+  },
+  {
+   "kind": "quote",
+   "schedule": 2,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T17:00:30.000Z",
+   "amount": 60
+  },
+  {
+   "kind": "quote",
+   "schedule": 2,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T17:31:31.000Z",
+   "amount": 100
+  },
+  {
+   "kind": "quote",
+   "schedule": 2,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-09T01:30:30.000Z",
+   "amount": 170
+  },
+  {
+   "kind": "quote",
+   "schedule": 2,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-09T15:30:29.000Z",
+   "amount": 170
+  },
+  {
+   "kind": "quote",
+   "schedule": 2,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-09T15:30:30.000Z",
+   "amount": 170
+  },
+  {
+   "kind": "quote",
+   "schedule": 2,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-09T16:31:31.000Z",
+   "amount": 210
+  },
+  {
+   "kind": "quote",
+   "schedule": 2,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-10T17:30:30.000Z",
+   "amount": 380
+  },
+  {
+   "kind": "exit",
+   "schedule": 2,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "paidAt": "2026-11-06T15:47:13.000Z",
+   "paidAmount": 40,
+   "exit": "2026-11-06T15:57:13.000Z",
+   "extra": null
+  },
+  {
+   "kind": "exit",
+   "schedule": 2,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "paidAt": "2026-11-06T15:47:13.000Z",
+   "paidAmount": 40,
+   "exit": "2026-11-06T16:02:13.000Z",
+   "extra": null
+  },
+  {
+   "kind": "exit",
+   "schedule": 2,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "paidAt": "2026-11-06T15:47:13.000Z",
+   "paidAmount": 40,
+   "exit": "2026-11-06T16:02:14.000Z",
+   "extra": 20
+  },
+  {
+   "kind": "exit",
+   "schedule": 2,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "paidAt": "2026-11-06T15:47:13.000Z",
+   "paidAmount": 40,
+   "exit": "2026-11-06T16:32:13.000Z",
+   "extra": 40
+  },
+  {
+   "kind": "exit",
+   "schedule": 2,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "paidAt": "2026-11-06T16:43:53.000Z",
+   "paidAmount": 80,
+   "exit": "2026-11-06T18:07:13.000Z",
+   "extra": 60
+  },
+  {
+   "kind": "exit",
+   "schedule": 2,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "paidAt": "2026-11-07T03:00:00.000Z",
+   "paidAmount": 40,
+   "exit": "2026-11-07T03:10:00.000Z",
+   "extra": null
+  },
+  {
+   "kind": "exit",
+   "schedule": 2,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "paidAt": "2026-11-07T03:00:00.000Z",
+   "paidAmount": 40,
+   "exit": "2026-11-07T03:15:00.000Z",
+   "extra": null
+  },
+  {
+   "kind": "exit",
+   "schedule": 2,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "paidAt": "2026-11-07T03:00:00.000Z",
+   "paidAmount": 40,
+   "exit": "2026-11-07T03:15:01.000Z",
+   "extra": 20
+  },
+  {
+   "kind": "exit",
+   "schedule": 2,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "paidAt": "2026-11-07T03:00:00.000Z",
+   "paidAmount": 40,
+   "exit": "2026-11-07T03:45:00.000Z",
+   "extra": 40
+  },
+  {
+   "kind": "exit",
+   "schedule": 2,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "paidAt": "2026-11-07T03:56:40.000Z",
+   "paidAmount": 80,
+   "exit": "2026-11-07T05:20:00.000Z",
+   "extra": 60
+  },
+  {
+   "kind": "exit",
+   "schedule": 2,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "paidAt": "2026-11-08T16:30:30.000Z",
+   "paidAmount": 40,
+   "exit": "2026-11-08T16:40:30.000Z",
+   "extra": null
+  },
+  {
+   "kind": "exit",
+   "schedule": 2,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "paidAt": "2026-11-08T16:30:30.000Z",
+   "paidAmount": 40,
+   "exit": "2026-11-08T16:45:30.000Z",
+   "extra": null
+  },
+  {
+   "kind": "exit",
+   "schedule": 2,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "paidAt": "2026-11-08T16:30:30.000Z",
+   "paidAmount": 40,
+   "exit": "2026-11-08T16:45:31.000Z",
+   "extra": 20
+  },
+  {
+   "kind": "exit",
+   "schedule": 2,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "paidAt": "2026-11-08T16:30:30.000Z",
+   "paidAmount": 40,
+   "exit": "2026-11-08T17:15:30.000Z",
+   "extra": 40
+  },
+  {
+   "kind": "exit",
+   "schedule": 2,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "paidAt": "2026-11-08T17:27:10.000Z",
+   "paidAmount": 80,
+   "exit": "2026-11-08T18:50:30.000Z",
+   "extra": 60
+  },
+  {
+   "kind": "quote",
+   "schedule": 3,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T14:47:13.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 3,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T14:48:12.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 3,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T14:57:13.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 3,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T14:58:12.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 3,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T14:58:13.000Z",
+   "amount": 40
+  },
+  {
+   "kind": "quote",
+   "schedule": 3,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T14:58:14.000Z",
+   "amount": 40
+  },
+  {
+   "kind": "quote",
+   "schedule": 3,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T15:17:12.000Z",
+   "amount": 40
+  },
+  {
+   "kind": "quote",
+   "schedule": 3,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T15:17:13.000Z",
+   "amount": 40
+  },
+  {
+   "kind": "quote",
+   "schedule": 3,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T15:17:14.000Z",
+   "amount": 40
+  },
+  {
+   "kind": "quote",
+   "schedule": 3,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T15:47:13.000Z",
+   "amount": 80
+  },
+  {
+   "kind": "quote",
+   "schedule": 3,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T15:48:14.000Z",
+   "amount": 120
+  },
+  {
+   "kind": "quote",
+   "schedule": 3,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T16:17:13.000Z",
+   "amount": 120
+  },
+  {
+   "kind": "quote",
+   "schedule": 3,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T16:48:14.000Z",
+   "amount": 200
+  },
+  {
+   "kind": "quote",
+   "schedule": 3,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-07T00:47:13.000Z",
+   "amount": 200
+  },
+  {
+   "kind": "quote",
+   "schedule": 3,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-07T14:47:12.000Z",
+   "amount": 200
+  },
+  {
+   "kind": "quote",
+   "schedule": 3,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-07T14:47:13.000Z",
+   "amount": 200
+  },
+  {
+   "kind": "quote",
+   "schedule": 3,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-07T15:48:14.000Z",
+   "amount": 320
+  },
+  {
+   "kind": "quote",
+   "schedule": 3,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-08T16:47:13.000Z",
+   "amount": 560
+  },
+  {
+   "kind": "quote",
+   "schedule": 3,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:00:00.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 3,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:00:59.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 3,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:10:00.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 3,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:10:59.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 3,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:11:00.000Z",
+   "amount": 40
+  },
+  {
+   "kind": "quote",
+   "schedule": 3,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:11:01.000Z",
+   "amount": 40
+  },
+  {
+   "kind": "quote",
+   "schedule": 3,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:29:59.000Z",
+   "amount": 40
+  },
+  {
+   "kind": "quote",
+   "schedule": 3,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:30:00.000Z",
+   "amount": 40
+  },
+  {
+   "kind": "quote",
+   "schedule": 3,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:30:01.000Z",
+   "amount": 40
+  },
+  {
+   "kind": "quote",
+   "schedule": 3,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T03:00:00.000Z",
+   "amount": 80
+  },
+  {
+   "kind": "quote",
+   "schedule": 3,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T03:01:01.000Z",
+   "amount": 120
+  },
+  {
+   "kind": "quote",
+   "schedule": 3,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T03:30:00.000Z",
+   "amount": 120
+  },
+  {
+   "kind": "quote",
+   "schedule": 3,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T04:01:01.000Z",
+   "amount": 200
+  },
+  {
+   "kind": "quote",
+   "schedule": 3,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T12:00:00.000Z",
+   "amount": 200
+  },
+  {
+   "kind": "quote",
+   "schedule": 3,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-08T01:59:59.000Z",
+   "amount": 200
+  },
+  {
+   "kind": "quote",
+   "schedule": 3,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-08T02:00:00.000Z",
+   "amount": 200
+  },
+  {
+   "kind": "quote",
+   "schedule": 3,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-08T03:01:01.000Z",
+   "amount": 320
+  },
+  {
+   "kind": "quote",
+   "schedule": 3,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-09T04:00:00.000Z",
+   "amount": 560
+  },
+  {
+   "kind": "quote",
+   "schedule": 3,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T15:30:30.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 3,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T15:31:29.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 3,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T15:40:30.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 3,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T15:41:29.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 3,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T15:41:30.000Z",
+   "amount": 40
+  },
+  {
+   "kind": "quote",
+   "schedule": 3,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T15:41:31.000Z",
+   "amount": 40
+  },
+  {
+   "kind": "quote",
+   "schedule": 3,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T16:00:29.000Z",
+   "amount": 40
+  },
+  {
+   "kind": "quote",
+   "schedule": 3,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T16:00:30.000Z",
+   "amount": 40
+  },
+  {
+   "kind": "quote",
+   "schedule": 3,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T16:00:31.000Z",
+   "amount": 40
+  },
+  {
+   "kind": "quote",
+   "schedule": 3,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T16:30:30.000Z",
+   "amount": 80
+  },
+  {
+   "kind": "quote",
+   "schedule": 3,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T16:31:31.000Z",
+   "amount": 120
+  },
+  {
+   "kind": "quote",
+   "schedule": 3,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T17:00:30.000Z",
+   "amount": 120
+  },
+  {
+   "kind": "quote",
+   "schedule": 3,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T17:31:31.000Z",
+   "amount": 200
+  },
+  {
+   "kind": "quote",
+   "schedule": 3,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-09T01:30:30.000Z",
+   "amount": 200
+  },
+  {
+   "kind": "quote",
+   "schedule": 3,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-09T15:30:29.000Z",
+   "amount": 200
+  },
+  {
+   "kind": "quote",
+   "schedule": 3,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-09T15:30:30.000Z",
+   "amount": 200
+  },
+  {
+   "kind": "quote",
+   "schedule": 3,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-09T16:31:31.000Z",
+   "amount": 320
+  },
+  {
+   "kind": "quote",
+   "schedule": 3,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-10T17:30:30.000Z",
+   "amount": 560
+  },
+  {
+   "kind": "exit",
+   "schedule": 3,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "paidAt": "2026-11-06T15:47:13.000Z",
+   "paidAmount": 80,
+   "exit": "2026-11-06T15:57:13.000Z",
+   "extra": null
+  },
+  {
+   "kind": "exit",
+   "schedule": 3,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "paidAt": "2026-11-06T15:47:13.000Z",
+   "paidAmount": 80,
+   "exit": "2026-11-06T16:02:13.000Z",
+   "extra": null
+  },
+  {
+   "kind": "exit",
+   "schedule": 3,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "paidAt": "2026-11-06T15:47:13.000Z",
+   "paidAmount": 80,
+   "exit": "2026-11-06T16:02:14.000Z",
+   "extra": 40
+  },
+  {
+   "kind": "exit",
+   "schedule": 3,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "paidAt": "2026-11-06T15:47:13.000Z",
+   "paidAmount": 80,
+   "exit": "2026-11-06T16:32:13.000Z",
+   "extra": 80
+  },
+  {
+   "kind": "exit",
+   "schedule": 3,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "paidAt": "2026-11-06T16:43:53.000Z",
+   "paidAmount": 160,
+   "exit": "2026-11-06T18:07:13.000Z",
+   "extra": 40
+  },
+  {
+   "kind": "exit",
+   "schedule": 3,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "paidAt": "2026-11-07T03:00:00.000Z",
+   "paidAmount": 80,
+   "exit": "2026-11-07T03:10:00.000Z",
+   "extra": null
+  },
+  {
+   "kind": "exit",
+   "schedule": 3,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "paidAt": "2026-11-07T03:00:00.000Z",
+   "paidAmount": 80,
+   "exit": "2026-11-07T03:15:00.000Z",
+   "extra": null
+  },
+  {
+   "kind": "exit",
+   "schedule": 3,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "paidAt": "2026-11-07T03:00:00.000Z",
+   "paidAmount": 80,
+   "exit": "2026-11-07T03:15:01.000Z",
+   "extra": 40
+  },
+  {
+   "kind": "exit",
+   "schedule": 3,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "paidAt": "2026-11-07T03:00:00.000Z",
+   "paidAmount": 80,
+   "exit": "2026-11-07T03:45:00.000Z",
+   "extra": 80
+  },
+  {
+   "kind": "exit",
+   "schedule": 3,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "paidAt": "2026-11-07T03:56:40.000Z",
+   "paidAmount": 160,
+   "exit": "2026-11-07T05:20:00.000Z",
+   "extra": 40
+  },
+  {
+   "kind": "exit",
+   "schedule": 3,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "paidAt": "2026-11-08T16:30:30.000Z",
+   "paidAmount": 80,
+   "exit": "2026-11-08T16:40:30.000Z",
+   "extra": null
+  },
+  {
+   "kind": "exit",
+   "schedule": 3,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "paidAt": "2026-11-08T16:30:30.000Z",
+   "paidAmount": 80,
+   "exit": "2026-11-08T16:45:30.000Z",
+   "extra": null
+  },
+  {
+   "kind": "exit",
+   "schedule": 3,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "paidAt": "2026-11-08T16:30:30.000Z",
+   "paidAmount": 80,
+   "exit": "2026-11-08T16:45:31.000Z",
+   "extra": 40
+  },
+  {
+   "kind": "exit",
+   "schedule": 3,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "paidAt": "2026-11-08T16:30:30.000Z",
+   "paidAmount": 80,
+   "exit": "2026-11-08T17:15:30.000Z",
+   "extra": 80
+  },
+  {
+   "kind": "exit",
+   "schedule": 3,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "paidAt": "2026-11-08T17:27:10.000Z",
+   "paidAmount": 160,
+   "exit": "2026-11-08T18:50:30.000Z",
+   "extra": 40
+  },
+  {
+   "kind": "quote",
+   "schedule": 4,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T14:47:13.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 4,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T14:48:12.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 4,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T14:57:13.000Z",
+   "amount": 50
+  },
+  {
+   "kind": "quote",
+   "schedule": 4,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T14:58:12.000Z",
+   "amount": 50
+  },
+  {
+   "kind": "quote",
+   "schedule": 4,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T14:58:13.000Z",
+   "amount": 50
+  },
+  {
+   "kind": "quote",
+   "schedule": 4,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T14:58:14.000Z",
+   "amount": 50
+  },
+  {
+   "kind": "quote",
+   "schedule": 4,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T15:17:12.000Z",
+   "amount": 50
+  },
+  {
+   "kind": "quote",
+   "schedule": 4,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T15:17:13.000Z",
+   "amount": 50
+  },
+  {
+   "kind": "quote",
+   "schedule": 4,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T15:17:14.000Z",
+   "amount": 50
+  },
+  {
+   "kind": "quote",
+   "schedule": 4,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T15:47:13.000Z",
+   "amount": 50
+  },
+  {
+   "kind": "quote",
+   "schedule": 4,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T15:48:14.000Z",
+   "amount": 100
+  },
+  {
+   "kind": "quote",
+   "schedule": 4,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T16:17:13.000Z",
+   "amount": 100
+  },
+  {
+   "kind": "quote",
+   "schedule": 4,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T16:48:14.000Z",
+   "amount": 150
+  },
+  {
+   "kind": "quote",
+   "schedule": 4,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-07T00:47:13.000Z",
+   "amount": 500
+  },
+  {
+   "kind": "quote",
+   "schedule": 4,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-07T14:47:12.000Z",
+   "amount": 1200
+  },
+  {
+   "kind": "quote",
+   "schedule": 4,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-07T14:47:13.000Z",
+   "amount": 1200
+  },
+  {
+   "kind": "quote",
+   "schedule": 4,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-07T15:48:14.000Z",
+   "amount": 1300
+  },
+  {
+   "kind": "quote",
+   "schedule": 4,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-08T16:47:13.000Z",
+   "amount": 2500
+  },
+  {
+   "kind": "quote",
+   "schedule": 4,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:00:00.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 4,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:00:59.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 4,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:10:00.000Z",
+   "amount": 50
+  },
+  {
+   "kind": "quote",
+   "schedule": 4,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:10:59.000Z",
+   "amount": 50
+  },
+  {
+   "kind": "quote",
+   "schedule": 4,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:11:00.000Z",
+   "amount": 50
+  },
+  {
+   "kind": "quote",
+   "schedule": 4,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:11:01.000Z",
+   "amount": 50
+  },
+  {
+   "kind": "quote",
+   "schedule": 4,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:29:59.000Z",
+   "amount": 50
+  },
+  {
+   "kind": "quote",
+   "schedule": 4,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:30:00.000Z",
+   "amount": 50
+  },
+  {
+   "kind": "quote",
+   "schedule": 4,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:30:01.000Z",
+   "amount": 50
+  },
+  {
+   "kind": "quote",
+   "schedule": 4,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T03:00:00.000Z",
+   "amount": 50
+  },
+  {
+   "kind": "quote",
+   "schedule": 4,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T03:01:01.000Z",
+   "amount": 100
+  },
+  {
+   "kind": "quote",
+   "schedule": 4,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T03:30:00.000Z",
+   "amount": 100
+  },
+  {
+   "kind": "quote",
+   "schedule": 4,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T04:01:01.000Z",
+   "amount": 150
+  },
+  {
+   "kind": "quote",
+   "schedule": 4,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T12:00:00.000Z",
+   "amount": 500
+  },
+  {
+   "kind": "quote",
+   "schedule": 4,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-08T01:59:59.000Z",
+   "amount": 1200
+  },
+  {
+   "kind": "quote",
+   "schedule": 4,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-08T02:00:00.000Z",
+   "amount": 1200
+  },
+  {
+   "kind": "quote",
+   "schedule": 4,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-08T03:01:01.000Z",
+   "amount": 1300
+  },
+  {
+   "kind": "quote",
+   "schedule": 4,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-09T04:00:00.000Z",
+   "amount": 2500
+  },
+  {
+   "kind": "quote",
+   "schedule": 4,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T15:30:30.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 4,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T15:31:29.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 4,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T15:40:30.000Z",
+   "amount": 50
+  },
+  {
+   "kind": "quote",
+   "schedule": 4,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T15:41:29.000Z",
+   "amount": 50
+  },
+  {
+   "kind": "quote",
+   "schedule": 4,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T15:41:30.000Z",
+   "amount": 50
+  },
+  {
+   "kind": "quote",
+   "schedule": 4,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T15:41:31.000Z",
+   "amount": 50
+  },
+  {
+   "kind": "quote",
+   "schedule": 4,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T16:00:29.000Z",
+   "amount": 50
+  },
+  {
+   "kind": "quote",
+   "schedule": 4,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T16:00:30.000Z",
+   "amount": 50
+  },
+  {
+   "kind": "quote",
+   "schedule": 4,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T16:00:31.000Z",
+   "amount": 50
+  },
+  {
+   "kind": "quote",
+   "schedule": 4,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T16:30:30.000Z",
+   "amount": 50
+  },
+  {
+   "kind": "quote",
+   "schedule": 4,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T16:31:31.000Z",
+   "amount": 100
+  },
+  {
+   "kind": "quote",
+   "schedule": 4,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T17:00:30.000Z",
+   "amount": 100
+  },
+  {
+   "kind": "quote",
+   "schedule": 4,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T17:31:31.000Z",
+   "amount": 150
+  },
+  {
+   "kind": "quote",
+   "schedule": 4,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-09T01:30:30.000Z",
+   "amount": 500
+  },
+  {
+   "kind": "quote",
+   "schedule": 4,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-09T15:30:29.000Z",
+   "amount": 1200
+  },
+  {
+   "kind": "quote",
+   "schedule": 4,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-09T15:30:30.000Z",
+   "amount": 1200
+  },
+  {
+   "kind": "quote",
+   "schedule": 4,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-09T16:31:31.000Z",
+   "amount": 1300
+  },
+  {
+   "kind": "quote",
+   "schedule": 4,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-10T17:30:30.000Z",
+   "amount": 2500
+  },
+  {
+   "kind": "exit",
+   "schedule": 4,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "paidAt": "2026-11-06T15:47:13.000Z",
+   "paidAmount": 50,
+   "exit": "2026-11-06T15:57:13.000Z",
+   "extra": null
+  },
+  {
+   "kind": "exit",
+   "schedule": 4,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "paidAt": "2026-11-06T15:47:13.000Z",
+   "paidAmount": 50,
+   "exit": "2026-11-06T16:02:13.000Z",
+   "extra": null
+  },
+  {
+   "kind": "exit",
+   "schedule": 4,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "paidAt": "2026-11-06T15:47:13.000Z",
+   "paidAmount": 50,
+   "exit": "2026-11-06T16:02:14.000Z",
+   "extra": 50
+  },
+  {
+   "kind": "exit",
+   "schedule": 4,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "paidAt": "2026-11-06T15:47:13.000Z",
+   "paidAmount": 50,
+   "exit": "2026-11-06T16:32:13.000Z",
+   "extra": 50
+  },
+  {
+   "kind": "exit",
+   "schedule": 4,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "paidAt": "2026-11-06T16:43:53.000Z",
+   "paidAmount": 100,
+   "exit": "2026-11-06T18:07:13.000Z",
+   "extra": 100
+  },
+  {
+   "kind": "exit",
+   "schedule": 4,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "paidAt": "2026-11-07T03:00:00.000Z",
+   "paidAmount": 50,
+   "exit": "2026-11-07T03:10:00.000Z",
+   "extra": null
+  },
+  {
+   "kind": "exit",
+   "schedule": 4,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "paidAt": "2026-11-07T03:00:00.000Z",
+   "paidAmount": 50,
+   "exit": "2026-11-07T03:15:00.000Z",
+   "extra": null
+  },
+  {
+   "kind": "exit",
+   "schedule": 4,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "paidAt": "2026-11-07T03:00:00.000Z",
+   "paidAmount": 50,
+   "exit": "2026-11-07T03:15:01.000Z",
+   "extra": 50
+  },
+  {
+   "kind": "exit",
+   "schedule": 4,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "paidAt": "2026-11-07T03:00:00.000Z",
+   "paidAmount": 50,
+   "exit": "2026-11-07T03:45:00.000Z",
+   "extra": 50
+  },
+  {
+   "kind": "exit",
+   "schedule": 4,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "paidAt": "2026-11-07T03:56:40.000Z",
+   "paidAmount": 100,
+   "exit": "2026-11-07T05:20:00.000Z",
+   "extra": 100
+  },
+  {
+   "kind": "exit",
+   "schedule": 4,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "paidAt": "2026-11-08T16:30:30.000Z",
+   "paidAmount": 50,
+   "exit": "2026-11-08T16:40:30.000Z",
+   "extra": null
+  },
+  {
+   "kind": "exit",
+   "schedule": 4,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "paidAt": "2026-11-08T16:30:30.000Z",
+   "paidAmount": 50,
+   "exit": "2026-11-08T16:45:30.000Z",
+   "extra": null
+  },
+  {
+   "kind": "exit",
+   "schedule": 4,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "paidAt": "2026-11-08T16:30:30.000Z",
+   "paidAmount": 50,
+   "exit": "2026-11-08T16:45:31.000Z",
+   "extra": 50
+  },
+  {
+   "kind": "exit",
+   "schedule": 4,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "paidAt": "2026-11-08T16:30:30.000Z",
+   "paidAmount": 50,
+   "exit": "2026-11-08T17:15:30.000Z",
+   "extra": 50
+  },
+  {
+   "kind": "exit",
+   "schedule": 4,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "paidAt": "2026-11-08T17:27:10.000Z",
+   "paidAmount": 100,
+   "exit": "2026-11-08T18:50:30.000Z",
+   "extra": 100
+  },
+  {
+   "kind": "quote",
+   "schedule": 5,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T14:47:13.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 5,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T14:48:12.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 5,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T14:57:13.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 5,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T14:58:12.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 5,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T14:58:13.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 5,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T14:58:14.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 5,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T15:17:12.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 5,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T15:17:13.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 5,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T15:17:14.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 5,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T15:47:13.000Z",
+   "amount": 60
+  },
+  {
+   "kind": "quote",
+   "schedule": 5,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T15:48:14.000Z",
+   "amount": 90
+  },
+  {
+   "kind": "quote",
+   "schedule": 5,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T16:17:13.000Z",
+   "amount": 90
+  },
+  {
+   "kind": "quote",
+   "schedule": 5,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T16:48:14.000Z",
+   "amount": 150
+  },
+  {
+   "kind": "quote",
+   "schedule": 5,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-07T00:47:13.000Z",
+   "amount": 600
+  },
+  {
+   "kind": "quote",
+   "schedule": 5,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-07T14:47:12.000Z",
+   "amount": 1440
+  },
+  {
+   "kind": "quote",
+   "schedule": 5,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-07T14:47:13.000Z",
+   "amount": 1440
+  },
+  {
+   "kind": "quote",
+   "schedule": 5,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-07T15:48:14.000Z",
+   "amount": 1530
+  },
+  {
+   "kind": "quote",
+   "schedule": 5,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-08T16:47:13.000Z",
+   "amount": 3000
+  },
+  {
+   "kind": "quote",
+   "schedule": 5,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:00:00.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 5,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:00:59.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 5,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:10:00.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 5,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:10:59.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 5,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:11:00.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 5,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:11:01.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 5,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:29:59.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 5,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:30:00.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 5,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:30:01.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 5,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T03:00:00.000Z",
+   "amount": 60
+  },
+  {
+   "kind": "quote",
+   "schedule": 5,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T03:01:01.000Z",
+   "amount": 90
+  },
+  {
+   "kind": "quote",
+   "schedule": 5,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T03:30:00.000Z",
+   "amount": 90
+  },
+  {
+   "kind": "quote",
+   "schedule": 5,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T04:01:01.000Z",
+   "amount": 150
+  },
+  {
+   "kind": "quote",
+   "schedule": 5,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T12:00:00.000Z",
+   "amount": 600
+  },
+  {
+   "kind": "quote",
+   "schedule": 5,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-08T01:59:59.000Z",
+   "amount": 1440
+  },
+  {
+   "kind": "quote",
+   "schedule": 5,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-08T02:00:00.000Z",
+   "amount": 1440
+  },
+  {
+   "kind": "quote",
+   "schedule": 5,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-08T03:01:01.000Z",
+   "amount": 1530
+  },
+  {
+   "kind": "quote",
+   "schedule": 5,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-09T04:00:00.000Z",
+   "amount": 3000
+  },
+  {
+   "kind": "quote",
+   "schedule": 5,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T15:30:30.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 5,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T15:31:29.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 5,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T15:40:30.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 5,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T15:41:29.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 5,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T15:41:30.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 5,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T15:41:31.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 5,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T16:00:29.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 5,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T16:00:30.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 5,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T16:00:31.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 5,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T16:30:30.000Z",
+   "amount": 60
+  },
+  {
+   "kind": "quote",
+   "schedule": 5,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T16:31:31.000Z",
+   "amount": 90
+  },
+  {
+   "kind": "quote",
+   "schedule": 5,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T17:00:30.000Z",
+   "amount": 90
+  },
+  {
+   "kind": "quote",
+   "schedule": 5,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T17:31:31.000Z",
+   "amount": 150
+  },
+  {
+   "kind": "quote",
+   "schedule": 5,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-09T01:30:30.000Z",
+   "amount": 600
+  },
+  {
+   "kind": "quote",
+   "schedule": 5,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-09T15:30:29.000Z",
+   "amount": 1440
+  },
+  {
+   "kind": "quote",
+   "schedule": 5,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-09T15:30:30.000Z",
+   "amount": 1440
+  },
+  {
+   "kind": "quote",
+   "schedule": 5,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-09T16:31:31.000Z",
+   "amount": 1530
+  },
+  {
+   "kind": "quote",
+   "schedule": 5,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-10T17:30:30.000Z",
+   "amount": 3000
+  },
+  {
+   "kind": "exit",
+   "schedule": 5,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "paidAt": "2026-11-06T15:47:13.000Z",
+   "paidAmount": 60,
+   "exit": "2026-11-06T15:57:13.000Z",
+   "extra": null
+  },
+  {
+   "kind": "exit",
+   "schedule": 5,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "paidAt": "2026-11-06T15:47:13.000Z",
+   "paidAmount": 60,
+   "exit": "2026-11-06T16:02:13.000Z",
+   "extra": null
+  },
+  {
+   "kind": "exit",
+   "schedule": 5,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "paidAt": "2026-11-06T15:47:13.000Z",
+   "paidAmount": 60,
+   "exit": "2026-11-06T16:02:14.000Z",
+   "extra": null
+  },
+  {
+   "kind": "exit",
+   "schedule": 5,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "paidAt": "2026-11-06T15:47:13.000Z",
+   "paidAmount": 60,
+   "exit": "2026-11-06T16:32:13.000Z",
+   "extra": 30
+  },
+  {
+   "kind": "exit",
+   "schedule": 5,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "paidAt": "2026-11-06T16:43:53.000Z",
+   "paidAmount": 120,
+   "exit": "2026-11-06T18:07:13.000Z",
+   "extra": 90
+  },
+  {
+   "kind": "exit",
+   "schedule": 5,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "paidAt": "2026-11-07T03:00:00.000Z",
+   "paidAmount": 60,
+   "exit": "2026-11-07T03:10:00.000Z",
+   "extra": null
+  },
+  {
+   "kind": "exit",
+   "schedule": 5,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "paidAt": "2026-11-07T03:00:00.000Z",
+   "paidAmount": 60,
+   "exit": "2026-11-07T03:15:00.000Z",
+   "extra": null
+  },
+  {
+   "kind": "exit",
+   "schedule": 5,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "paidAt": "2026-11-07T03:00:00.000Z",
+   "paidAmount": 60,
+   "exit": "2026-11-07T03:15:01.000Z",
+   "extra": null
+  },
+  {
+   "kind": "exit",
+   "schedule": 5,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "paidAt": "2026-11-07T03:00:00.000Z",
+   "paidAmount": 60,
+   "exit": "2026-11-07T03:45:00.000Z",
+   "extra": 30
+  },
+  {
+   "kind": "exit",
+   "schedule": 5,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "paidAt": "2026-11-07T03:56:40.000Z",
+   "paidAmount": 120,
+   "exit": "2026-11-07T05:20:00.000Z",
+   "extra": 90
+  },
+  {
+   "kind": "exit",
+   "schedule": 5,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "paidAt": "2026-11-08T16:30:30.000Z",
+   "paidAmount": 60,
+   "exit": "2026-11-08T16:40:30.000Z",
+   "extra": null
+  },
+  {
+   "kind": "exit",
+   "schedule": 5,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "paidAt": "2026-11-08T16:30:30.000Z",
+   "paidAmount": 60,
+   "exit": "2026-11-08T16:45:30.000Z",
+   "extra": null
+  },
+  {
+   "kind": "exit",
+   "schedule": 5,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "paidAt": "2026-11-08T16:30:30.000Z",
+   "paidAmount": 60,
+   "exit": "2026-11-08T16:45:31.000Z",
+   "extra": null
+  },
+  {
+   "kind": "exit",
+   "schedule": 5,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "paidAt": "2026-11-08T16:30:30.000Z",
+   "paidAmount": 60,
+   "exit": "2026-11-08T17:15:30.000Z",
+   "extra": 30
+  },
+  {
+   "kind": "exit",
+   "schedule": 5,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "paidAt": "2026-11-08T17:27:10.000Z",
+   "paidAmount": 120,
+   "exit": "2026-11-08T18:50:30.000Z",
+   "extra": 90
+  },
+  {
+   "kind": "quote",
+   "schedule": 6,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T14:47:13.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 6,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T14:48:12.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 6,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T14:57:13.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 6,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T14:58:12.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 6,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T14:58:13.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 6,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T14:58:14.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 6,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T15:17:12.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 6,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T15:17:13.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 6,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T15:17:14.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 6,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T15:47:13.000Z",
+   "amount": 60
+  },
+  {
+   "kind": "quote",
+   "schedule": 6,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T15:48:14.000Z",
+   "amount": 90
+  },
+  {
+   "kind": "quote",
+   "schedule": 6,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T16:17:13.000Z",
+   "amount": 90
+  },
+  {
+   "kind": "quote",
+   "schedule": 6,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T16:48:14.000Z",
+   "amount": 150
+  },
+  {
+   "kind": "quote",
+   "schedule": 6,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-07T00:47:13.000Z",
+   "amount": 600
+  },
+  {
+   "kind": "quote",
+   "schedule": 6,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-07T14:47:12.000Z",
+   "amount": 1440
+  },
+  {
+   "kind": "quote",
+   "schedule": 6,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-07T14:47:13.000Z",
+   "amount": 1440
+  },
+  {
+   "kind": "quote",
+   "schedule": 6,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-07T15:48:14.000Z",
+   "amount": 1530
+  },
+  {
+   "kind": "quote",
+   "schedule": 6,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-08T16:47:13.000Z",
+   "amount": 3000
+  },
+  {
+   "kind": "quote",
+   "schedule": 6,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:00:00.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 6,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:00:59.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 6,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:10:00.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 6,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:10:59.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 6,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:11:00.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 6,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:11:01.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 6,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:29:59.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 6,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:30:00.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 6,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:30:01.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 6,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T03:00:00.000Z",
+   "amount": 60
+  },
+  {
+   "kind": "quote",
+   "schedule": 6,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T03:01:01.000Z",
+   "amount": 90
+  },
+  {
+   "kind": "quote",
+   "schedule": 6,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T03:30:00.000Z",
+   "amount": 90
+  },
+  {
+   "kind": "quote",
+   "schedule": 6,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T04:01:01.000Z",
+   "amount": 150
+  },
+  {
+   "kind": "quote",
+   "schedule": 6,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T12:00:00.000Z",
+   "amount": 600
+  },
+  {
+   "kind": "quote",
+   "schedule": 6,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-08T01:59:59.000Z",
+   "amount": 1440
+  },
+  {
+   "kind": "quote",
+   "schedule": 6,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-08T02:00:00.000Z",
+   "amount": 1440
+  },
+  {
+   "kind": "quote",
+   "schedule": 6,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-08T03:01:01.000Z",
+   "amount": 1530
+  },
+  {
+   "kind": "quote",
+   "schedule": 6,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-09T04:00:00.000Z",
+   "amount": 3000
+  },
+  {
+   "kind": "quote",
+   "schedule": 6,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T15:30:30.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 6,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T15:31:29.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 6,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T15:40:30.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 6,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T15:41:29.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 6,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T15:41:30.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 6,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T15:41:31.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 6,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T16:00:29.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 6,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T16:00:30.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 6,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T16:00:31.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 6,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T16:30:30.000Z",
+   "amount": 60
+  },
+  {
+   "kind": "quote",
+   "schedule": 6,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T16:31:31.000Z",
+   "amount": 90
+  },
+  {
+   "kind": "quote",
+   "schedule": 6,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T17:00:30.000Z",
+   "amount": 90
+  },
+  {
+   "kind": "quote",
+   "schedule": 6,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T17:31:31.000Z",
+   "amount": 150
+  },
+  {
+   "kind": "quote",
+   "schedule": 6,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-09T01:30:30.000Z",
+   "amount": 600
+  },
+  {
+   "kind": "quote",
+   "schedule": 6,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-09T15:30:29.000Z",
+   "amount": 1440
+  },
+  {
+   "kind": "quote",
+   "schedule": 6,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-09T15:30:30.000Z",
+   "amount": 1440
+  },
+  {
+   "kind": "quote",
+   "schedule": 6,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-09T16:31:31.000Z",
+   "amount": 1530
+  },
+  {
+   "kind": "quote",
+   "schedule": 6,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-10T17:30:30.000Z",
+   "amount": 3000
+  },
+  {
+   "kind": "exit",
+   "schedule": 6,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "paidAt": "2026-11-06T15:47:13.000Z",
+   "paidAmount": 60,
+   "exit": "2026-11-06T15:57:13.000Z",
+   "extra": null
+  },
+  {
+   "kind": "exit",
+   "schedule": 6,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "paidAt": "2026-11-06T15:47:13.000Z",
+   "paidAmount": 60,
+   "exit": "2026-11-06T16:02:13.000Z",
+   "extra": null
+  },
+  {
+   "kind": "exit",
+   "schedule": 6,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "paidAt": "2026-11-06T15:47:13.000Z",
+   "paidAmount": 60,
+   "exit": "2026-11-06T16:02:14.000Z",
+   "extra": 30
+  },
+  {
+   "kind": "exit",
+   "schedule": 6,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "paidAt": "2026-11-06T15:47:13.000Z",
+   "paidAmount": 60,
+   "exit": "2026-11-06T16:32:13.000Z",
+   "extra": 60
+  },
+  {
+   "kind": "exit",
+   "schedule": 6,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "paidAt": "2026-11-06T16:43:53.000Z",
+   "paidAmount": 120,
+   "exit": "2026-11-06T18:07:13.000Z",
+   "extra": 90
+  },
+  {
+   "kind": "exit",
+   "schedule": 6,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "paidAt": "2026-11-07T03:00:00.000Z",
+   "paidAmount": 60,
+   "exit": "2026-11-07T03:10:00.000Z",
+   "extra": null
+  },
+  {
+   "kind": "exit",
+   "schedule": 6,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "paidAt": "2026-11-07T03:00:00.000Z",
+   "paidAmount": 60,
+   "exit": "2026-11-07T03:15:00.000Z",
+   "extra": null
+  },
+  {
+   "kind": "exit",
+   "schedule": 6,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "paidAt": "2026-11-07T03:00:00.000Z",
+   "paidAmount": 60,
+   "exit": "2026-11-07T03:15:01.000Z",
+   "extra": 30
+  },
+  {
+   "kind": "exit",
+   "schedule": 6,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "paidAt": "2026-11-07T03:00:00.000Z",
+   "paidAmount": 60,
+   "exit": "2026-11-07T03:45:00.000Z",
+   "extra": 60
+  },
+  {
+   "kind": "exit",
+   "schedule": 6,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "paidAt": "2026-11-07T03:56:40.000Z",
+   "paidAmount": 120,
+   "exit": "2026-11-07T05:20:00.000Z",
+   "extra": 90
+  },
+  {
+   "kind": "exit",
+   "schedule": 6,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "paidAt": "2026-11-08T16:30:30.000Z",
+   "paidAmount": 60,
+   "exit": "2026-11-08T16:40:30.000Z",
+   "extra": null
+  },
+  {
+   "kind": "exit",
+   "schedule": 6,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "paidAt": "2026-11-08T16:30:30.000Z",
+   "paidAmount": 60,
+   "exit": "2026-11-08T16:45:30.000Z",
+   "extra": null
+  },
+  {
+   "kind": "exit",
+   "schedule": 6,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "paidAt": "2026-11-08T16:30:30.000Z",
+   "paidAmount": 60,
+   "exit": "2026-11-08T16:45:31.000Z",
+   "extra": 30
+  },
+  {
+   "kind": "exit",
+   "schedule": 6,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "paidAt": "2026-11-08T16:30:30.000Z",
+   "paidAmount": 60,
+   "exit": "2026-11-08T17:15:30.000Z",
+   "extra": 60
+  },
+  {
+   "kind": "exit",
+   "schedule": 6,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "paidAt": "2026-11-08T17:27:10.000Z",
+   "paidAmount": 120,
+   "exit": "2026-11-08T18:50:30.000Z",
+   "extra": 90
+  },
+  {
+   "kind": "quote",
+   "schedule": 7,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T14:47:13.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 7,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T14:48:12.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 7,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T14:57:13.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 7,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T14:58:12.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 7,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T14:58:13.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 7,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T14:58:14.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 7,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T15:17:12.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 7,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T15:17:13.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 7,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T15:17:14.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 7,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T15:47:13.000Z",
+   "amount": 60
+  },
+  {
+   "kind": "quote",
+   "schedule": 7,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T15:48:14.000Z",
+   "amount": 90
+  },
+  {
+   "kind": "quote",
+   "schedule": 7,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T16:17:13.000Z",
+   "amount": 90
+  },
+  {
+   "kind": "quote",
+   "schedule": 7,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T16:48:14.000Z",
+   "amount": 150
+  },
+  {
+   "kind": "quote",
+   "schedule": 7,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-07T00:47:13.000Z",
+   "amount": 600
+  },
+  {
+   "kind": "quote",
+   "schedule": 7,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-07T14:47:12.000Z",
+   "amount": 1440
+  },
+  {
+   "kind": "quote",
+   "schedule": 7,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-07T14:47:13.000Z",
+   "amount": 1440
+  },
+  {
+   "kind": "quote",
+   "schedule": 7,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-07T15:48:14.000Z",
+   "amount": 1530
+  },
+  {
+   "kind": "quote",
+   "schedule": 7,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-08T16:47:13.000Z",
+   "amount": 3000
+  },
+  {
+   "kind": "quote",
+   "schedule": 7,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:00:00.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 7,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:00:59.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 7,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:10:00.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 7,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:10:59.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 7,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:11:00.000Z",
+   "amount": 10
+  },
+  {
+   "kind": "quote",
+   "schedule": 7,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:11:01.000Z",
+   "amount": 10
+  },
+  {
+   "kind": "quote",
+   "schedule": 7,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:29:59.000Z",
+   "amount": 10
+  },
+  {
+   "kind": "quote",
+   "schedule": 7,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:30:00.000Z",
+   "amount": 10
+  },
+  {
+   "kind": "quote",
+   "schedule": 7,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:30:01.000Z",
+   "amount": 10
+  },
+  {
+   "kind": "quote",
+   "schedule": 7,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T03:00:00.000Z",
+   "amount": 20
+  },
+  {
+   "kind": "quote",
+   "schedule": 7,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T03:01:01.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 7,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T03:30:00.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 7,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T04:01:01.000Z",
+   "amount": 50
+  },
+  {
+   "kind": "quote",
+   "schedule": 7,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T12:00:00.000Z",
+   "amount": 200
+  },
+  {
+   "kind": "quote",
+   "schedule": 7,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-08T01:59:59.000Z",
+   "amount": 480
+  },
+  {
+   "kind": "quote",
+   "schedule": 7,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-08T02:00:00.000Z",
+   "amount": 480
+  },
+  {
+   "kind": "quote",
+   "schedule": 7,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-08T03:01:01.000Z",
+   "amount": 510
+  },
+  {
+   "kind": "quote",
+   "schedule": 7,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-09T04:00:00.000Z",
+   "amount": 1000
+  },
+  {
+   "kind": "quote",
+   "schedule": 7,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T15:30:30.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 7,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T15:31:29.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 7,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T15:40:30.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 7,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T15:41:29.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 7,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T15:41:30.000Z",
+   "amount": 10
+  },
+  {
+   "kind": "quote",
+   "schedule": 7,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T15:41:31.000Z",
+   "amount": 10
+  },
+  {
+   "kind": "quote",
+   "schedule": 7,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T16:00:29.000Z",
+   "amount": 10
+  },
+  {
+   "kind": "quote",
+   "schedule": 7,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T16:00:30.000Z",
+   "amount": 10
+  },
+  {
+   "kind": "quote",
+   "schedule": 7,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T16:00:31.000Z",
+   "amount": 10
+  },
+  {
+   "kind": "quote",
+   "schedule": 7,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T16:30:30.000Z",
+   "amount": 20
+  },
+  {
+   "kind": "quote",
+   "schedule": 7,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T16:31:31.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 7,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T17:00:30.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 7,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T17:31:31.000Z",
+   "amount": 50
+  },
+  {
+   "kind": "quote",
+   "schedule": 7,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-09T01:30:30.000Z",
+   "amount": 200
+  },
+  {
+   "kind": "quote",
+   "schedule": 7,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-09T15:30:29.000Z",
+   "amount": 480
+  },
+  {
+   "kind": "quote",
+   "schedule": 7,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-09T15:30:30.000Z",
+   "amount": 480
+  },
+  {
+   "kind": "quote",
+   "schedule": 7,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-09T16:31:31.000Z",
+   "amount": 510
+  },
+  {
+   "kind": "quote",
+   "schedule": 7,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-10T17:30:30.000Z",
+   "amount": 1000
+  },
+  {
+   "kind": "exit",
+   "schedule": 7,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "paidAt": "2026-11-06T15:47:13.000Z",
+   "paidAmount": 60,
+   "exit": "2026-11-06T15:57:13.000Z",
+   "extra": null
+  },
+  {
+   "kind": "exit",
+   "schedule": 7,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "paidAt": "2026-11-06T15:47:13.000Z",
+   "paidAmount": 60,
+   "exit": "2026-11-06T16:02:13.000Z",
+   "extra": null
+  },
+  {
+   "kind": "exit",
+   "schedule": 7,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "paidAt": "2026-11-06T15:47:13.000Z",
+   "paidAmount": 60,
+   "exit": "2026-11-06T16:02:14.000Z",
+   "extra": 30
+  },
+  {
+   "kind": "exit",
+   "schedule": 7,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "paidAt": "2026-11-06T15:47:13.000Z",
+   "paidAmount": 60,
+   "exit": "2026-11-06T16:32:13.000Z",
+   "extra": 60
+  },
+  {
+   "kind": "exit",
+   "schedule": 7,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "paidAt": "2026-11-06T16:43:53.000Z",
+   "paidAmount": 120,
+   "exit": "2026-11-06T18:07:13.000Z",
+   "extra": 90
+  },
+  {
+   "kind": "exit",
+   "schedule": 7,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "paidAt": "2026-11-07T03:00:00.000Z",
+   "paidAmount": 20,
+   "exit": "2026-11-07T03:10:00.000Z",
+   "extra": null
+  },
+  {
+   "kind": "exit",
+   "schedule": 7,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "paidAt": "2026-11-07T03:00:00.000Z",
+   "paidAmount": 20,
+   "exit": "2026-11-07T03:15:00.000Z",
+   "extra": null
+  },
+  {
+   "kind": "exit",
+   "schedule": 7,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "paidAt": "2026-11-07T03:00:00.000Z",
+   "paidAmount": 20,
+   "exit": "2026-11-07T03:15:01.000Z",
+   "extra": 10
+  },
+  {
+   "kind": "exit",
+   "schedule": 7,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "paidAt": "2026-11-07T03:00:00.000Z",
+   "paidAmount": 20,
+   "exit": "2026-11-07T03:45:00.000Z",
+   "extra": 20
+  },
+  {
+   "kind": "exit",
+   "schedule": 7,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "paidAt": "2026-11-07T03:56:40.000Z",
+   "paidAmount": 40,
+   "exit": "2026-11-07T05:20:00.000Z",
+   "extra": 30
+  },
+  {
+   "kind": "exit",
+   "schedule": 7,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "paidAt": "2026-11-08T16:30:30.000Z",
+   "paidAmount": 20,
+   "exit": "2026-11-08T16:40:30.000Z",
+   "extra": null
+  },
+  {
+   "kind": "exit",
+   "schedule": 7,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "paidAt": "2026-11-08T16:30:30.000Z",
+   "paidAmount": 20,
+   "exit": "2026-11-08T16:45:30.000Z",
+   "extra": null
+  },
+  {
+   "kind": "exit",
+   "schedule": 7,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "paidAt": "2026-11-08T16:30:30.000Z",
+   "paidAmount": 20,
+   "exit": "2026-11-08T16:45:31.000Z",
+   "extra": 10
+  },
+  {
+   "kind": "exit",
+   "schedule": 7,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "paidAt": "2026-11-08T16:30:30.000Z",
+   "paidAmount": 20,
+   "exit": "2026-11-08T17:15:30.000Z",
+   "extra": 20
+  },
+  {
+   "kind": "exit",
+   "schedule": 7,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "paidAt": "2026-11-08T17:27:10.000Z",
+   "paidAmount": 40,
+   "exit": "2026-11-08T18:50:30.000Z",
+   "extra": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 8,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T14:47:13.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 8,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T14:48:12.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 8,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T14:57:13.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 8,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T14:58:12.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 8,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T14:58:13.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 8,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T14:58:14.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 8,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T15:17:12.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 8,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T15:17:13.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 8,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T15:17:14.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 8,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T15:47:13.000Z",
+   "amount": 60
+  },
+  {
+   "kind": "quote",
+   "schedule": 8,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T15:48:14.000Z",
+   "amount": 90
+  },
+  {
+   "kind": "quote",
+   "schedule": 8,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T16:17:13.000Z",
+   "amount": 90
+  },
+  {
+   "kind": "quote",
+   "schedule": 8,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T16:48:14.000Z",
+   "amount": 110
+  },
+  {
+   "kind": "quote",
+   "schedule": 8,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-07T00:47:13.000Z",
+   "amount": 260
+  },
+  {
+   "kind": "quote",
+   "schedule": 8,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-07T14:47:12.000Z",
+   "amount": 540
+  },
+  {
+   "kind": "quote",
+   "schedule": 8,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-07T14:47:13.000Z",
+   "amount": 540
+  },
+  {
+   "kind": "quote",
+   "schedule": 8,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-07T15:48:14.000Z",
+   "amount": 570
+  },
+  {
+   "kind": "quote",
+   "schedule": 8,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-08T16:47:13.000Z",
+   "amount": 1080
+  },
+  {
+   "kind": "quote",
+   "schedule": 8,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:00:00.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 8,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:00:59.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 8,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:10:00.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 8,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:10:59.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 8,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:11:00.000Z",
+   "amount": 10
+  },
+  {
+   "kind": "quote",
+   "schedule": 8,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:11:01.000Z",
+   "amount": 10
+  },
+  {
+   "kind": "quote",
+   "schedule": 8,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:29:59.000Z",
+   "amount": 10
+  },
+  {
+   "kind": "quote",
+   "schedule": 8,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:30:00.000Z",
+   "amount": 10
+  },
+  {
+   "kind": "quote",
+   "schedule": 8,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:30:01.000Z",
+   "amount": 10
+  },
+  {
+   "kind": "quote",
+   "schedule": 8,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T03:00:00.000Z",
+   "amount": 20
+  },
+  {
+   "kind": "quote",
+   "schedule": 8,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T03:01:01.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 8,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T03:30:00.000Z",
+   "amount": 30
+  },
+  {
+   "kind": "quote",
+   "schedule": 8,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T04:01:01.000Z",
+   "amount": 50
+  },
+  {
+   "kind": "quote",
+   "schedule": 8,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T12:00:00.000Z",
+   "amount": 200
+  },
+  {
+   "kind": "quote",
+   "schedule": 8,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-08T01:59:59.000Z",
+   "amount": 480
+  },
+  {
+   "kind": "quote",
+   "schedule": 8,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-08T02:00:00.000Z",
+   "amount": 480
+  },
+  {
+   "kind": "quote",
+   "schedule": 8,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-08T03:01:01.000Z",
+   "amount": 510
+  },
+  {
+   "kind": "quote",
+   "schedule": 8,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-09T04:00:00.000Z",
+   "amount": 1480
+  },
+  {
+   "kind": "quote",
+   "schedule": 8,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T15:30:30.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 8,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T15:31:29.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 8,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T15:40:30.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 8,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T15:41:29.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 8,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T15:41:30.000Z",
+   "amount": 10
+  },
+  {
+   "kind": "quote",
+   "schedule": 8,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T15:41:31.000Z",
+   "amount": 10
+  },
+  {
+   "kind": "quote",
+   "schedule": 8,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T16:00:29.000Z",
+   "amount": 10
+  },
+  {
+   "kind": "quote",
+   "schedule": 8,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T16:00:30.000Z",
+   "amount": 10
+  },
+  {
+   "kind": "quote",
+   "schedule": 8,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T16:00:31.000Z",
+   "amount": 10
+  },
+  {
+   "kind": "quote",
+   "schedule": 8,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T16:30:30.000Z",
+   "amount": 40
+  },
+  {
+   "kind": "quote",
+   "schedule": 8,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T16:31:31.000Z",
+   "amount": 70
+  },
+  {
+   "kind": "quote",
+   "schedule": 8,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T17:00:30.000Z",
+   "amount": 70
+  },
+  {
+   "kind": "quote",
+   "schedule": 8,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T17:31:31.000Z",
+   "amount": 130
+  },
+  {
+   "kind": "quote",
+   "schedule": 8,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-09T01:30:30.000Z",
+   "amount": 580
+  },
+  {
+   "kind": "quote",
+   "schedule": 8,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-09T15:30:29.000Z",
+   "amount": 1420
+  },
+  {
+   "kind": "quote",
+   "schedule": 8,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-09T15:30:30.000Z",
+   "amount": 1420
+  },
+  {
+   "kind": "quote",
+   "schedule": 8,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-09T16:31:31.000Z",
+   "amount": 1510
+  },
+  {
+   "kind": "quote",
+   "schedule": 8,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-10T17:30:30.000Z",
+   "amount": 2980
+  },
+  {
+   "kind": "exit",
+   "schedule": 8,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "paidAt": "2026-11-06T15:47:13.000Z",
+   "paidAmount": 60,
+   "exit": "2026-11-06T15:57:13.000Z",
+   "extra": null
+  },
+  {
+   "kind": "exit",
+   "schedule": 8,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "paidAt": "2026-11-06T15:47:13.000Z",
+   "paidAmount": 60,
+   "exit": "2026-11-06T16:02:13.000Z",
+   "extra": null
+  },
+  {
+   "kind": "exit",
+   "schedule": 8,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "paidAt": "2026-11-06T15:47:13.000Z",
+   "paidAmount": 60,
+   "exit": "2026-11-06T16:02:14.000Z",
+   "extra": 30
+  },
+  {
+   "kind": "exit",
+   "schedule": 8,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "paidAt": "2026-11-06T15:47:13.000Z",
+   "paidAmount": 60,
+   "exit": "2026-11-06T16:32:13.000Z",
+   "extra": 40
+  },
+  {
+   "kind": "exit",
+   "schedule": 8,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "paidAt": "2026-11-06T16:43:53.000Z",
+   "paidAmount": 100,
+   "exit": "2026-11-06T18:07:13.000Z",
+   "extra": 30
+  },
+  {
+   "kind": "exit",
+   "schedule": 8,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "paidAt": "2026-11-07T03:00:00.000Z",
+   "paidAmount": 20,
+   "exit": "2026-11-07T03:10:00.000Z",
+   "extra": null
+  },
+  {
+   "kind": "exit",
+   "schedule": 8,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "paidAt": "2026-11-07T03:00:00.000Z",
+   "paidAmount": 20,
+   "exit": "2026-11-07T03:15:00.000Z",
+   "extra": null
+  },
+  {
+   "kind": "exit",
+   "schedule": 8,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "paidAt": "2026-11-07T03:00:00.000Z",
+   "paidAmount": 20,
+   "exit": "2026-11-07T03:15:01.000Z",
+   "extra": 10
+  },
+  {
+   "kind": "exit",
+   "schedule": 8,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "paidAt": "2026-11-07T03:00:00.000Z",
+   "paidAmount": 20,
+   "exit": "2026-11-07T03:45:00.000Z",
+   "extra": 20
+  },
+  {
+   "kind": "exit",
+   "schedule": 8,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "paidAt": "2026-11-07T03:56:40.000Z",
+   "paidAmount": 40,
+   "exit": "2026-11-07T05:20:00.000Z",
+   "extra": 30
+  },
+  {
+   "kind": "exit",
+   "schedule": 8,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "paidAt": "2026-11-08T16:30:30.000Z",
+   "paidAmount": 40,
+   "exit": "2026-11-08T16:40:30.000Z",
+   "extra": null
+  },
+  {
+   "kind": "exit",
+   "schedule": 8,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "paidAt": "2026-11-08T16:30:30.000Z",
+   "paidAmount": 40,
+   "exit": "2026-11-08T16:45:30.000Z",
+   "extra": null
+  },
+  {
+   "kind": "exit",
+   "schedule": 8,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "paidAt": "2026-11-08T16:30:30.000Z",
+   "paidAmount": 40,
+   "exit": "2026-11-08T16:45:31.000Z",
+   "extra": 30
+  },
+  {
+   "kind": "exit",
+   "schedule": 8,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "paidAt": "2026-11-08T16:30:30.000Z",
+   "paidAmount": 40,
+   "exit": "2026-11-08T17:15:30.000Z",
+   "extra": 60
+  },
+  {
+   "kind": "exit",
+   "schedule": 8,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "paidAt": "2026-11-08T17:27:10.000Z",
+   "paidAmount": 100,
+   "exit": "2026-11-08T18:50:30.000Z",
+   "extra": 90
+  },
+  {
+   "kind": "quote",
+   "schedule": 9,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T14:47:13.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 9,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T14:48:12.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 9,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T14:57:13.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 9,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T14:58:12.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 9,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T14:58:13.000Z",
+   "amount": 20
+  },
+  {
+   "kind": "quote",
+   "schedule": 9,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T14:58:14.000Z",
+   "amount": 20
+  },
+  {
+   "kind": "quote",
+   "schedule": 9,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T15:17:12.000Z",
+   "amount": 20
+  },
+  {
+   "kind": "quote",
+   "schedule": 9,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T15:17:13.000Z",
+   "amount": 20
+  },
+  {
+   "kind": "quote",
+   "schedule": 9,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T15:17:14.000Z",
+   "amount": 20
+  },
+  {
+   "kind": "quote",
+   "schedule": 9,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T15:47:13.000Z",
+   "amount": 40
+  },
+  {
+   "kind": "quote",
+   "schedule": 9,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T15:48:14.000Z",
+   "amount": 60
+  },
+  {
+   "kind": "quote",
+   "schedule": 9,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T16:17:13.000Z",
+   "amount": 60
+  },
+  {
+   "kind": "quote",
+   "schedule": 9,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-06T16:48:14.000Z",
+   "amount": 100
+  },
+  {
+   "kind": "quote",
+   "schedule": 9,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-07T00:47:13.000Z",
+   "amount": 210
+  },
+  {
+   "kind": "quote",
+   "schedule": 9,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-07T14:47:12.000Z",
+   "amount": 210
+  },
+  {
+   "kind": "quote",
+   "schedule": 9,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-07T14:47:13.000Z",
+   "amount": 210
+  },
+  {
+   "kind": "quote",
+   "schedule": 9,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-07T15:48:14.000Z",
+   "amount": 210
+  },
+  {
+   "kind": "quote",
+   "schedule": 9,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "at": "2026-11-08T16:47:13.000Z",
+   "amount": 380
+  },
+  {
+   "kind": "quote",
+   "schedule": 9,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:00:00.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 9,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:00:59.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 9,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:10:00.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 9,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:10:59.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 9,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:11:00.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 9,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:11:01.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 9,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:29:59.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 9,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:30:00.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 9,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T02:30:01.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 9,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T03:00:00.000Z",
+   "amount": 40
+  },
+  {
+   "kind": "quote",
+   "schedule": 9,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T03:01:01.000Z",
+   "amount": 60
+  },
+  {
+   "kind": "quote",
+   "schedule": 9,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T03:30:00.000Z",
+   "amount": 60
+  },
+  {
+   "kind": "quote",
+   "schedule": 9,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T04:01:01.000Z",
+   "amount": 100
+  },
+  {
+   "kind": "quote",
+   "schedule": 9,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-07T12:00:00.000Z",
+   "amount": 150
+  },
+  {
+   "kind": "quote",
+   "schedule": 9,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-08T01:59:59.000Z",
+   "amount": 300
+  },
+  {
+   "kind": "quote",
+   "schedule": 9,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-08T02:00:00.000Z",
+   "amount": 300
+  },
+  {
+   "kind": "quote",
+   "schedule": 9,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-08T03:01:01.000Z",
+   "amount": 300
+  },
+  {
+   "kind": "quote",
+   "schedule": 9,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "at": "2026-11-09T04:00:00.000Z",
+   "amount": 450
+  },
+  {
+   "kind": "quote",
+   "schedule": 9,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T15:30:30.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 9,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T15:31:29.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 9,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T15:40:30.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 9,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T15:41:29.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 9,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T15:41:30.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 9,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T15:41:31.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 9,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T16:00:29.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 9,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T16:00:30.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 9,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T16:00:31.000Z",
+   "amount": 0
+  },
+  {
+   "kind": "quote",
+   "schedule": 9,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T16:30:30.000Z",
+   "amount": 40
+  },
+  {
+   "kind": "quote",
+   "schedule": 9,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T16:31:31.000Z",
+   "amount": 60
+  },
+  {
+   "kind": "quote",
+   "schedule": 9,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T17:00:30.000Z",
+   "amount": 60
+  },
+  {
+   "kind": "quote",
+   "schedule": 9,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-08T17:31:31.000Z",
+   "amount": 100
+  },
+  {
+   "kind": "quote",
+   "schedule": 9,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-09T01:30:30.000Z",
+   "amount": 170
+  },
+  {
+   "kind": "quote",
+   "schedule": 9,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-09T15:30:29.000Z",
+   "amount": 170
+  },
+  {
+   "kind": "quote",
+   "schedule": 9,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-09T15:30:30.000Z",
+   "amount": 170
+  },
+  {
+   "kind": "quote",
+   "schedule": 9,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-09T16:31:31.000Z",
+   "amount": 210
+  },
+  {
+   "kind": "quote",
+   "schedule": 9,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "at": "2026-11-10T17:30:30.000Z",
+   "amount": 380
+  },
+  {
+   "kind": "exit",
+   "schedule": 9,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "paidAt": "2026-11-06T15:47:13.000Z",
+   "paidAmount": 40,
+   "exit": "2026-11-06T15:57:13.000Z",
+   "extra": null
+  },
+  {
+   "kind": "exit",
+   "schedule": 9,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "paidAt": "2026-11-06T15:47:13.000Z",
+   "paidAmount": 40,
+   "exit": "2026-11-06T16:02:13.000Z",
+   "extra": null
+  },
+  {
+   "kind": "exit",
+   "schedule": 9,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "paidAt": "2026-11-06T15:47:13.000Z",
+   "paidAmount": 40,
+   "exit": "2026-11-06T16:02:14.000Z",
+   "extra": 20
+  },
+  {
+   "kind": "exit",
+   "schedule": 9,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "paidAt": "2026-11-06T15:47:13.000Z",
+   "paidAmount": 40,
+   "exit": "2026-11-06T16:32:13.000Z",
+   "extra": 40
+  },
+  {
+   "kind": "exit",
+   "schedule": 9,
+   "entry": "2026-11-06T22:47:13+08:00",
+   "paidAt": "2026-11-06T16:43:53.000Z",
+   "paidAmount": 80,
+   "exit": "2026-11-06T18:07:13.000Z",
+   "extra": 60
+  },
+  {
+   "kind": "exit",
+   "schedule": 9,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "paidAt": "2026-11-07T03:00:00.000Z",
+   "paidAmount": 40,
+   "exit": "2026-11-07T03:10:00.000Z",
+   "extra": null
+  },
+  {
+   "kind": "exit",
+   "schedule": 9,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "paidAt": "2026-11-07T03:00:00.000Z",
+   "paidAmount": 40,
+   "exit": "2026-11-07T03:15:00.000Z",
+   "extra": null
+  },
+  {
+   "kind": "exit",
+   "schedule": 9,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "paidAt": "2026-11-07T03:00:00.000Z",
+   "paidAmount": 40,
+   "exit": "2026-11-07T03:15:01.000Z",
+   "extra": 20
+  },
+  {
+   "kind": "exit",
+   "schedule": 9,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "paidAt": "2026-11-07T03:00:00.000Z",
+   "paidAmount": 40,
+   "exit": "2026-11-07T03:45:00.000Z",
+   "extra": 40
+  },
+  {
+   "kind": "exit",
+   "schedule": 9,
+   "entry": "2026-11-07T10:00:00+08:00",
+   "paidAt": "2026-11-07T03:56:40.000Z",
+   "paidAmount": 80,
+   "exit": "2026-11-07T05:20:00.000Z",
+   "extra": 60
+  },
+  {
+   "kind": "exit",
+   "schedule": 9,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "paidAt": "2026-11-08T16:30:30.000Z",
+   "paidAmount": 40,
+   "exit": "2026-11-08T16:40:30.000Z",
+   "extra": null
+  },
+  {
+   "kind": "exit",
+   "schedule": 9,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "paidAt": "2026-11-08T16:30:30.000Z",
+   "paidAmount": 40,
+   "exit": "2026-11-08T16:45:30.000Z",
+   "extra": null
+  },
+  {
+   "kind": "exit",
+   "schedule": 9,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "paidAt": "2026-11-08T16:30:30.000Z",
+   "paidAmount": 40,
+   "exit": "2026-11-08T16:45:31.000Z",
+   "extra": 20
+  },
+  {
+   "kind": "exit",
+   "schedule": 9,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "paidAt": "2026-11-08T16:30:30.000Z",
+   "paidAmount": 40,
+   "exit": "2026-11-08T17:15:30.000Z",
+   "extra": 40
+  },
+  {
+   "kind": "exit",
+   "schedule": 9,
+   "entry": "2026-11-08T23:30:30+08:00",
+   "paidAt": "2026-11-08T17:27:10.000Z",
+   "paidAmount": 80,
+   "exit": "2026-11-08T18:50:30.000Z",
+   "extra": 60
+  }
+ ]
+}

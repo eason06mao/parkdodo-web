@@ -1,0 +1,56 @@
+# 場站工控機程式（ParkDodo Edge）：測試，並產生 Windows 安裝包
+# 安裝包下載：Actions → 「工控機程式」→ 最新一次執行 → 下方 Artifacts 的 ParkDodo.Edge-win-x64
+name: 工控機程式
+
+on:
+  push:
+    branches: [main]
+    paths: ["edge/**", "src/lib/billing/**", "scripts/gen-fee-vectors.ts", ".github/workflows/edge.yml"]
+  pull_request:
+    paths: ["edge/**", "src/lib/billing/**", "scripts/gen-fee-vectors.ts", ".github/workflows/edge.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: 測試（計費一致、斷網、佇列、FK 封包）
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - name: 計費測試向量要和雲端程式一致
+        run: |
+          npx tsx scripts/gen-fee-vectors.ts
+          git diff --exit-code edge/ParkDodo.Edge.Tests/fee_vectors.json || (echo "雲端計費規則改了，請執行 npx tsx scripts/gen-fee-vectors.ts 並提交"; exit 1)
+      - uses: actions/setup-dotnet@v4
+        with: { dotnet-version: "8.0.x" }
+      - name: Edge 測試
+        run: dotnet run --project edge/ParkDodo.Edge.Tests
+      - name: FK 封包 CRC 測試
+        run: dotnet run --project edge/FkProtocol.Tests
+
+  package:
+    name: Windows 安裝包
+    needs: test
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with: { dotnet-version: "8.0.x" }
+      - name: 發布（win-x64、自包含、單一執行檔，現場不用另外安裝 .NET）
+        shell: pwsh
+        run: |
+          Remove-Item edge/ParkDodo.Edge/nuget.config
+          dotnet publish edge/ParkDodo.Edge/ParkDodo.Edge.csproj -c Release -r win-x64 --self-contained true `
+            -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o out
+          Remove-Item out/*.pdb -ErrorAction SilentlyContinue
+          "ICE SDK 的 DLL 請從廠商 SDK（ice_ipcsdk/bin，64 位元）複製到這個資料夾，詳見 README.md" | Out-File out/請放入ICE_SDK_DLL.txt -Encoding utf8
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ParkDodo.Edge-win-x64
+          path: out/
+          retention-days: 30

@@ -33,7 +33,7 @@ export function LaneCard({ lane }: { lane: Lane }) {
           <span>雷達：<span style={{ color: "var(--pd-ink)" }}>{lane.radar === "occupied" ? "有車" : "無車"}</span></span>
           <span>LED：<span style={{ color: "var(--pd-ink)" }}>{lane.ledText}</span></span>
         </div>
-        <RemoteOpenButton laneName={lane.name} plate={lane.lastPlate} />
+        <RemoteOpenButton siteId={lane.siteId} laneCode={lane.code} laneName={lane.name} plate={lane.lastPlate} />
       </div>
     </article>
   );

@@ -8,6 +8,7 @@ import { formatDateTime } from "@/lib/format";
 import { can, ORG_TYPE_LABELS } from "@/lib/permissions";
 import { COLLECTION_LABELS, OPERATION_LABELS, PLAN_LABELS } from "@/lib/siteForm";
 import { daysUntil, DEVICE_LABELS, EDGE_STATUS, LICENSE_STATUS, SITE_STATUS } from "@/lib/siteLabels";
+import { getLiveEdge } from "@/lib/edge/console";
 import { PairEdgeButton } from "./PairEdgeButton";
 
 export const metadata: Metadata = { title: "站點設定" };
@@ -30,7 +31,12 @@ export default async function SitePage({ params }: { params: Promise<{ id: strin
   const canEdit = can(user, "site.edit", scope);
   const isHqAdmin = can(user, "site.create");
   const st = SITE_STATUS[site.status];
-  const edge = EDGE_STATUS[site.edge?.status ?? "provisioning"];
+  // 有雲端資料庫時顯示工控機真實狀態（undefined＝沒有資料庫，維持 Mock；null＝尚未配對）
+  const live = await getLiveEdge(site.code);
+  const edgeInfo = live === undefined ? site.edge
+    : live === null ? { name: "待配對", status: "provisioning" as const }
+    : { name: live.name, model: live.model ?? undefined, agentVersion: live.agentVersion ?? undefined, status: live.status, lastSeenAt: live.lastSeenAt ?? undefined };
+  const edge = EDGE_STATUS[edgeInfo?.status ?? "provisioning"];
   const lic = site.license;
   const days = lic ? daysUntil(lic.endsOn) : null;
 
@@ -95,14 +101,16 @@ export default async function SitePage({ params }: { params: Promise<{ id: strin
         <section aria-labelledby="edge-h" className="pd-card">
           <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", marginBottom: 14 }}>
             <h2 id="edge-h" className="pd-serif" style={{ margin: 0, fontSize: 18 }}>工控機（Edge）</h2>
-            {can(user, "edge.pair") && <PairEdgeButton siteName={site.name} paired={site.edge?.status !== "provisioning"} />}
+            {can(user, "edge.pair") && <PairEdgeButton siteId={site.id} siteName={site.name} paired={edgeInfo?.status !== undefined && edgeInfo.status !== "provisioning"} />}
           </div>
           <dl style={{ display: "grid", gridTemplateColumns: "max-content 1fr", gap: "10px 20px", margin: 0 }}>
-            <Row label="狀態"><Chip tone={edge.tone} dot={site.edge?.status === "online"}>{edge.label}</Chip></Row>
-            <Row label="名稱">{site.edge?.name ?? "—"}</Row>
-            <Row label="機型">{site.edge?.model ?? "—"}</Row>
-            <Row label="程式版本"><span className="pd-mono">{site.edge?.agentVersion ?? "—"}</span></Row>
-            <Row label="最後回報">{site.edge?.lastSeenAt ? formatDateTime(site.edge.lastSeenAt) : "—"}</Row>
+            <Row label="狀態"><Chip tone={edge.tone} dot={edgeInfo?.status === "online"}>{edge.label}</Chip>{live === undefined && <span className="pd-label">　示範資料</span>}</Row>
+            <Row label="名稱">{edgeInfo?.name ?? "—"}</Row>
+            <Row label="機型">{edgeInfo?.model ?? "—"}</Row>
+            <Row label="程式版本"><span className="pd-mono">{edgeInfo?.agentVersion ?? "—"}</span></Row>
+            <Row label="最後回報">{edgeInfo?.lastSeenAt ? formatDateTime(edgeInfo.lastSeenAt) : "—"}</Row>
+            {live && <Row label="待補傳"><span className="pd-mono">{live.queueDepth}</span> 筆{live.queueDepth > 0 && <span className="pd-label">（斷網期間累積，連線後自動補傳）</span>}</Row>}
+            {live && <Row label="今日事件"><span className="pd-mono">{live.eventsToday}</span> 筆</Row>}
           </dl>
           {!can(user, "edge.pair") && <p className="pd-label" style={{ margin: "14px 0 0" }}>工控機配對與更換由總部處理。</p>}
         </section>
