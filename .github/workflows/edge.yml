@@ -13,6 +13,9 @@ on:
 permissions:
   contents: read
 
+env:
+  DOTNET_SYSTEM_GLOBALIZATION_INVARIANT: "1"   # 新版 Ubuntu 執行環境沒有 ICU；本程式不需要地區化
+
 jobs:
   test:
     name: 測試（計費一致、斷網、佇列、FK 封包）

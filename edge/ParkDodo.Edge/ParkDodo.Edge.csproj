@@ -10,7 +10,7 @@
     <AssemblyName>ParkDodo.Edge</AssemblyName>
     <RootNamespace>ParkDodo.Edge</RootNamespace>
     <Version>0.1.0</Version>
-    <InvariantGlobalization>false</InvariantGlobalization>
+    <InvariantGlobalization>true</InvariantGlobalization>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="../FkProtocol/FkPacket.cs" Link="Display/FkPacket.cs" />
