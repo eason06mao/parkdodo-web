@@ -82,3 +82,27 @@ test("收款、續約、停用、變更車牌", async () => {
   assert.deepEqual(r.vehicles.map((x) => x.plate), ["TST-2002"]);
   assert.deepEqual(r.history.map((h) => h.action), ["建立合約", "確認收款", "續約", "停用", "恢復", "變更車牌"]);
 });
+
+test("同時建立多份合約：合約編號不會重複", async () => {
+  const mk = (i: number) => createContract(hq, draft({ startsOn: "2026-12-01", activatesOn: "2026-12-01", vehicles: [{ plate: `CON-${1000 + i}`, kind: "car", brand: "", color: "" }] }));
+  const rs = await Promise.all([0, 1, 2, 3, 4].map(mk));
+  assert.equal(new Set(rs.map((r) => r.contractNo)).size, 5);
+});
+
+test("續約待付款：原本已付款的期間照常有效；收款後才延長到期日，只收續約金額", async () => {
+  const r = await createContract(hq, draft({ startsOn: "2026-10-15", activatesOn: "2026-10-15", deposit: 500, vehicles: [{ plate: "REN-0001", kind: "car", brand: "", color: "" }] }));
+  assert.equal(contractState(r, TODAY), "active");
+  await updateContract(hq, r.id, { action: "renew", months: 1, paymentStatus: "unpaid", method: "cash", ref: "" });
+  assert.equal(r.endsOn, "2026-11-14", "未付款不延長");
+  assert.equal(r.paymentStatus, "paid");
+  assert.notEqual(contractState(r, TODAY), "pending", "已付款期間不能被改成待開通");
+  await assert.rejects(updateContract(hq, r.id, { action: "renew", months: 1, paymentStatus: "unpaid", method: "cash", ref: "" }), /待付款/);
+  // 續約期間先保留：別人不能用同一車牌搶在這段期間
+  await assert.rejects(createContract(hq, draft({ startsOn: "2026-11-20", activatesOn: "2026-11-20", vehicles: [{ plate: "REN-0001", kind: "car", brand: "", color: "" }] })), /已有月租合約/);
+  await updateContract(hq, r.id, { action: "confirm_payment", method: "cash", ref: "" });
+  assert.equal(r.endsOn, "2026-12-14");
+  const last = r.history.at(-1)!;
+  assert.equal(last.action, "續約收款");
+  assert.match(last.note!, /NT\$2,200/, "只收 1 個月租金，不含已付的月份與押金");
+  await assert.rejects(updateContract(hq, r.id, { action: "confirm_payment", method: "cash", ref: "" }), /沒有待收/);
+});
