@@ -45,7 +45,8 @@ export default async function ContractPage({ params, searchParams }: { params: P
           </h1>
         </div>
         <ContractActions id={r.id} paymentStatus={r.paymentStatus} suspended={!!r.suspended} cancelled={!!r.cancelled} endsOn={r.endsOn}
-          monthlyFee={r.monthlyFee} due={a.due} vehicles={r.vehicles} canManage={canManage} />
+          monthlyFee={r.monthlyFee} due={a.due} vehicles={r.vehicles} canManage={canManage}
+          pendingRenewal={r.renewals.find((x) => !x.paidAt)} />
       </header>
 
       {sp.created && <p role="status" className="pd-card" style={{ margin: 0, borderColor: "var(--pd-accent)", background: "var(--pd-accent-tint)" }}>
@@ -71,12 +72,18 @@ export default async function ContractPage({ params, searchParams }: { params: P
           <h2 id="p-h" className="pd-serif" style={{ margin: "0 0 14px", fontSize: 18 }}>費用與付款</h2>
           <dl style={dl}>
             <Row label="月費"><span className="pd-mono">NT${r.monthlyFee.toLocaleString()}</span>{plan && r.monthlyFee !== plan.monthlyPrice && <span className="pd-label">（方案價 NT${plan.monthlyPrice.toLocaleString()}）</span>}</Row>
-            <Row label="期數">{r.months} 個月</Row>
+            <Row label="首期">{r.months} 個月</Row>
             {r.discount > 0 && <Row label="折扣"><span className="pd-mono">−NT${r.discount.toLocaleString()}</span><span className="pd-label">　{r.discountReason}</span></Row>}
             {r.deposit > 0 && <Row label="押金"><span className="pd-mono">NT${r.deposit.toLocaleString()}</span></Row>}
-            <Row label="應收"><strong className="pd-mono">NT${a.due.toLocaleString()}</strong></Row>
+            <Row label="首期應收"><strong className="pd-mono">NT${a.due.toLocaleString()}</strong></Row>
             <Row label="付款">{r.paymentStatus === "paid" ? <>已付款・{PAYMENT_METHOD_LABELS[r.paymentMethod]}{r.paymentRef && <span className="pd-mono pd-label">　{r.paymentRef}</span>}</> : <Chip tone="warn">待付款</Chip>}</Row>
             {r.paidAt && <Row label="收款時間"><span className="pd-mono">{formatDateTime(r.paidAt)}</span></Row>}
+            {r.renewals.map((x, i) => (
+              <Row key={i} label={`續約 ${i + 1}`}>
+                <span className="pd-mono">{x.from} 至 {x.endsOn}</span>・{x.months} 個月・<span className="pd-mono">NT${x.amount.toLocaleString()}</span>
+                {x.paidAt ? <span className="pd-label">　已付款</span> : <>　<Chip tone="warn">待付款</Chip></>}
+              </Row>
+            ))}
             <Row label="發票">{INVOICE[r.invoiceKind]}{r.invoiceValue && <span className="pd-mono">　{r.invoiceValue}</span>}{r.invoiceKind === "company" && <span className="pd-mono">　{c.taxId}</span>}</Row>
           </dl>
         </section>

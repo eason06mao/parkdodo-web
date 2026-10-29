@@ -321,7 +321,8 @@ async function entry(db: Db, gw: Gateway, e: EdgeEvent, laneId: string, plate: s
 async function exitQuote(db: Db, gw: Gateway, e: EdgeEvent, plate: string): Promise<Omit<EventResult, "uid" | "status">> {
   const s = await findOpenSession(db, gw.siteId, plate);
   if (!s) return { decision: { action: "hold", reason: "no_entry_record" } };
-  if (s.session_type !== "transient" || (await isMonthly(db, gw.siteId, plate, e.occurredAt))) {
+  // 以「入場時」判定的身分為準：同合約第二台車入場時已被判為臨停，出場照臨停收費
+  if (s.session_type !== "transient") {
     return { sessionId: s.id, amount: 0, decision: { action: "open", reason: "monthly" } };
   }
   const rate = await currentSchedule(db, gw.siteId, new Date(s.entry_at));
