@@ -5,9 +5,10 @@ import { NextResponse, type NextRequest } from "next/server";
 //   1. 登入頁 /__gate（表單＋簽章 cookie，12 小時）：桌面版 App 內建瀏覽器、手機都能用
 //   2. HTTP Basic Auth：給 curl、腳本使用
 // cookie 用 STAGING_BASIC_AUTH 做 HMAC 簽章；換密碼後舊的登入自動失效。
-// 例外：統一金流的背景通知必須能直接打進來（它自己有 HashInfo 驗證）。
+// 例外：統一金流的背景通知必須能直接打進來（它自己有 HashInfo 驗證）；工控機 API 用裝置金鑰。
 // 正式站不設這個變數，改用正式登入與 MFA。
-const OPEN_PATHS = ["/api/payments/payuni/notify"];
+// /api/edge/ 由工控機的裝置金鑰驗證（不用門禁帳密）
+const OPEN_PATHS = ["/api/payments/payuni/notify", "/api/edge/"];
 const GATE = "/__gate";
 const COOKIE = "pd_staging_gate";
 const MAX_AGE = 12 * 60 * 60;

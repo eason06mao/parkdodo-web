@@ -1,0 +1,11 @@
+{
+  "cloudUrl": "https://parkdodo-staging-XXXXXXXX.asia-east1.run.app",
+  "simulate": false,
+  "simPort": 8787,
+  "offlineUnpaidExit": "hold",
+  "minConfidence": 0.7,
+  "duplicateSeconds": 10,
+  "exitWaitMinutes": 5,
+  "passSignalEdge": "rise",
+  "voices": null
+}

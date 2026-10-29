@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { validatePlan, type Promotion, type RatePlan } from "@/lib/billing/fee";
-import { auditEntries, rateSchedules, siteRecords } from "@/lib/mock/tenancy";
+import { dbConfigured, tx } from "@/lib/db";
+import { accounts, auditEntries, rateSchedules, siteRecords } from "@/lib/mock/tenancy";
 import { can } from "@/lib/permissions";
 
 // Mock：儲存場站費率並「下發」到 Edge。
@@ -35,9 +36,26 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
   }
   if (!b.reason?.trim()) return NextResponse.json({ error: "invalid", message: "請填寫修改原因。" }, { status: 422 });
 
+  // 有雲端資料庫：新增一個費率版本（舊版本保留、結束生效），工控機下次心跳會看到設定版本變更並重新下載
+  if (dbConfigured()) {
+    const email = accounts.find((a) => a.id === user.id)?.email ?? "";
+    const saved = await tx(async (c) => {
+      const s = (await c.query("SELECT id FROM sites WHERE code = $1", [site.code])).rows[0];
+      if (!s) return false;
+      const u = (await c.query("SELECT id FROM users WHERE email = $1", [email])).rows[0];
+      await c.query("UPDATE fee_rate_versions SET effective_to = now() WHERE site_id = $1 AND effective_to IS NULL", [s.id]);
+      await c.query(
+        `INSERT INTO fee_rate_versions (site_id, version_no, rules, effective_from, approved_by)
+         SELECT $1, COALESCE(max(version_no), 0) + 1, $2, now(), $3 FROM fee_rate_versions WHERE site_id = $1`,
+        [s.id, JSON.stringify({ base: b.base, promotions: sorted }), u?.id ?? null]);
+      return true;
+    }).catch((e) => { console.error("[rates db]", e); return null; });
+    if (saved === null) return NextResponse.json({ error: "server_error", message: "費率寫入雲端資料庫失敗，請再試一次。" }, { status: 500 });
+  }
+
   const prev = rateSchedules[id];
   const next = { base: b.base, promotions: sorted, version: (prev?.version ?? 0) + 1, updatedAt: new Date().toISOString(), updatedBy: user.name };
   rateSchedules[id] = next;
   auditEntries.unshift({ at: next.updatedAt, actor: user.name, action: "修改費率", target: `${site.name}・第 ${next.version} 版`, orgId: site.orgId, reason: b.reason.trim() });
-  return NextResponse.json({ version: next.version, edge: "queued", mock: true });
+  return NextResponse.json({ version: next.version, edge: "queued", mock: !dbConfigured() });
 }

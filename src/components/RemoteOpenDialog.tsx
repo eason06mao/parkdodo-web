@@ -4,27 +4,57 @@ import { useRef, useState } from "react";
 import { GATE_REASONS, type GateReason } from "@/lib/types";
 
 /**
- * 遠端開閘：原因必選、「其他」須填說明、送出前 MFA（此版為示意）。
- * 正式版送出 POST /api/gate-commands，後端寫入 gate_commands（有效 30 秒）並由 Edge 執行。
+ * 遠端開閘：原因必選、「其他」須填說明。送出 POST /api/gate-commands，後端寫入 gate_commands（有效 30 秒），
+ * 現場工控機取回後透過相機繼電器開閘並回報；畫面每秒查詢一次結果。MFA 尚未實作（TODO）。
  */
-export function RemoteOpenButton({ laneName, plate, variant = "primary" }: { laneName: string; plate?: string; variant?: "primary" | "default" }) {
+type Phase = "form" | "sending" | "waiting" | "executed" | "failed" | "expired" | "mock";
+
+export function RemoteOpenButton({ siteId, laneCode, laneName, plate, variant = "primary" }: { siteId: string; laneCode: string; laneName: string; plate?: string; variant?: "primary" | "default" }) {
   const ref = useRef<HTMLDialogElement>(null);
   const [reason, setReason] = useState<GateReason>("intercom_request");
   const [note, setNote] = useState("");
   const [error, setError] = useState("");
-  const [sent, setSent] = useState(false);
+  const [phase, setPhase] = useState<Phase>("form");
+  const [detail, setDetail] = useState("");
+  const timer = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const open = () => { setSent(false); setError(""); ref.current?.showModal(); };
-  const close = () => ref.current?.close();
+  const stop = () => { if (timer.current) clearInterval(timer.current); timer.current = null; };
+  const open = () => { stop(); setPhase("form"); setError(""); setDetail(""); ref.current?.showModal(); };
+  const close = () => { stop(); ref.current?.close(); };
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (reason === "other" && note.trim() === "") {
       setError("原因選「其他」時，請填寫補充說明。");
       return;
     }
-    setError("");
-    setSent(true);
+    setError(""); setPhase("sending");
+    const res = await fetch("/api/gate-commands", {
+      method: "POST", headers: { "content-type": "application/json" },
+      body: JSON.stringify({ siteId, laneCode, plate, reasonCode: reason, reasonNote: note, idempotencyKey: crypto.randomUUID() }),
+    }).catch(() => null);
+    const body = await res?.json().catch(() => ({}));
+    if (!res?.ok) { setPhase("form"); setError(body?.message ?? "送出失敗，請再試一次。"); return; }
+    if (body.mock) { setPhase("mock"); return; }
+    setPhase("waiting");
+    const until = Date.parse(body.expiresAt) + 3000;
+    timer.current = setInterval(async () => {
+      const r = await fetch(`/api/gate-commands/${body.id}`, { cache: "no-store" }).then((x) => x.json()).catch(() => null);
+      const st = r?.status as string | undefined;
+      if (st === "executed" || st === "failed" || st === "expired") {
+        stop(); setPhase(st); setDetail(r?.result?.detail ?? "");
+      } else if (Date.now() > until) {
+        stop(); setPhase("expired");
+      }
+    }, 1000);
+  };
+
+  const RESULT: Record<Exclude<Phase, "form" | "sending">, { title: string; text: string }> = {
+    waiting: { title: "指令已送出", text: `${laneName}：等待現場工控機執行（30 秒內有效）…` },
+    executed: { title: "已開閘", text: `${laneName}：工控機已執行開閘，車輛通過後會自動結案。` },
+    failed: { title: "開閘失敗", text: `${laneName}：工控機回報無法開閘${detail ? `（${detail}）` : ""}。請改用現場人員處理。` },
+    expired: { title: "工控機沒有回應", text: `${laneName}：30 秒內沒有執行，指令已作廢，不會延遲開閘。請確認工控機是否連線。` },
+    mock: { title: "指令已送出（示意）", text: `${laneName}：雲端資料庫尚未設定，此為示意，未連接實際設備。` },
   };
 
   return (
@@ -33,7 +63,7 @@ export function RemoteOpenButton({ laneName, plate, variant = "primary" }: { lan
         遠端開閘
       </button>
       <dialog ref={ref} className="pd-dialog" aria-labelledby={`dlg-${laneName}`}>
-        {!sent ? (
+        {phase === "form" || phase === "sending" ? (
           <form onSubmit={submit} style={{ display: "flex", flexDirection: "column", gap: 18 }}>
             <div>
               <h2 id={`dlg-${laneName}`} className="pd-serif" style={{ margin: 0, fontSize: 22 }}>遠端開閘・{laneName}</h2>
@@ -61,15 +91,13 @@ export function RemoteOpenButton({ laneName, plate, variant = "primary" }: { lan
             </div>
             <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
               <button type="button" className="pd-btn" onClick={close}>取消</button>
-              <button type="submit" className="pd-btn pd-btn--primary">驗證並開閘</button>
+              <button type="submit" className="pd-btn pd-btn--primary" disabled={phase === "sending"}>{phase === "sending" ? "送出中…" : "確認開閘"}</button>
             </div>
           </form>
         ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-            <h2 className="pd-serif" style={{ margin: 0, fontSize: 22 }}>指令已送出（示意）</h2>
-            <p style={{ margin: 0, color: "var(--pd-ink-2)", lineHeight: 1.7 }}>
-              {laneName}：等待現場 Edge 執行並由雷達確認車輛通過。此為 Mock 版本，未連接實際設備。
-            </p>
+          <div style={{ display: "flex", flexDirection: "column", gap: 14 }} aria-live="polite">
+            <h2 className="pd-serif" style={{ margin: 0, fontSize: 22 }}>{RESULT[phase].title}</h2>
+            <p style={{ margin: 0, color: "var(--pd-ink-2)", lineHeight: 1.7 }}>{RESULT[phase].text}</p>
             <div style={{ display: "flex", justifyContent: "flex-end" }}>
               <button type="button" className="pd-btn pd-btn--primary" onClick={close}>完成</button>
             </div>

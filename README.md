@@ -140,3 +140,25 @@ cd edge/FkProtocol.Tests && dotnet run
   瀏覽器會轉到登入頁 `/__gate`（桌面版 App 內建瀏覽器、手機都能用），登入保留 12 小時；`/__gate?logout=1` 登出。curl 等工具仍可用 Basic Auth。換密碼後舊的登入自動失效。
 - 沒人使用時自動關機（min-instances 0），第一次打開會慢幾秒。
 - 第一次設定：在 Google Cloud Shell 執行 `bash scripts/gcp-staging-setup.sh <專案ID>`，再把印出的三個值填到 GitHub 的 Actions Variables。不需要也不會產生任何金鑰檔。
+
+## 工控機（Edge）與雲端連線
+
+```
+ICE 相機（車牌辨識、繼電器開閘、雷達 IO、FK 顯示卡 RS-485）──網路線── 工控機 ParkDodo Edge ──HTTPS── 雲端 /api/edge/v1
+```
+
+- 原則：**開閘由現場工控機決定，金額由雲端決定**。入場不等雲端立刻開閘；出口問雲端（最多 2.5 秒），斷網時用本機副本判斷。
+- 雲端 API（裝置金鑰驗證，不需門禁帳密）：`pair` 配對、`heartbeat` 心跳、`config` 設定、`events` 事件（以 uid 去重）、
+  `exit-check` 出口等待付款確認、`images` 車牌照片、`commands` 遠端開閘。程式在 `src/lib/edge/`。
+- 後台：站點頁「配對工控機」產生 8 位數一次性配對碼（10 分鐘）；工控機狀態、待補傳筆數即時顯示；遠端開閘會等工控機回報結果。
+- 工控機程式：`edge/ParkDodo.Edge`（C# .NET 8，只用內建函式庫）。安裝方式見 `edge/ParkDodo.Edge/README.md`；
+  Windows 安裝包由 GitHub Actions「工控機程式」自動產生。
+- 沒有設備也能測：`npx tsx scripts/edge-sim.ts`（模擬工控機呼叫雲端），或工控機程式 `simulate: true`（本機模擬網頁 http://localhost:8787）。
+- 測試：`npm run test:edge`（需要 `DATABASE_URL`）、`dotnet run --project edge/ParkDodo.Edge.Tests`（計費與雲端逐筆一致、斷網、佇列）。
+
+## 雲端資料庫（Cloud SQL）
+
+- 設定 `DATABASE_URL` 後，後台的配對、工控機狀態、遠端開閘、費率改寫入資料庫；沒設定時維持 Mock。
+- 第一次設定：Google Cloud Shell 執行 `bash scripts/gcp-cloudsql-setup.sh <專案ID>`，再把印出的 `CLOUDSQL_INSTANCE`、`EDGE_IMAGE_BUCKET` 填到 GitHub Variables。
+  之後每次部署會自動套用新的 migration（`scripts/migrate.mjs`）。資料庫密碼只存在 Secret Manager。
+- 本機：`DATABASE_URL=postgres://... node scripts/migrate.mjs --seed` 建表並寫入測試站資料（中航站 TXG001）。
