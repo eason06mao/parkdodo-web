@@ -130,5 +130,6 @@ cd edge/FkProtocol.Tests && dotnet run
 
 - `main` 合併、GitHub 自動檢查通過後，自動部署到 Cloud Run 服務 `parkdodo-staging`（asia-east1）。
 - 測試站整站有門禁帳密（`STAGING_BASIC_AUTH`，存在 Secret Manager）；只有統一金流背景通知 `/api/payments/payuni/notify` 不需門禁。
+  瀏覽器會轉到登入頁 `/__gate`（桌面版 App 內建瀏覽器、手機都能用），登入保留 12 小時；`/__gate?logout=1` 登出。curl 等工具仍可用 Basic Auth。換密碼後舊的登入自動失效。
 - 沒人使用時自動關機（min-instances 0），第一次打開會慢幾秒。
 - 第一次設定：在 Google Cloud Shell 執行 `bash scripts/gcp-staging-setup.sh <專案ID>`，再把印出的三個值填到 GitHub 的 Actions Variables。不需要也不會產生任何金鑰檔。
