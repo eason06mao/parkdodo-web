@@ -5,7 +5,7 @@
 //   npm run db:reset    刪掉所有本機資料，重新啟動（只影響本機）
 import { spawnSync } from "node:child_process";
 
-const MIGRATIONS = ["/db/migrations/0001_v2_core.sql", "/db/migrations/0002_tenancy_licensing.sql", "/db/migrations/0003_custom_roles.sql", "/db/migrations/0004_edge_link.sql"];
+const MIGRATIONS = ["/db/migrations/0001_v2_core.sql", "/db/migrations/0002_tenancy_licensing.sql", "/db/migrations/0003_custom_roles.sql", "/db/migrations/0004_edge_link.sql", "/db/migrations/0005_monthly_detail.sql"];
 const TESTS = ["/db/tests/0001_constraints_test.sql", "/db/tests/0002_tenancy_test.sql", "/db/tests/0003_custom_roles_test.sql"];
 
 function run(args, { quiet = false } = {}) {

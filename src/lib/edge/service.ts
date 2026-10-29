@@ -133,7 +133,7 @@ export async function getConfig(db: Db, gw: Gateway) {
   const monthly = (await db.query(
     `SELECT v.plate_no, c.contract_no, c.ends_on FROM monthly_contracts c
      JOIN contract_vehicles cv ON cv.contract_id = c.id JOIN vehicles v ON v.id = cv.vehicle_id
-     WHERE c.site_id = $1 AND c.status = 'active' AND current_date BETWEEN c.starts_on AND c.ends_on`, [gw.siteId])).rows;
+     WHERE c.site_id = $1 AND c.status = 'active' AND (now() AT TIME ZONE 'Asia/Taipei')::date BETWEEN COALESCE(c.activates_on, c.starts_on) AND c.ends_on`, [gw.siteId])).rows;
   const open = (await db.query(
     "SELECT id, plate_no, entry_at, total_charged FROM parking_sessions WHERE site_id = $1 AND status IN ('open','paid','exiting')",
     [gw.siteId])).rows;
@@ -290,7 +290,7 @@ async function findOpenSession(db: Db, siteId: string, plate: string | null, ses
 async function isMonthly(db: Db, siteId: string, plate: string, at: string): Promise<string | null> {
   const r = await db.query(
     `SELECT c.id FROM monthly_contracts c JOIN contract_vehicles cv ON cv.contract_id = c.id JOIN vehicles v ON v.id = cv.vehicle_id
-     WHERE c.site_id = $1 AND v.plate_no = $2 AND c.status = 'active' AND ($3::timestamptz AT TIME ZONE 'Asia/Taipei')::date BETWEEN c.starts_on AND c.ends_on
+     WHERE c.site_id = $1 AND v.plate_no = $2 AND c.status = 'active' AND ($3::timestamptz AT TIME ZONE 'Asia/Taipei')::date BETWEEN COALESCE(c.activates_on, c.starts_on) AND c.ends_on
      LIMIT 1`, [siteId, plate, at]);
   return r.rows[0]?.id ?? null;
 }
@@ -301,7 +301,14 @@ async function entry(db: Db, gw: Gateway, e: EdgeEvent, laneId: string, plate: s
     // 同一台車已在場內（例如前一次出場沒拍到）：仍放行入場，但不重複建立紀錄，交由例外處理
     return { sessionId: existing.id as string, decision: { action: "open", reason: "already_inside" } as Decision };
   }
-  const monthlyId = await isMonthly(db, gw.siteId, plate, e.occurredAt);
+  let monthlyId = await isMonthly(db, gw.siteId, plate, e.occurredAt);
+  if (monthlyId) {
+    // 一份月租登記多台車：同時只能一台以月租身分在場，第二台以臨停計費
+    const other = await db.query(
+      `SELECT 1 FROM parking_sessions WHERE site_id = $1 AND monthly_contract_id = $2 AND status IN ('open','paid','exiting','exception') LIMIT 1`,
+      [gw.siteId, monthlyId]);
+    if (other.rowCount) monthlyId = null;
+  }
   const rate = await currentSchedule(db, gw.siteId, new Date(e.occurredAt));
   const r = await db.query(
     `INSERT INTO parking_sessions (site_id, org_id, plate_no, session_type, monthly_contract_id, entry_lane_id, entry_event_uid, entry_at, entry_confidence, fee_rate_version_id)

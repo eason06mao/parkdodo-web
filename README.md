@@ -30,7 +30,9 @@ NEXT_PUBLIC_FEATURE_CASH_KIOSK=true npm run dev
 | `/console/monitor` | 即時監控（深色） |
 | `/console/incidents` | 例外處理（清單＋詳情） |
 | `/console/sessions` | 車輛進出紀錄 |
-| `/console/monthly` | 月租管理 |
+| `/console/monthly` | 月租管理：清單（搜尋車牌／姓名／電話、方案、狀態篩選）、到期與待開通統計 |
+| `/console/monthly/new` | 新增月租：方案與車位、客戶（個人／公司統編）、車輛（最多 3 台）、生效日／啟用日／期數、費用與付款、發票、到期提醒 |
+| `/console/monthly/[id]` | 月租合約：確認收款、續約、停用／恢復、變更車牌、異動紀錄 |
 | `/console/analytics` | 營收與車輛戰情板（日／週／月／季＋自訂日期） |
 | `/console/sites` | 場站與設備（站點清單、組織清單） |
 | `/console/sites/new` | 新增站點（僅總部；4 步驟） |
