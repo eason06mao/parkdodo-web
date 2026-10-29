@@ -34,7 +34,8 @@ jobs:
       - name: Edge 測試
         run: dotnet run --project edge/ParkDodo.Edge.Tests
       - name: FK 封包 CRC 測試
-        run: dotnet run --project edge/FkProtocol.Tests
+        working-directory: edge/FkProtocol.Tests
+        run: dotnet run
 
   package:
     name: Windows 安裝包
