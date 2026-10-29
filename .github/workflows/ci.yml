@@ -33,6 +33,8 @@ jobs:
         run: npm run test:billing
       - name: 自訂角色規則測試
         run: npm run test:roles
+      - name: 月租建檔規則測試
+        run: npm run test:monthly
       - name: 正式建置
         run: npm run build
 
@@ -63,6 +65,7 @@ jobs:
           psql -v ON_ERROR_STOP=1 -q -f db/migrations/0002_tenancy_licensing.sql
           psql -v ON_ERROR_STOP=1 -q -f db/migrations/0003_custom_roles.sql
           psql -v ON_ERROR_STOP=1 -q -f db/migrations/0004_edge_link.sql
+          psql -v ON_ERROR_STOP=1 -q -f db/migrations/0005_monthly_detail.sql
       - name: 約束測試
         run: |
           psql -v ON_ERROR_STOP=1 -f db/tests/0001_constraints_test.sql | tee t1.log

@@ -1,7 +1,7 @@
 // Mock 資料：只用於開發與展示。車牌皆為範例格式，非真實車輛。
 // 上線時由 src/lib/data.ts 改接雲端 API，畫面元件不需修改。
 import type {
-  AnalyticsData, CashKioskStatus, Incident, Lane, MetricPoint, MonthlyContract, ParkingSession, Period, Site,
+  AnalyticsData, CashKioskStatus, Incident, Lane, MetricPoint, ParkingSession, Period, Site,
 } from "../types";
 
 export const sites: Site[] = [
@@ -69,13 +69,6 @@ export const sessions: ParkingSession[] = [
   { id: "s6", plate: "MNO-4321", type: "臨停", entryAt: "2026-10-18T20:12:00+08:00", exitAt: "2026-10-18T20:40:00+08:00", fee: 30, discount: 0, status: "待確認" },
 ];
 
-export const contracts: MonthlyContract[] = [
-  { id: "m1", owner: "車主 A", plate: "DEF-2468", plan: "固定車位", space: "B-12", startsOn: "2026-10-01", endsOn: "2026-10-31", inside: true, status: "有效" },
-  { id: "m2", owner: "車主 B", plate: "PQR-7788", plan: "共用月租", startsOn: "2026-10-05", endsOn: "2026-11-04", inside: false, status: "即將到期" },
-  { id: "m3", owner: "車主 C", plate: "STU-1122", plan: "共用月租", startsOn: "2026-10-15", endsOn: "2026-11-14", inside: true, status: "有效" },
-  { id: "m4", owner: "車主 D", plate: "VWX-3344", plan: "固定車位", space: "B-07", startsOn: "2026-09-01", endsOn: "2026-09-30", inside: false, status: "已過期" },
-  { id: "m5", owner: "車主 E", plate: "LMN-5566", plan: "共用月租", startsOn: "2026-10-10", endsOn: "2026-11-09", inside: false, status: "有效" },
-];
 
 export const cashKiosk: CashKioskStatus = {
   name: "繳費機-1",

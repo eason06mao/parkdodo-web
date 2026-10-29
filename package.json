@@ -19,6 +19,7 @@
     "test:billing": "tsx --test tests/billing/fee.test.ts",
     "test:roles": "tsx --test tests/roles/roles.test.ts",
     "test:edge": "tsx --test tests/edge/edge.test.ts",
+    "test:monthly": "tsx --test tests/monthly/monthly.test.ts",
     "db:migrate:url": "node scripts/migrate.mjs"
   },
   "engines": {

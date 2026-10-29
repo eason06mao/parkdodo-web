@@ -1,7 +1,9 @@
 // 資料存取層：畫面只呼叫這裡的函式。
 // 目前回傳 Mock；接上雲端 API 後，只需把各函式改成 fetch，元件不必修改。
-import { cashKiosk, contracts, incidents, lanes, sessions, sites, buildAnalytics } from "./mock/data";
-import type { AnalyticsData, CashKioskStatus, Incident, Lane, MonthlyContract, ParkingSession, Period, Site } from "./types";
+import { cashKiosk, incidents, lanes, sessions, sites, buildAnalytics } from "./mock/data";
+import { fixedSpaces, monthlyPlans, monthlyRecords, type MonthlyRecord } from "./mock/monthly";
+import type { MonthlyPlan } from "./monthly";
+import type { AnalyticsData, CashKioskStatus, Incident, Lane, ParkingSession, Period, Site } from "./types";
 import { features } from "./features";
 import { accounts, auditEntries, organizations, siteRecords } from "./mock/tenancy";
 import { can, type Principal } from "./permissions";
@@ -11,7 +13,6 @@ export async function getSites(): Promise<Site[]> { return sites; }
 export async function getLanes(): Promise<Lane[]> { return lanes; }
 export async function getIncidents(): Promise<Incident[]> { return incidents; }
 export async function getSessions(): Promise<ParkingSession[]> { return sessions; }
-export async function getContracts(): Promise<MonthlyContract[]> { return contracts; }
 export function getAnalytics(period: Period): AnalyticsData { return buildAnalytics(period); }
 
 /** 現金繳費機：功能開關關閉時回傳 null，畫面顯示「預留・未啟用」。 */
@@ -65,3 +66,25 @@ export function nextSiteCode(city: string): string {
   const n = siteRecords.filter((s) => s.code.startsWith(prefix)).length + 1;
   return `${prefix}${String(n).padStart(3, "0")}`;
 }
+
+// ---------- 月租 ----------
+
+const monthlyVisible = (user: Principal, siteId: string) => {
+  const s = siteRecords.find((x) => x.id === siteId);
+  return !!s && siteVisible(user, s);
+};
+
+export async function getMonthlyRecords(user: Principal): Promise<MonthlyRecord[]> {
+  return monthlyRecords.filter((r) => monthlyVisible(user, r.siteId)).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+}
+
+export async function getMonthlyRecord(user: Principal, id: string): Promise<MonthlyRecord | null> {
+  const r = monthlyRecords.find((x) => x.id === id);
+  return r && monthlyVisible(user, r.siteId) ? r : null;
+}
+
+export async function getMonthlyPlans(user: Principal): Promise<MonthlyPlan[]> {
+  return monthlyPlans.filter((p) => p.active && monthlyVisible(user, p.siteId));
+}
+
+export function getFixedSpaces(siteId: string): string[] { return fixedSpaces[siteId] ?? []; }

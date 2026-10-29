@@ -17,7 +17,7 @@ export async function POST(req: Request) {
   if (problem) return NextResponse.json({ error: "forbidden", message: problem }, { status: problem.startsWith("你沒有") ? 403 : 422 });
 
   const role: Role = {
-    code: `c_${Date.now().toString(36)}`, name: draft.name, description: draft.description, orgType: org.type, orgId: org.id,
+    code: `c_${crypto.randomUUID().replace(/-/g, "").slice(0, 10)}`, name: draft.name, description: draft.description, orgType: org.type, orgId: org.id,
     permissions: draft.permissions, createdBy: user.name, updatedAt: new Date().toISOString(),
   };
   customRoles().push(role);

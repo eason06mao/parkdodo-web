@@ -181,3 +181,31 @@ t("出口等待付款：付款完成後重新確認就放行（不建立事件�
   assert.equal(afterN.rows[0].n, before.rows[0].n);
   await assert.rejects(exitDecision(c, gw, { laneCode: "IN-1", plate }), /只能查詢出口/);
 });
+
+t("月租：啟用日前、未付款不算月租；同一合約第二台車以臨停計費", async (c) => {
+  const { gw } = await paired(c);
+  const p1 = rp(), p2 = rp(), p3 = rp();
+  const plan = (await c.query("INSERT INTO monthly_plans (site_id, name, plan_type, monthly_price) VALUES ($1, '測試共用', 'shared', 2200) RETURNING id", [SITE])).rows[0].id;
+  const cu = (await c.query("INSERT INTO customers (display_name, phone) VALUES ('測試', '0912000000') RETURNING id")).rows[0].id;
+  const mk = async (no: string, plates: string[], status: string, pay: string, activates: string) => {
+    const id = (await c.query(
+      `INSERT INTO monthly_contracts (site_id, plan_id, customer_id, contract_no, starts_on, ends_on, status, activates_on, payment_status)
+       VALUES ($1, $2, $3, $4, current_date - 5, current_date + 25, $5, ${activates}, $6) RETURNING id`, [SITE, plan, cu, no, status, pay])).rows[0].id;
+    for (const p of plates) {
+      const v = (await c.query("INSERT INTO vehicles (plate_no) VALUES ($1) RETURNING id", [p.replace("-", "")])).rows[0].id;
+      await c.query("INSERT INTO contract_vehicles VALUES ($1, $2)", [id, v]);
+    }
+  };
+  await mk(`T-${randomUUID()}`, [p1, p2], "active", "paid", "current_date - 5");
+  await mk(`T-${randomUUID()}`, [p3], "active", "paid", "current_date + 2");   // 還沒到啟用日
+  const [a] = await ingestEvents(c, gw, [ev("plate_read", "IN-1", 20, { plate: p1 })]);
+  assert.deepEqual(a.decision, { action: "open", reason: "monthly" });
+  const [b] = await ingestEvents(c, gw, [ev("plate_read", "IN-1", 10, { plate: p2 })]);
+  assert.deepEqual(b.decision, { action: "open", reason: "entry" }, "第二台以臨停進場");
+  const [d] = await ingestEvents(c, gw, [ev("plate_read", "IN-1", 5, { plate: p3 })]);
+  assert.deepEqual(d.decision, { action: "open", reason: "entry" }, "未到啟用日以臨停進場");
+  const cfg = await getConfig(c, gw);
+  const wl = cfg.monthlyWhitelist.map((m) => m.plate);
+  assert.ok(wl.includes(p1.replace("-", "")) && !wl.includes(p3.replace("-", "")));
+  await assert.rejects(c.query("UPDATE monthly_contracts SET payment_status = 'unpaid' WHERE contract_no LIKE 'T-%' AND status = 'active'"), /monthly_paid_before_active/);
+});
