@@ -2,7 +2,7 @@
 // 新增的站點與帳號只存在記憶體，重新啟動開發伺服器後會消失。
 import type { RateSchedule } from "../billing/fee";
 import { DEFAULT_PLAN } from "../billing/fee";
-import type { Principal } from "../permissions";
+import { customRoles, type Principal, type Role } from "../permissions";
 import type { AccountRecord, AuditEntry, Organization, SiteRecord } from "../types";
 
 const seed_organizations: Organization[] = [
@@ -48,9 +48,21 @@ const seed_accounts: AccountRecord[] = [
     bindings: [{ orgId: "org-lic-a", role: "licensee_admin" }] },
   { id: "u-lic-staff", name: "示範客戶 A 現場", email: "a-staff@example.com", status: "invited", mfa: false,
     bindings: [{ orgId: "org-lic-a", role: "licensee_staff", siteId: "site-002" }] },
+  { id: "u-lic-night", name: "示範客戶 A 夜班", email: "a-night@example.com", status: "active", mfa: true, lastLoginAt: "2026-10-28T23:40:00+08:00",
+    bindings: [{ orgId: "org-lic-a", role: "c_lic_night", siteId: "site-002" }] },
+];
+
+// 示範自訂角色：系統客戶 A 的「夜班值班」（可人工補登與遠端開閘，但不能改費率、不能退款）
+const seed_customRoles: Role[] = [
+  { code: "c_lic_night", name: "夜班值班", orgType: "licensee", orgId: "org-lic-a",
+    description: "夜間例外處理、人工補登、遠端開閘",
+    permissions: ["site.view", "session.view", "incident.handle", "session.adjust", "gate.remote_open"],
+    createdBy: "示範客戶 A 管理員", updatedAt: "2026-10-28T20:00:00+08:00" },
 ];
 
 const seed_auditEntries: AuditEntry[] = [
+  { at: "2026-10-28T20:05:00+08:00", actor: "示範客戶 A 管理員", action: "邀請帳號", target: "a-night@example.com・夜班值班・示範二號站", orgId: "org-lic-a" },
+  { at: "2026-10-28T20:00:00+08:00", actor: "示範客戶 A 管理員", action: "建立角色", target: "夜班值班：檢視站點、檢視進出紀錄、處理例外、人工結案、調整紀錄、遠端開閘", orgId: "org-lic-a" },
   { at: "2026-10-20T18:31:00+08:00", actor: "示範客戶 A 管理員", action: "邀請帳號", target: "a-staff@example.com・系統客戶現場人員・示範二號站", orgId: "org-lic-a" },
   { at: "2026-10-20T15:12:00+08:00", actor: "示範總部管理員", action: "開立授權", target: "示範二號站・LIC-2026-0001・標準版", orgId: "org-lic-a" },
   { at: "2026-10-20T15:05:00+08:00", actor: "示範總部管理員", action: "新增站點", target: "示範二號站（TXG002）→ 示範系統客戶 A", orgId: "org-lic-a" },
@@ -64,6 +76,7 @@ export const mockPersonas: (Principal & { label: string })[] = [
   { id: "u-hq-ops", name: "示範值班人員", label: "總部營運", isHq: true, bindings: [{ orgId: "org-hq", role: "hq_ops" }] },
   { id: "u-lic-admin", name: "示範客戶 A 管理員", label: "系統客戶管理員", isHq: false, bindings: [{ orgId: "org-lic-a", role: "licensee_admin" }] },
   { id: "u-lic-staff", name: "示範客戶 A 現場", label: "系統客戶現場人員", isHq: false, bindings: [{ orgId: "org-lic-a", role: "licensee_staff", siteId: "site-002" }] },
+  { id: "u-lic-night", name: "示範客戶 A 夜班", label: "系統客戶夜班（自訂角色）", isHq: false, bindings: [{ orgId: "org-lic-a", role: "c_lic_night", siteId: "site-002" }] },
 ];
 
 const seed_rateSchedules: Record<string, RateSchedule & { version: number; updatedAt: string; updatedBy: string }> = {
@@ -78,4 +91,9 @@ store.__pdTenancy ??= {
   rateSchedules: seed_rateSchedules,
 };
 store.__pdTenancy.rateSchedules ??= seed_rateSchedules;
+const roleStore = globalThis as unknown as { __pdCustomRolesSeeded?: boolean };
+if (!roleStore.__pdCustomRolesSeeded) {
+  customRoles().push(...seed_customRoles);
+  roleStore.__pdCustomRolesSeeded = true;
+}
 export const { organizations, siteRecords, accounts, auditEntries, rateSchedules } = store.__pdTenancy;

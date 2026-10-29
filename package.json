@@ -16,7 +16,8 @@
     "test:payuni": "tsx --test tests/payuni/crypto.test.ts",
     "payuni:check": "tsx scripts/payuni-check.ts",
     "test:invoice": "tsx --test tests/invoice/invoice.test.ts",
-    "test:billing": "tsx --test tests/billing/fee.test.ts"
+    "test:billing": "tsx --test tests/billing/fee.test.ts",
+    "test:roles": "tsx --test tests/roles/roles.test.ts"
   },
   "engines": {
     "node": ">=20"

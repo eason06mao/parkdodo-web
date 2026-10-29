@@ -31,6 +31,8 @@ jobs:
         run: npm run test:invoice
       - name: 計費規則測試
         run: npm run test:billing
+      - name: 自訂角色規則測試
+        run: npm run test:roles
       - name: 正式建置
         run: npm run build
 
@@ -59,12 +61,15 @@ jobs:
         run: |
           psql -v ON_ERROR_STOP=1 -q -f db/migrations/0001_v2_core.sql
           psql -v ON_ERROR_STOP=1 -q -f db/migrations/0002_tenancy_licensing.sql
+          psql -v ON_ERROR_STOP=1 -q -f db/migrations/0003_custom_roles.sql
       - name: 約束測試
         run: |
           psql -v ON_ERROR_STOP=1 -f db/tests/0001_constraints_test.sql | tee t1.log
           psql -v ON_ERROR_STOP=1 -f db/tests/0002_tenancy_test.sql | tee t2.log
+          psql -v ON_ERROR_STOP=1 -f db/tests/0003_custom_roles_test.sql | tee t3.log
           grep -q "ALL CONSTRAINT TESTS PASSED" t1.log
           grep -q "ALL TENANCY TESTS PASSED" t2.log
+          grep -q "ALL CUSTOM ROLE TESTS PASSED" t3.log
 
   # main 合併後、兩項檢查都通過才部署測試站。尚未設定 GCP 變數時自動略過。
   deploy-staging:

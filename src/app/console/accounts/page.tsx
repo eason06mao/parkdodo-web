@@ -6,7 +6,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { getAccounts, getAuditEntries, getOrganizations, getSiteRecords } from "@/lib/data";
 import { formatDateTime } from "@/lib/format";
 import {
-  can, grantableRoles, grantableSiteScope, HQ_ONLY, ORG_TYPE_LABELS, PERMISSION_LABELS, roleByCode, ROLES, type OrgType,
+  can, canManageRoles, customRoles, grantableRoles, grantableSiteScope, HQ_ONLY, isCustomRole, ORG_TYPE_LABELS, PERMISSION_LABELS, roleByCode, ROLES, type OrgType,
 } from "@/lib/permissions";
 import { InviteButton, type InviteOrg } from "./InviteButton";
 
@@ -37,6 +37,9 @@ export default async function AccountsPage() {
     .filter((o) => o.roles.length > 0);
 
   const visibleTypes = [...new Set(user.isHq ? ROLES.map((r) => r.orgType) : orgs.map((o) => o.type))] as OrgType[];
+  const orgIds = new Set(orgs.map((o) => o.id));
+  const visibleRoles = [...ROLES, ...customRoles().filter((r) => !r.archivedAt && orgIds.has(r.orgId!))];
+  const manageRoles = orgs.some((o) => canManageRoles(user, o.id));
 
   return (
     <main className="pd-main">
@@ -45,7 +48,10 @@ export default async function AccountsPage() {
           <nav aria-label="路徑" className="pd-label"><Link href="/console">營運總覽</Link> ／ 帳號權限</nav>
           <h1 className="pd-page-title">帳號權限</h1>
         </div>
-        {inviteOrgs.length > 0 && <InviteButton key={user.id} orgs={inviteOrgs} />}
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+          <Link href="/console/accounts/roles" className="pd-btn">{manageRoles ? "管理角色" : "檢視角色"}</Link>
+          {inviteOrgs.length > 0 && <InviteButton key={user.id} orgs={inviteOrgs} />}
+        </div>
       </header>
 
       <section aria-label="帳號清單" className="pd-card" style={{ padding: 0, overflow: "hidden" }}>
@@ -79,14 +85,15 @@ export default async function AccountsPage() {
           <h2 id="roles-h" className="pd-serif" style={{ margin: 0, fontSize: 20 }}>角色與權限</h2>
           <p className="pd-label" style={{ margin: "6px 0 14px", lineHeight: 1.8 }}>
             你只能指派「不超過自己權限」的角色；只負責特定站點的人，只能為那些站點建立帳號。
+            預設角色不符合分工時，可以到「{manageRoles ? "管理角色" : "檢視角色"}」建立自訂角色。
             遠端開閘與退款核准都需要 MFA，並寫入稽核紀錄。
           </p>
           {visibleTypes.map((t) => (
             <div key={t} style={{ marginTop: 10 }}>
               <h3 style={{ fontSize: 15, margin: "12px 0 6px" }}>{ORG_TYPE_LABELS[t]}</h3>
-              {ROLES.filter((r) => r.orgType === t).map((r) => (
+              {visibleRoles.filter((r) => r.orgType === t).map((r) => (
                 <details key={r.code} style={{ borderTop: "1px solid var(--pd-line-soft)", padding: "10px 0" }}>
-                  <summary style={{ cursor: "pointer", minHeight: 28 }}><strong style={{ fontWeight: 500 }}>{r.name}</strong><span className="pd-label">　{r.description}</span></summary>
+                  <summary style={{ cursor: "pointer", minHeight: 28 }}><strong style={{ fontWeight: 500 }}>{r.name}</strong>{isCustomRole(r) && <>　<Chip tone="ok">自訂</Chip></>}<span className="pd-label">　{r.description}{isCustomRole(r) && user.isHq ? `・${orgName(r.orgId!)}` : ""}</span></summary>
                   <ul style={{ display: "flex", flexWrap: "wrap", gap: 6, listStyle: "none", padding: 0, margin: "10px 0 0" }}>
                     {r.permissions.map((p) => (
                       <li key={p}><Chip tone={HQ_ONLY.includes(p) ? "info" : "neutral"}>{PERMISSION_LABELS[p]}</Chip></li>
