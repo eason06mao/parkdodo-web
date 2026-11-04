@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { brandForSite } from "@/lib/brandingServer";
 import { features } from "@/lib/features";
+import { siteRecords } from "@/lib/mock/tenancy";
 import { PayFlow } from "./PayFlow";
 
 export const metadata: Metadata = { title: "停車繳費" };
@@ -9,5 +10,5 @@ export const metadata: Metadata = { title: "停車繳費" };
 export default async function PayPage({ searchParams }: { searchParams: Promise<{ site?: string }> }) {
   const { site } = await searchParams;
   const code = site ?? "TXG001";
-  return <PayFlow siteCode={code} siteName="中航站" paperEnabled={features.cashKiosk} brand={await brandForSite(code)} />;
+  return <PayFlow siteCode={code} siteName={siteRecords.find((x) => x.code === code)?.name ?? "停車場"} paperEnabled={features.cashKiosk} brand={await brandForSite(code)} />;
 }
