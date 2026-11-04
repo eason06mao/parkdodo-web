@@ -1,7 +1,7 @@
 // 月租合約的後端規則（API 使用）。前端檢查在 monthly.ts；這裡另外檢查需要看到全部資料的規則：
 //   車位不能重疊出租、同一車牌不能同時有兩份有效合約、共用月租不能超過合約上限。
 // 有雲端資料庫時同步寫入，工控機的月租白名單會跟著更新。
-import { dbConfigured, tx } from "./db";
+import { dbConfigured, pool, tx } from "./db";
 import { normalizePlate as edgePlate } from "./edge/service";
 import {
   addDays, amounts, contractNo, contractState, endsOn, formatPlate, hasErrors, todayTaipei, validateContract,
@@ -15,8 +15,11 @@ export class MonthlyError extends Error {
   constructor(message: string, public status = 422, public errors?: ContractErrors) { super(message); }
 }
 
-const overlaps = (a: { activatesOn: string; endsOn: string }, b: { activatesOn: string; endsOn: string }) =>
-  a.activatesOn <= b.endsOn && b.activatesOn <= a.endsOn;
+/** 合約占用到哪一天：待付款的續約期間也先保留，避免被別人租走 */
+const reservedEnd = (r: { endsOn: string; renewals?: { endsOn: string }[] }) =>
+  (r.renewals ?? []).reduce((m, x) => (x.endsOn > m ? x.endsOn : m), r.endsOn);
+const overlaps = (a: { activatesOn: string; endsOn: string; renewals?: { endsOn: string }[] }, b: { activatesOn: string; endsOn: string; renewals?: { endsOn: string }[] }) =>
+  a.activatesOn <= reservedEnd(b) && b.activatesOn <= reservedEnd(a);
 const live = (r: MonthlyRecord) => !r.cancelled && !r.suspended && contractState(r) !== "expired";
 
 function checkConflicts(v: ContractInput & { endsOn: string }, ignoreId?: string) {
@@ -63,20 +66,36 @@ export async function createContract(user: Principal, raw: ContractInput): Promi
   const record: MonthlyRecord = {
     ...v,
     id: `m-${crypto.randomUUID().slice(0, 8)}`,
-    contractNo: contractNo(site.code, v.startsOn, monthlyRecords.filter((r) => r.siteId === site.id && r.startsOn.slice(0, 7) === v.startsOn.slice(0, 7)).length + 1),
+    contractNo: "",
     endsOn: endsOn(v.startsOn, v.months),
     createdAt: new Date().toISOString(),
     createdBy: user.name,
     paidAt: v.paymentStatus === "paid" ? new Date().toISOString() : undefined,
     inside: false,
+    renewals: [],
     history: [],
   };
   checkConflicts(record);
   const a = amounts(v);
   record.history.push({ at: record.createdAt, actor: user.name, action: "建立合約",
     note: `${plan!.name}・${v.months} 個月・應收 NT$${a.due.toLocaleString()}（${v.paymentStatus === "paid" ? "已付款" : "待付款"}）` });
-  await syncDb(record);
-  monthlyRecords.push(record);
+
+  // 合約編號：取「記憶體」與「雲端資料庫」中同站同月的最大流水號 +1；配號與加入清單在同一步完成（不會被同時建立的合約搶到同號）
+  const prefix = contractNo(site.code, v.startsOn, 0).slice(0, -4);
+  const dbMax = await maxDbSeq(prefix);
+  for (let attempt = 0; ; attempt++) {
+    const memMax = Math.max(0, ...monthlyRecords.filter((r) => r.contractNo.startsWith(prefix)).map((r) => Number(r.contractNo.slice(-4))));
+    record.contractNo = contractNo(site.code, v.startsOn, Math.max(memMax, dbMax) + 1 + attempt);
+    monthlyRecords.push(record);
+    try {
+      await syncDb(record, { isNew: true });
+      break;
+    } catch (e) {
+      monthlyRecords.splice(monthlyRecords.indexOf(record), 1);
+      if ((e as { code?: string }).code === "23505" && attempt < 5) continue;   // 編號被占用：換下一號
+      throw e;
+    }
+  }
   audit(user, site.orgId, "新增月租", `${record.contractNo}・${record.vehicles.map((x) => x.plate).join("、")}`);
   return record;
 }
@@ -101,22 +120,36 @@ export async function updateContract(user: Principal, id: string, a: MonthlyActi
 
   switch (a.action) {
     case "confirm_payment": {
-      if (r.paymentStatus === "paid") throw new MonthlyError("這份合約已經付款。", 409);
       const p = needRef(a.method, a.ref); if (p) throw new MonthlyError(p);
-      Object.assign(next, { paymentStatus: "paid", paymentMethod: a.method, paymentRef: a.ref.trim(), paidAt: now });
-      next.history.push({ at: now, actor: user.name, action: "確認收款", note: `NT$${amounts(r).due.toLocaleString()}・${a.method}` });
+      const pending = next.renewals.find((x) => !x.paidAt);
+      if (r.paymentStatus === "unpaid") {
+        Object.assign(next, { paymentStatus: "paid", paymentMethod: a.method, paymentRef: a.ref.trim(), paidAt: now });
+        next.history.push({ at: now, actor: user.name, action: "確認收款", note: `NT$${amounts(r).due.toLocaleString()}・${a.method}` });
+      } else if (pending) {
+        // 續約收款：這時才把到期日延長
+        Object.assign(pending, { paidAt: now, method: a.method, ref: a.ref.trim() });
+        next.endsOn = pending.endsOn;
+        next.history.push({ at: now, actor: user.name, action: "續約收款", note: `NT$${pending.amount.toLocaleString()}・${a.method}・到期日延至 ${pending.endsOn}` });
+      } else {
+        throw new MonthlyError("這份合約沒有待收的款項。", 409);
+      }
       break;
     }
     case "renew": {
       if (![1, 3, 6, 12].includes(a.months)) throw new MonthlyError("請選擇續約期數。");
+      if (next.renewals.some((x) => !x.paidAt)) throw new MonthlyError("已有一筆續約待付款，請先確認收款。", 409);
       if (a.paymentStatus === "paid") { const p = needRef(a.method, a.ref); if (p) throw new MonthlyError(p); }
-      // 續約：從原到期日的隔天接續；已過期很久就從今天起算
+      // 續約：從目前到期日的隔天接續；已過期就從今天起算
       const from = r.endsOn >= todayTaipei() ? addDays(r.endsOn, 1) : todayTaipei();
       const newEnds = endsOn(from, a.months);
       checkConflicts({ ...r, activatesOn: from, startsOn: from, endsOn: newEnds, months: a.months }, r.id);
-      Object.assign(next, { endsOn: newEnds, months: r.months + a.months, paymentStatus: a.paymentStatus, paymentMethod: a.method, paymentRef: a.ref.trim(),
-        paidAt: a.paymentStatus === "paid" ? now : r.paidAt, suspended: false });
-      next.history.push({ at: now, actor: user.name, action: "續約", note: `${from} 起 ${a.months} 個月，到 ${newEnds}・NT$${(r.monthlyFee * a.months).toLocaleString()}（${a.paymentStatus === "paid" ? "已付款" : "待付款"}）` });
+      const amount = r.monthlyFee * a.months;   // 續約只收這次期數的租金（押金不重收）
+      const renewal = { from, endsOn: newEnds, months: a.months, amount, createdAt: now,
+        ...(a.paymentStatus === "paid" ? { paidAt: now, method: a.method, ref: a.ref.trim() } : {}) };
+      next.renewals.push(renewal);
+      if (a.paymentStatus === "paid") { next.endsOn = newEnds; next.suspended = false; }
+      next.history.push({ at: now, actor: user.name, action: "續約",
+        note: `${from} 起 ${a.months} 個月，到 ${newEnds}・NT$${amount.toLocaleString()}（${a.paymentStatus === "paid" ? "已付款" : "待付款，收款後才延長到期日"}）` });
       break;
     }
     case "suspend":
@@ -152,20 +185,28 @@ function audit(user: Principal, orgId: string, action: string, target: string) {
 
 export const isLive = live;
 
+/** 雲端資料庫中同一前綴（站點＋年月）的最大流水號 */
+async function maxDbSeq(prefix: string): Promise<number> {
+  if (!dbConfigured()) return 0;
+  const r = await pool().query("SELECT max(right(contract_no, 4)::int) AS m FROM monthly_contracts WHERE contract_no LIKE $1 || '%' AND right(contract_no, 4) ~ '^[0-9]{4}$'", [prefix]);
+  return Number(r.rows[0]?.m ?? 0);
+}
+
 // ---------------------------------------------------------------- 雲端資料庫同步
 
 /** 寫入 customers／vehicles／monthly_contracts／contract_vehicles；工控機下次下載設定就拿到新的白名單 */
-async function syncDb(r: MonthlyRecord) {
+async function syncDb(r: MonthlyRecord, opts: { isNew?: boolean } = {}) {
   if (!dbConfigured()) return;
-  try { await writeDb(r); } catch (e) {
+  try { await writeDb(r, opts.isNew ?? false); } catch (e) {
     const code = (e as { code?: string }).code;
     if (code === "23P01") throw new MonthlyError(`車位 ${r.space} 在這段期間已出租（雲端資料庫）。`, 409, { space: "這段期間已出租。" });
+    if (code === "23505") throw e;   // 合約編號重複：由呼叫端換號重試
     if (code === "23514") throw new MonthlyError("資料不符合合約規則，請檢查日期、折扣與付款狀態。", 422);
     throw e;
   }
 }
 
-async function writeDb(r: MonthlyRecord) {
+async function writeDb(r: MonthlyRecord, isNew: boolean) {
   const site = siteRecords.find((s) => s.id === r.siteId)!;
   const plan = monthlyPlans.find((p) => p.id === r.planId)!;
   await tx(async (c) => {
@@ -175,7 +216,8 @@ async function writeDb(r: MonthlyRecord) {
     planId ??= (await c.query("INSERT INTO monthly_plans (site_id, name, plan_type, monthly_price, max_contracts) VALUES ($1, $2, $3, $4, $5) RETURNING id",
       [s.id, plan.name, plan.type, plan.monthlyPrice, plan.maxContracts ?? null])).rows[0].id;
 
-    const existing = (await c.query("SELECT id, customer_id FROM monthly_contracts WHERE contract_no = $1", [r.contractNo])).rows[0];
+    // 新合約一律 INSERT（編號重複會失敗並換號），不會覆蓋到別人的合約
+    const existing = isNew ? undefined : (await c.query("SELECT id, customer_id FROM monthly_contracts WHERE contract_no = $1", [r.contractNo])).rows[0];
     const cu = r.customer;
     const customerId = existing?.customer_id
       ? (await c.query(

@@ -198,10 +198,14 @@ t("月租：啟用日前、未付款不算月租；同一合約第二台車以�
   };
   await mk(`T-${randomUUID()}`, [p1, p2], "active", "paid", "current_date - 5");
   await mk(`T-${randomUUID()}`, [p3], "active", "paid", "current_date + 2");   // 還沒到啟用日
-  const [a] = await ingestEvents(c, gw, [ev("plate_read", "IN-1", 20, { plate: p1 })]);
+  const [a] = await ingestEvents(c, gw, [ev("plate_read", "IN-1", 60, { plate: p1 })]);
   assert.deepEqual(a.decision, { action: "open", reason: "monthly" });
-  const [b] = await ingestEvents(c, gw, [ev("plate_read", "IN-1", 10, { plate: p2 })]);
+  const [b] = await ingestEvents(c, gw, [ev("plate_read", "IN-1", 45, { plate: p2 })]);
   assert.deepEqual(b.decision, { action: "open", reason: "entry" }, "第二台以臨停進場");
+  const [bx] = await ingestEvents(c, gw, [ev("plate_read", "OUT-1", 0, { plate: p2 })]);
+  assert.deepEqual(bx.decision, { action: "pay", amount: 60, reason: "unpaid" }, "第二台出場照臨停收費");
+  const [ax] = await ingestEvents(c, gw, [ev("plate_read", "OUT-1", 0, { plate: p1 })]);
+  assert.deepEqual(ax.decision, { action: "open", reason: "monthly" });
   const [d] = await ingestEvents(c, gw, [ev("plate_read", "IN-1", 5, { plate: p3 })]);
   assert.deepEqual(d.decision, { action: "open", reason: "entry" }, "未到啟用日以臨停進場");
   const cfg = await getConfig(c, gw);

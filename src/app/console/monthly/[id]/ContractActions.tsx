@@ -8,7 +8,7 @@ type Kind = "pay" | "renew" | "suspend" | "vehicles";
 
 export function ContractActions(props: {
   id: string; paymentStatus: PaymentStatus; suspended: boolean; cancelled: boolean; endsOn: string; monthlyFee: number;
-  due: number; vehicles: VehicleInput[]; canManage: boolean;
+  due: number; vehicles: VehicleInput[]; canManage: boolean; pendingRenewal?: { amount: number; from: string; endsOn: string };
 }) {
   const router = useRouter();
   const ref = useRef<HTMLDialogElement>(null);
@@ -49,8 +49,8 @@ export function ContractActions(props: {
   return (
     <>
       <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-        {props.paymentStatus === "unpaid" && <button type="button" className="pd-btn pd-btn--primary" onClick={() => open("pay")}>確認收款</button>}
-        <button type="button" className={props.paymentStatus === "unpaid" ? "pd-btn" : "pd-btn pd-btn--primary"} onClick={() => open("renew")}>續約</button>
+        {(props.paymentStatus === "unpaid" || props.pendingRenewal) && <button type="button" className="pd-btn pd-btn--primary" onClick={() => open("pay")}>確認收款</button>}
+        {!props.pendingRenewal && <button type="button" className={props.paymentStatus === "unpaid" ? "pd-btn" : "pd-btn pd-btn--primary"} onClick={() => open("renew")}>續約</button>}
         <button type="button" className="pd-btn" onClick={() => open("vehicles")}>變更車牌</button>
         {props.suspended
           ? <button type="button" className="pd-btn" onClick={() => send({ action: "resume" })} disabled={busy}>恢復合約</button>
@@ -68,14 +68,17 @@ export function ContractActions(props: {
         }} style={{ display: "grid", gap: 16 }}>
           <h2 id="act-h" className="pd-serif" style={{ margin: 0, fontSize: 20 }}>{{ pay: "確認收款", renew: "續約", suspend: "停用合約", vehicles: "變更車牌" }[kind]}</h2>
 
-          {kind === "pay" && <><p style={{ margin: 0 }}>應收 <strong className="pd-mono">NT${props.due.toLocaleString()}</strong>。確認後，啟用日一到車牌就會開通。</p>{payFields}</>}
+          {kind === "pay" && <><p style={{ margin: 0, lineHeight: 1.8 }}>{props.paymentStatus === "unpaid"
+            ? <>應收 <strong className="pd-mono">NT${props.due.toLocaleString()}</strong>。確認後，啟用日一到車牌就會開通。</>
+            : <>續約 <span className="pd-mono">{props.pendingRenewal!.from} 至 {props.pendingRenewal!.endsOn}</span>，應收 <strong className="pd-mono">NT${props.pendingRenewal!.amount.toLocaleString()}</strong>。確認後到期日延長。</>}</p>{payFields}</>}
 
           {kind === "renew" && (
             <>
               <div className="pd-choice-grid" role="group" aria-label="續約期數">
                 {TERM_OPTIONS.map((m) => <button key={m} type="button" className="pd-choice" aria-pressed={months === m} onClick={() => setMonths(m)}>{m} 個月</button>)}
               </div>
-              <p style={{ margin: 0, lineHeight: 1.8 }}>新期間 <span className="pd-mono">{from} 至 {endsOn(from, months)}</span>・應收 <strong className="pd-mono">NT${(props.monthlyFee * months).toLocaleString()}</strong></p>
+              <p style={{ margin: 0, lineHeight: 1.8 }}>新期間 <span className="pd-mono">{from} 至 {endsOn(from, months)}</span>・應收 <strong className="pd-mono">NT${(props.monthlyFee * months).toLocaleString()}</strong>
+                {paid === "unpaid" && <><br /><span className="pd-label">待付款時，目前已付款的期間照常使用；收款後才延長到期日。</span></>}</p>
               <div className="pd-segmented" role="group" aria-label="付款狀態" style={{ justifySelf: "start" }}>
                 <button type="button" aria-pressed={paid === "paid"} onClick={() => setPaid("paid")}>已收款</button>
                 <button type="button" aria-pressed={paid === "unpaid"} onClick={() => setPaid("unpaid")}>待付款</button>

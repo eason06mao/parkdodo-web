@@ -3,6 +3,9 @@ import { endsOn, type ContractInput, type MonthlyPlan } from "../monthly";
 
 export interface MonthlyHistory { at: string; actor: string; action: string; note?: string }
 
+/** 續約期間：已付款才把合約到期日延長；待付款的續約不影響目前已付款的期間 */
+export interface Renewal { from: string; endsOn: string; months: number; amount: number; createdAt: string; paidAt?: string; method?: string; ref?: string }
+
 export interface MonthlyRecord extends ContractInput {
   id: string;
   contractNo: string;
@@ -13,6 +16,7 @@ export interface MonthlyRecord extends ContractInput {
   suspended?: boolean;
   cancelled?: boolean;
   inside: boolean;
+  renewals: Renewal[];
   history: MonthlyHistory[];
 }
 
@@ -37,7 +41,7 @@ const base = (o: Partial<ContractInput> & Pick<ContractInput, "planId" | "starts
 });
 const rec = (id: string, no: string, c: ContractInput, inside: boolean): MonthlyRecord => ({
   ...c, id, contractNo: no, endsOn: endsOn(c.startsOn, c.months), createdAt: `${c.startsOn}T10:00:00+08:00`, createdBy: "示範總部管理員",
-  paidAt: c.paymentStatus === "paid" ? `${c.startsOn}T10:00:00+08:00` : undefined, inside,
+  paidAt: c.paymentStatus === "paid" ? `${c.startsOn}T10:00:00+08:00` : undefined, inside, renewals: [],
   history: [{ at: `${c.startsOn}T10:00:00+08:00`, actor: "示範總部管理員", action: "建立合約" }],
 });
 const car = (plate: string) => ({ plate, kind: "car" as const, brand: "", color: "" });
