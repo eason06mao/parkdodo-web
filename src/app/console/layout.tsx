@@ -3,14 +3,18 @@ import { Sidebar } from "@/components/Sidebar";
 import { getCurrentUser } from "@/lib/auth";
 import { getIncidents } from "@/lib/data";
 import { mockPersonas } from "@/lib/mock/tenancy";
+import { accentVars } from "@/lib/branding";
+import { brandForUser, editableOrgs } from "@/lib/brandingServer";
 import { can } from "@/lib/permissions";
 
 export default async function ConsoleLayout({ children }: { children: React.ReactNode }) {
   const [incidents, user] = await Promise.all([getIncidents(), getCurrentUser()]);
+  const brand = await brandForUser(user);
   const open = incidents.filter((i) => i.status === "open").length; // 待處理（未認領）
   const hidden = [
     !can(user, "site.view") && "/console/sites",
     !can(user, "user.manage_org") && "/console/accounts",
+    editableOrgs(user).length === 0 && "/console/brand",
   ].filter(Boolean) as string[];
   return (
     <>
@@ -18,8 +22,8 @@ export default async function ConsoleLayout({ children }: { children: React.Reac
         模擬環境・Mock 資料，未連接設備、金流與資料庫
         <PersonaSwitcher current={user.id} options={mockPersonas.map((p) => ({ id: p.id, label: p.label }))} />
       </div>
-      <div className="pd-app">
-        <Sidebar openIncidents={open} hidden={hidden} userName={user.name} userRole={user.label} />
+      <div className="pd-app" style={accentVars(brand.accentColor) as React.CSSProperties}>
+        <Sidebar openIncidents={open} hidden={hidden} userName={user.name} userRole={user.label} brand={brand} />
         {children}
       </div>
     </>

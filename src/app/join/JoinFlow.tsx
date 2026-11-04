@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { BrandMark } from "@/components/BrandMark";
+import { accentVars, type Brand } from "@/lib/branding";
 import { formatPhone, MAX_MEMBER_PLATES, normalizePhone, PROVIDER_LABELS, type ProfileErrors, type Provider } from "@/lib/members";
 
 export interface JoinSite { code: string; name: string; plans: { id: string; name: string; price: number }[] }
@@ -19,7 +21,7 @@ async function call<T>(url: string, method: string, body?: unknown): Promise<{ o
   return { ok: r.ok, status: r.status, data: await r.json().catch(() => ({})) };
 }
 
-export function JoinFlow({ sites, siteCode, next, mock, notice }: { sites: JoinSite[]; siteCode: string | null; next: string | null; mock: boolean; notice: JoinNotice }) {
+export function JoinFlow({ brand, sites, siteCode, next, mock, notice }: { brand: Brand; sites: JoinSite[]; siteCode: string | null; next: string | null; mock: boolean; notice: JoinNotice }) {
   const [step, setStep] = useState<Step>("loading");
   const [binding, setBinding] = useState(false); // 已登入，正在綁定手機
   const [banner, setBanner] = useState(notice.login ? `${notice.linked ? "已綁定" : "已用"} ${PROVIDER_LABELS[notice.login as Provider] ?? notice.login} ${notice.linked ? "" : "登入"}`.trim() : "");
@@ -102,10 +104,10 @@ export function JoinFlow({ sites, siteCode, next, mock, notice }: { sites: JoinS
   const site = sites.find((s) => s.code === leadSite);
 
   return (
-    <div style={{ minHeight: "100vh", maxWidth: 480, margin: "0 auto", display: "flex", flexDirection: "column", background: "var(--pd-ground)" }}>
+    <div style={{ minHeight: "100vh", maxWidth: 480, margin: "0 auto", display: "flex", flexDirection: "column", background: "var(--pd-ground)", ...(accentVars(brand.accentColor) as React.CSSProperties) }}>
       {mock && <div className="pd-mock-banner" role="note">模擬環境・不會寄出簡訊，LINE／Google 為模擬登入</div>}
       <header style={{ padding: "22px 20px 8px" }}>
-        <div className="pd-label">ParkDodo 停車會員</div>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}><BrandMark brand={brand} size={32} /><span style={{ fontWeight: 700 }}>{brand.displayName} 停車會員</span></div>
         <h1 className="pd-serif" style={{ margin: "2px 0 0", fontSize: 24 }}>{step === "profile" && !isNew ? "我的會員資料" : "加入會員"}</h1>
       </header>
 
@@ -141,7 +143,7 @@ export function JoinFlow({ sites, siteCode, next, mock, notice }: { sites: JoinS
             {binding && <button type="button" className="pd-btn" onClick={() => { setBinding(false); setError(""); setStep("profile"); }}>返回</button>}
             <details className="pd-label" style={{ lineHeight: 1.8 }}>
               <summary style={{ cursor: "pointer", minHeight: 28 }}>登入即表示你已閱讀並同意《個人資料告知事項》</summary>
-              <p style={{ margin: "6px 0" }}>ParkDodo 停車場營運方依個人資料保護法告知：</p>
+              <p style={{ margin: "6px 0" }}>{brand.displayName} 停車場營運方依個人資料保護法告知：</p>
               <ol style={{ margin: 0, paddingLeft: 20 }}>
                 <li>蒐集目的：會員管理、電子發票會員載具與中獎通知、停車繳費、月租洽詢與客服聯絡。</li>
                 <li>蒐集項目：手機號碼、Email、LINE／Google 帳號識別碼與顯示名稱、稱呼、車牌號碼、月租登記內容，以及停車進出與繳費紀錄。</li>

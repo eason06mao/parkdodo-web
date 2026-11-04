@@ -137,7 +137,7 @@ a:hover { color: var(--pd-accent-hover); }
 .pd-card { background: var(--pd-surface); border: 1px solid var(--pd-line); border-radius: var(--pd-r-md); padding: var(--pd-s5) 22px; }
 .pd-card--warn { background: #FFFBF5; border-color: var(--pd-warn-line); }
 .pd-card--reserved { background: var(--pd-surface-sunk); border-style: dashed; }   /* 預留、未啟用模組 */
-.pd-card--selected { border-color: var(--pd-accent); background: #F3F8F7; }
+.pd-card--selected { border-color: var(--pd-accent); background: color-mix(in srgb, var(--pd-accent) 5%, white); }
 
 /* KPI */
 .pd-metric-value { font-family: var(--pd-font-mono); font-size: var(--pd-fs-metric); font-weight: 600; line-height: 1.1; }
