@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { TaxHint } from "@/components/TaxHint";
+import { useTaxName } from "@/lib/useTaxName";
 import {
   addDays, amounts, contractState, EARLY_ACTIVATION_DAYS, emptyCustomer, emptyVehicle, endsOn, formatPlate, hasErrors, MAX_PLATES,
   PAYMENT_METHOD_LABELS, PLAN_TYPE_LABELS, STATE_LABELS, TERM_OPTIONS, todayTaipei, validateContract,
@@ -43,6 +45,15 @@ export function MonthlyForm({ sites, plans, operator }: { sites: FormSite[]; pla
     };
   });
   const [activationTouched, setActivationTouched] = useState(false);
+  const taxName = useTaxName(v.customer.type === "company" ? v.customer.taxId : "");
+  const [autoCompany, setAutoCompany] = useState("");
+  // 查到公司名稱時自動填入（客服改過就不覆蓋）
+  useEffect(() => {
+    if (taxName.status !== "found") return;
+    setV((cur) => (cur.customer.companyName === "" || cur.customer.companyName === autoCompany
+      ? { ...cur, customer: { ...cur.customer, companyName: taxName.name } } : cur));
+    setAutoCompany(taxName.name);
+  }, [taxName]); // eslint-disable-line react-hooks/exhaustive-deps
   const [errors, setErrors] = useState<ContractErrors>({});
   const [submitted, setSubmitted] = useState(false);
   const [serverError, setServerError] = useState("");
@@ -136,8 +147,10 @@ export function MonthlyForm({ sites, plans, operator }: { sites: FormSite[]; pla
           </div>
           {v.customer.type === "company" && (
             <div style={row}>
-              <div className="pd-field"><label htmlFor="mco">公司名稱</label><input id="mco" className="pd-input" value={v.customer.companyName} onChange={(e) => setCustomer({ companyName: e.target.value })} />{err("companyName")}</div>
-              <div className="pd-field"><label htmlFor="mtax">統一編號</label><input id="mtax" className="pd-input pd-mono" inputMode="numeric" maxLength={8} value={v.customer.taxId} onChange={(e) => setCustomer({ taxId: e.target.value.replace(/\D/g, "") })} />{err("taxId")}</div>
+              <div className="pd-field"><label htmlFor="mtax">統一編號</label><input id="mtax" className="pd-input pd-mono" inputMode="numeric" maxLength={8} value={v.customer.taxId} onChange={(e) => setCustomer({ taxId: e.target.value.replace(/\D/g, "") })} aria-describedby="mtax-hint" />
+                {err("taxId") ?? <TaxHint id="mtax-hint" taxId={v.customer.taxId} state={taxName} />}</div>
+              <div className="pd-field"><label htmlFor="mco">公司名稱</label><input id="mco" className="pd-input" value={v.customer.companyName} onChange={(e) => setCustomer({ companyName: e.target.value })} />
+                {taxName.status === "found" && v.customer.companyName === taxName.name && <span className="pd-label">依統編自動帶出，可修改</span>}{err("companyName")}</div>
             </div>
           )}
           <div style={row}>
