@@ -164,3 +164,11 @@ ICE 相機（車牌辨識、繼電器開閘、雷達 IO、FK 顯示卡 RS-485）
 - 第一次設定：Google Cloud Shell 執行 `bash scripts/gcp-cloudsql-setup.sh <專案ID>`，再把印出的 `CLOUDSQL_INSTANCE`、`EDGE_IMAGE_BUCKET` 填到 GitHub Variables。
   之後每次部署會自動套用新的 migration（`scripts/migrate.mjs`）。資料庫密碼只存在 Secret Manager。
 - 本機：`DATABASE_URL=postgres://... node scripts/migrate.mjs --seed` 建表並寫入測試站資料（中航站 TXG001）。
+
+## 統編自動帶出公司名稱
+
+- 繳費頁（公司報帳）與月租建檔（公司戶）輸入 8 碼統編後，先在畫面上檢查檢查碼，正確才查公司名稱：`GET /api/tax-id/{統編}`。
+- 查到的名稱會自動填入抬頭，客戶仍可修改；查不到（新設立、非營業中、機關學校）就提示自己填，**不會擋付款**。
+- 資料來源：財政部「全國營業(稅籍)登記資料集」（政府資料開放授權條款第 1 版），只含營業中的營業人。
+  GitHub Actions「統編資料同步」每天 03:40（台北）匯入 `tax_registry`；第一次合併後請手動 Run workflow 一次。
+- 本機匯入：`DATABASE_URL=... node scripts/import-tax-registry.mjs`（或加 `--file 檔案.zip|.csv`）。沒有資料庫時只有兩筆示範統編：10000004、10000010。

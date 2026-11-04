@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { INVOICE_LABELS, validateInvoice, type InvoiceChoice } from "@/lib/invoice";
+import { useTaxName } from "@/lib/useTaxName";
+import { TaxHint } from "@/components/TaxHint";
 
 type Step = "plate" | "confirm" | "redirect" | "done";
 type Kind = InvoiceChoice["kind"];
@@ -28,6 +30,14 @@ export function PayFlow({ siteCode, siteName, paperEnabled }: { siteCode: string
   const [loveCode, setLoveCode] = useState("");
   const [taxId, setTaxId] = useState("");
   const [title, setTitle] = useState("");
+  const [autoTitle, setAutoTitle] = useState("");
+  const taxName = useTaxName(kind === "company" ? taxId : "");
+  // 查到公司名稱時自動填入抬頭（客戶自己改過就不覆蓋）
+  useEffect(() => {
+    if (taxName.status !== "found") return;
+    setTitle((t) => (t === "" || t === autoTitle ? taxName.name : t));
+    setAutoTitle(taxName.name);
+  }, [taxName]); // eslint-disable-line react-hooks/exhaustive-deps
   const [email, setEmail] = useState("");
   const [remember, setRemember] = useState(true);
   const [error, setError] = useState("");
@@ -174,8 +184,9 @@ export function PayFlow({ siteCode, siteName, paperEnabled }: { siteCode: string
               {kind === "company" && (
                 <div style={{ display: "grid", gap: 12, paddingLeft: 8 }}>
                   <div className="pd-field"><label htmlFor="tax">統一編號</label>
-                    <input id="tax" className="pd-input pd-mono" inputMode="numeric" maxLength={8} placeholder="8 位數字" value={taxId} onChange={(e) => setTaxId(e.target.value.replace(/\D/g, ""))} /></div>
-                  <div className="pd-field"><label htmlFor="title">公司抬頭（選填）</label>
+                    <input id="tax" className="pd-input pd-mono" inputMode="numeric" maxLength={8} placeholder="8 位數字" value={taxId} onChange={(e) => setTaxId(e.target.value.replace(/\D/g, ""))} aria-describedby="tax-hint" />
+                    <TaxHint id="tax-hint" taxId={taxId} state={taxName} /></div>
+                  <div className="pd-field"><label htmlFor="title">公司抬頭（選填，沒填就以統編代替）</label>
                     <input id="title" className="pd-input" value={title} onChange={(e) => setTitle(e.target.value)} /></div>
                   <div className="pd-field"><label htmlFor="email">寄送 Email</label>
                     <input id="email" type="email" className="pd-input" inputMode="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} /></div>
@@ -222,3 +233,4 @@ export function PayFlow({ siteCode, siteName, paperEnabled }: { siteCode: string
     </div>
   );
 }
+

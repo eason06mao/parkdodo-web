@@ -20,6 +20,7 @@
     "test:roles": "tsx --test tests/roles/roles.test.ts",
     "test:edge": "tsx --test tests/edge/edge.test.ts",
     "test:monthly": "tsx --test tests/monthly/monthly.test.ts",
+    "test:taxreg": "tsx --test tests/taxreg/taxreg.test.ts",
     "db:migrate:url": "node scripts/migrate.mjs"
   },
   "engines": {

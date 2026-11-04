@@ -1,0 +1,40 @@
+# 每天匯入財政部「全國營業(稅籍)登記資料集」的統一編號與營業人名稱到雲端資料庫（輸入統編自動帶出公司名稱）
+# 設定 CLOUDSQL_INSTANCE 變數後才會執行；失敗時 GitHub 會寄信通知。也可以在 Actions 頁面按「Run workflow」手動匯入。
+name: 統編資料同步
+
+on:
+  schedule:
+    - cron: "40 19 * * *"   # 每天台灣時間 03:40（財政部資料於夜間更新）
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency: tax-registry
+
+jobs:
+  import:
+    name: 匯入營業人名稱
+    if: vars.CLOUDSQL_INSTANCE != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci --omit=dev --ignore-scripts
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_DEPLOY_SA }}
+      - uses: google-github-actions/setup-gcloud@v2
+      - name: 連線雲端資料庫並匯入
+        run: |
+          curl -sSLo cloud-sql-proxy https://storage.googleapis.com/cloud-sql-connectors/cloud-sql-proxy/v2.14.1/cloud-sql-proxy.linux.amd64
+          chmod +x cloud-sql-proxy
+          ./cloud-sql-proxy --port 5432 "${{ vars.CLOUDSQL_INSTANCE }}" &
+          for i in $(seq 1 30); do (echo > /dev/tcp/127.0.0.1/5432) 2>/dev/null && break; sleep 1; done
+          export DATABASE_URL="$(gcloud secrets versions access latest --secret staging-database-migrate-url)"
+          node scripts/migrate.mjs
+          node scripts/import-tax-registry.mjs
