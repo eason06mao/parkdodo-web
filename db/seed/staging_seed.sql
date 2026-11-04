@@ -5,6 +5,7 @@ BEGIN;
 INSERT INTO organizations (id, org_type, name, status) VALUES
   ('00000000-0000-4000-8000-000000000001', 'hq', 'ParkDodo 總部', 'active')
 ON CONFLICT (id) DO NOTHING;
+UPDATE organizations SET code = 'org-hq' WHERE id = '00000000-0000-4000-8000-000000000001' AND code IS NULL;
 
 INSERT INTO users (id, email, display_name, status) VALUES
   ('00000000-0000-4000-8000-000000000101', 'hq-admin@example.com', '示範總部管理員', 'active'),

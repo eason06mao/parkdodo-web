@@ -187,3 +187,10 @@ ICE 相機（車牌辨識、繼電器開閘、雷達 IO、FK 顯示卡 RS-485）
   - Google：`GOOGLE_OAUTH_CLIENT_ID`、`GOOGLE_OAUTH_CLIENT_SECRET`；重新導向 URI 設 `https://<網域>/api/members/oauth/google/callback`
   - 會員登入簽章：`MEMBER_SESSION_SECRET`（32 字元以上亂數）；簡訊商：`SMS_PROVIDER` 與帳密（串接時再加）
   - 上線前把登入按鈕換成 LINE、Google 官方規範的按鈕樣式。
+
+## 品牌設定（白牌）
+
+- 後台「品牌設定」：組織管理員（加盟主、系統客戶、自營商；權限 `brand.manage`）可以改自己組織的**名稱、副標題、Logo、主題色**；總部管理員可以改所有組織。
+- 套用範圍：該組織帳號的後台左上角與按鈕顏色；該組織站點的車主繳費頁、會員頁。總部與總部的站點維持 ParkDodo。
+- Logo：PNG、JPG、WebP（以檔案內容判斷格式，不收 SVG），最大 512 KB，存在雲端資料庫 `org_branding`。
+- 主題色必須與白字對比至少 4.5:1，太淺的顏色會被擋下（避免按鈕字看不清楚）。
