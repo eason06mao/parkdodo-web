@@ -10,6 +10,7 @@ const items = [
   { href: "/console/incidents", label: "例外處理", icon: "alert", badgeKey: "incidents" },
   { href: "/console/sessions", label: "車輛進出紀錄", icon: "list" },
   { href: "/console/monthly", label: "月租管理", icon: "calendar" },
+  { href: "/console/members", label: "會員與月租登記", icon: "users" },
   { href: "/console/analytics", label: "營收與車輛戰情板", icon: "chart" },
   { href: "/console/sites", label: "場站與設備", icon: "building" },
   { href: "/console/accounts", label: "帳號權限", icon: "lock" },

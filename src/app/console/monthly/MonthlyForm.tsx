@@ -31,15 +31,21 @@ function H({ n, title, hint }: { n: number; title: string; hint?: string }) {
   );
 }
 
-export function MonthlyForm({ sites, plans, operator }: { sites: FormSite[]; plans: MonthlyPlan[]; operator: string }) {
+/** 從月租登記單建約時帶入的資料 */
+export interface FormPrefill { leadId: string; siteId: string; planId: string | null; name: string; phone: string; plates: string[] }
+
+export function MonthlyForm({ sites, plans, operator, prefill }: { sites: FormSite[]; plans: MonthlyPlan[]; operator: string; prefill?: FormPrefill }) {
   const router = useRouter();
   const today = todayTaipei();
   const firstOfNext = (() => { const [y, m] = today.split("-").map(Number); return m === 12 ? `${y + 1}-01-01` : `${y}-${String(m + 1).padStart(2, "0")}-01`; })();
 
   const [v, setV] = useState<ContractInput>(() => {
-    const plan = plans.find((p) => p.siteId === sites[0].id)!;
+    const site = sites.find((x) => x.id === prefill?.siteId) ?? sites[0];
+    const plan = plans.find((p) => p.id === prefill?.planId && p.siteId === site.id) ?? plans.find((p) => p.siteId === site.id)!;
+    const customer = prefill ? { ...emptyCustomer(), name: prefill.name, phone: prefill.phone } : emptyCustomer();
+    const vehicles = prefill?.plates.length ? prefill.plates.slice(0, 3).map((plate) => ({ ...emptyVehicle(), plate })) : [emptyVehicle()];
     return {
-      siteId: sites[0].id, planId: plan.id, space: "", customer: emptyCustomer(), vehicles: [emptyVehicle()],
+      siteId: site.id, planId: plan.id, space: "", customer, vehicles,
       startsOn: firstOfNext, activatesOn: firstOfNext, months: 1, monthlyFee: plan.monthlyPrice, discount: 0, discountReason: "", deposit: 0,
       paymentMethod: "cash", paymentStatus: "paid", paymentRef: "", invoiceKind: "paper", invoiceValue: "", remindDays: 14, note: "",
     };
@@ -91,6 +97,8 @@ export function MonthlyForm({ sites, plans, operator }: { sites: FormSite[]; pla
     const body = await res?.json().catch(() => ({}));
     setBusy(false);
     if (!res?.ok) { setServerError(body?.message ?? "儲存失敗，請再試一次。"); if (body?.errors) setErrors(body.errors); return; }
+    // 從登記單建約：把登記單標為「已建約」（失敗不影響合約）
+    if (prefill) await fetch(`/api/member-leads/${prefill.leadId}`, { method: "PATCH", headers: { "content-type": "application/json" }, body: JSON.stringify({ status: "converted" }) }).catch(() => null);
     router.push(`/console/monthly/${body.id}?created=1`);
     router.refresh();
   };
