@@ -172,3 +172,18 @@ ICE 相機（車牌辨識、繼電器開閘、雷達 IO、FK 顯示卡 RS-485）
 - 資料來源：財政部「全國營業(稅籍)登記資料集」（政府資料開放授權條款第 1 版），只含營業中的營業人。
   GitHub Actions「統編資料同步」每天 03:40（台北）匯入 `tax_registry`；第一次合併後請手動 Run workflow 一次。
 - 本機匯入：`DATABASE_URL=... node scripts/import-tax-registry.mjs`（或加 `--file 檔案.zip|.csv`）。沒有資料庫時只有兩筆示範統編：10000004、10000010。
+
+## 會員與月租登記
+
+- 會員加入頁：`/join?site=TXG001`（場內 QR、繳費頁「存入會員載具」都會連到這裡）。
+  - 登入方式三選一：**LINE**、**Google**、**手機簡訊驗證碼**，都對應到同一位會員；登入後可再綁定其他方式。
+  - 稱呼、車牌（最多 3 台）都是選填；勾「我想租月租」再留稱呼、聯絡手機、方案，後台會出現一張登記單。
+  - 臨停不需要加入會員；只有發票選「存入會員載具」才需要登入。
+- 後台：「會員與月租登記」看登記單（新登記 → 已聯絡 → 建立合約／不租了）與會員清單。按「建立合約」會帶入稱呼、手機、車牌、方案，建約後登記單自動標為已建約。
+- 模擬模式：沒設定金鑰時，測試站與本機的 LINE／Google 會走模擬登入頁 `/join/mock-login`，簡訊驗證碼直接顯示在畫面上。
+  正式站（沒有 `STAGING_BASIC_AUTH`）沒設定金鑰時，這些登入方式會顯示「暫時無法使用」。本機 `npm start` 要模擬請加 `MEMBER_AUTH_MOCK=1`。
+- 正式金鑰（放 Secret Manager，不要寫進程式或對話）：
+  - LINE Login：`LINE_LOGIN_CHANNEL_ID`、`LINE_LOGIN_CHANNEL_SECRET`；Callback URL 設 `https://<網域>/api/members/oauth/line/callback`
+  - Google：`GOOGLE_OAUTH_CLIENT_ID`、`GOOGLE_OAUTH_CLIENT_SECRET`；重新導向 URI 設 `https://<網域>/api/members/oauth/google/callback`
+  - 會員登入簽章：`MEMBER_SESSION_SECRET`（32 字元以上亂數）；簡訊商：`SMS_PROVIDER` 與帳密（串接時再加）
+  - 上線前把登入按鈕換成 LINE、Google 官方規範的按鈕樣式。

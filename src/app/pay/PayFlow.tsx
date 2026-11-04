@@ -44,6 +44,11 @@ export function PayFlow({ siteCode, siteName, paperEnabled }: { siteCode: string
   const [busy, setBusy] = useState(false);
   const [orderNo, setOrderNo] = useState("");
   const [now, setNow] = useState(() => Date.now());
+  const [member, setMember] = useState<{ name: string; providers: string[] } | null | undefined>(undefined); // undefined＝讀取中
+
+  useEffect(() => {
+    fetch("/api/members/me").then((r) => r.json()).then((b) => setMember(b.member ?? null)).catch(() => setMember(null));
+  }, []);
 
   // 讀回這支手機上次的選擇
   useEffect(() => {
@@ -87,6 +92,7 @@ export function PayFlow({ siteCode, siteName, paperEnabled }: { siteCode: string
     const c = choice();
     const problem = validateInvoice(c, { paperEnabled });
     if (problem) { setError(problem); return; }
+    if (c.kind === "member" && !member) { setError("存入會員載具需要先加入會員，或改選其他發票方式。"); return; }
     if (quote.expiresAt.getTime() < Date.now()) { setError("金額已更新，請重新查詢。"); setQuote(mockQuote(quote.plate)); return; }
     setError(""); setBusy(true);
     try { if (remember) localStorage.setItem(PREF_KEY, JSON.stringify(c)); else localStorage.removeItem(PREF_KEY); } catch { /* 略過 */ }
@@ -164,7 +170,14 @@ export function PayFlow({ siteCode, siteName, paperEnabled }: { siteCode: string
 
             <fieldset style={{ border: 0, padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 10 }}>
               <legend className="pd-serif" style={{ fontSize: 18, fontWeight: 700, marginBottom: 10 }}>電子發票</legend>
-              {option("member", "不用輸入任何資料，中獎時以簡訊或 Email 通知")}
+              {option("member", member ? "發票存到你的會員帳號，中獎會通知你" : "LINE、Google 或手機一鍵加入會員，中獎會通知你")}
+              {kind === "member" && member === null && (
+                <p className="pd-card" style={{ margin: 0, padding: "12px 16px", display: "flex", gap: 12, alignItems: "center", justifyContent: "space-between", flexWrap: "wrap" }}>
+                  <span>還不是會員？30 秒加入，不用填資料</span>
+                  <a className="pd-btn pd-btn--primary" style={{ minHeight: 40 }} href={`/join?site=${encodeURIComponent(siteCode)}&next=${encodeURIComponent(`/pay?site=${siteCode}`)}`}>加入會員</a>
+                </p>
+              )}
+              {kind === "member" && member && <p className="pd-label" style={{ margin: "0 0 0 8px" }}>✓ 已登入會員{member.name ? `：${member.name}` : ""}</p>}
               {option("mobile", "存到財政部手機條碼載具，可在發票 App 查看")}
               {kind === "mobile" && (
                 <div className="pd-field" style={{ paddingLeft: 8 }}>

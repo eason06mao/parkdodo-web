@@ -3,14 +3,17 @@ import Link from "next/link";
 import { Forbidden } from "@/components/Forbidden";
 import { getCurrentUser } from "@/lib/auth";
 import { getFixedSpaces, getMonthlyPlans, getMonthlyRecords, getSiteRecords } from "@/lib/data";
+import { formatPhone } from "@/lib/members";
+import { listLeads } from "@/lib/membersServer";
 import { isLive } from "@/lib/monthlyServer";
 import { can } from "@/lib/permissions";
-import { MonthlyForm, type FormSite } from "../MonthlyForm";
+import { MonthlyForm, type FormPrefill, type FormSite } from "../MonthlyForm";
 
 export const metadata: Metadata = { title: "新增月租" };
 export const dynamic = "force-dynamic";
 
-export default async function NewMonthlyPage() {
+export default async function NewMonthlyPage({ searchParams }: { searchParams: Promise<{ lead?: string }> }) {
+  const { lead: leadId } = await searchParams;
   const user = await getCurrentUser();
   const [sites, plans, records] = await Promise.all([getSiteRecords(user), getMonthlyPlans(user), getMonthlyRecords(user)]);
   const allowed = sites.filter((s) => can(user, "monthly.manage", { orgId: s.orgId, siteId: s.id }) && plans.some((p) => p.siteId === s.id));
@@ -24,6 +27,13 @@ export default async function NewMonthlyPage() {
     }),
   }));
 
+  let prefill: FormPrefill | undefined;
+  if (leadId) {
+    const lead = (await listLeads(allowed.map((s) => s.code))).find((l) => l.id === leadId);
+    const site = lead && allowed.find((s) => s.code === lead.siteCode);
+    if (lead && site) prefill = { leadId: lead.id, siteId: site.id, planId: lead.planId, name: lead.name, phone: formatPhone(lead.phone), plates: lead.plates };
+  }
+
   return (
     <main className="pd-main">
       <header className="pd-page-head">
@@ -32,7 +42,8 @@ export default async function NewMonthlyPage() {
           <h1 className="pd-page-title">新增月租</h1>
         </div>
       </header>
-      <MonthlyForm key={user.id} sites={formSites} plans={plans.filter((p) => allowed.some((s) => s.id === p.siteId))} operator={user.name} />
+      {prefill && <p className="pd-card pd-card--selected" style={{ margin: 0, padding: "12px 16px" }}>已從月租登記單帶入稱呼、手機、車牌與方案，請補齊其他資料。建約後登記單會自動標為「已建約」。</p>}
+      <MonthlyForm key={user.id} sites={formSites} plans={plans.filter((p) => allowed.some((s) => s.id === p.siteId))} operator={user.name} prefill={prefill} />
     </main>
   );
 }

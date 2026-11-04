@@ -21,6 +21,7 @@
     "test:edge": "tsx --test tests/edge/edge.test.ts",
     "test:monthly": "tsx --test tests/monthly/monthly.test.ts",
     "test:taxreg": "tsx --test tests/taxreg/taxreg.test.ts",
+    "test:members": "tsx --test tests/members/members.test.ts",
     "db:migrate:url": "node scripts/migrate.mjs"
   },
   "engines": {

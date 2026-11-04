@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { features } from "@/lib/features";
 import { validateInvoice, type InvoiceChoice } from "@/lib/invoice";
+import { currentMember } from "../../members/_util";
 
 // Mock：建立付款訂單。正式版：
 //   1. 以 quoteId 取報價（未過期、金額未變），建立 payment_orders（同一停車紀錄只能有一張進行中訂單）
@@ -12,5 +13,9 @@ export async function POST(req: Request) {
   if (!b?.plate || !b.invoice || !Number.isInteger(b.amount)) return NextResponse.json({ error: "invalid" }, { status: 400 });
   const problem = validateInvoice(b.invoice, { paperEnabled: features.cashKiosk });
   if (problem) return NextResponse.json({ error: "invalid_invoice", message: problem }, { status: 422 });
+  // 會員載具：必須已登入會員（發票歸到會員帳號，中獎用 LINE／Email／簡訊通知）
+  if (b.invoice.kind === "member" && !(await currentMember())) {
+    return NextResponse.json({ error: "invalid_invoice", message: "存入會員載具需要先加入會員（LINE、Google 或手機一鍵登入），或改選其他發票方式。" }, { status: 422 });
+  }
   return NextResponse.json({ orderNo: `PD${Date.now()}`, mock: true }, { status: 201 });
 }

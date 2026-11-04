@@ -37,6 +37,8 @@ jobs:
         run: npm run test:monthly
       - name: 統編資料解析測試
         run: npm run test:taxreg
+      - name: 會員規則測試
+        run: npm run test:members
       - name: 正式建置
         run: npm run build
 
@@ -69,6 +71,7 @@ jobs:
           psql -v ON_ERROR_STOP=1 -q -f db/migrations/0004_edge_link.sql
           psql -v ON_ERROR_STOP=1 -q -f db/migrations/0005_monthly_detail.sql
           psql -v ON_ERROR_STOP=1 -q -f db/migrations/0006_tax_registry.sql
+          psql -v ON_ERROR_STOP=1 -q -f db/migrations/0007_members.sql
       - name: 約束測試
         run: |
           psql -v ON_ERROR_STOP=1 -f db/tests/0001_constraints_test.sql | tee t1.log
