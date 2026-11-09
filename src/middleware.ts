@@ -8,7 +8,7 @@ import { NextResponse, type NextRequest } from "next/server";
 // 例外：統一金流的背景通知必須能直接打進來（它自己有 HashInfo 驗證）；工控機 API 用裝置金鑰。
 // 正式站不設這個變數，改用正式登入與 MFA。
 // /api/edge/ 由工控機的裝置金鑰驗證（不用門禁帳密）
-const OPEN_PATHS = ["/api/payments/payuni/notify", "/api/edge/"];
+const OPEN_PATHS = ["/api/payments/payuni/notify", "/api/payments/payuni/return", "/api/edge/"];
 const GATE = "/__gate";
 const COOKIE = "pd_staging_gate";
 const MAX_AGE = 12 * 60 * 60;

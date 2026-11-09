@@ -132,7 +132,7 @@ export function BrandForm({ orgId, orgName, initial }: { orgId: string; orgName:
         <div className="pd-card" style={{ padding: 16, display: "grid", gap: 12, maxWidth: 360 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <BrandMark brand={preview} size={32} />
-            <div><div style={{ fontWeight: 700 }}>{preview.displayName}</div><div className="pd-label">中航站・停車繳費</div></div>
+            <div><div style={{ fontWeight: 700 }}>{preview.displayName}</div><div className="pd-label">台中南屯停車場・停車繳費</div></div>
           </div>
           <div className="pd-card pd-card--selected" style={{ padding: "10px 14px" }}>存入會員載具</div>
           <button type="button" className="pd-btn pd-btn--primary pd-btn--block" tabIndex={-1}>前往付款 NT$150</button>

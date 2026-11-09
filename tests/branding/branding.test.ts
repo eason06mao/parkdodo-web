@@ -61,7 +61,7 @@ for (const withDb of [false, true]) {
     const logo = await s.getLogo("org-lic-a");
     assert.equal(logo?.type, "image/png");
     assert.deepEqual(new Uint8Array(logo!.bytes), PNG);
-    assert.equal((await s.brandForSite("TXG002")).logoUrl, withLogo.logoUrl);  // 該組織的站點
+    assert.equal((await s.brandForSite("DEMO02")).logoUrl, withLogo.logoUrl);  // 該組織的站點
     assert.equal((await s.brandForSite("TXG001")).displayName, "ParkDodo");    // 總部的站點不受影響
     const removed = await s.saveLogo(p("u-lic-admin"), "org-lic-a", null);
     assert.equal(removed.logoUrl, null);

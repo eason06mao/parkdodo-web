@@ -23,6 +23,7 @@
     "test:taxreg": "tsx --test tests/taxreg/taxreg.test.ts",
     "test:members": "tsx --test tests/members/members.test.ts",
     "test:branding": "tsx --test tests/branding/branding.test.ts",
+    "test:payments": "tsx --test tests/payments/parking.test.ts",
     "db:migrate:url": "node scripts/migrate.mjs"
   },
   "engines": {

@@ -35,7 +35,7 @@ export function MobileGateFlow({ lanes }: { lanes: Lane[] }) {
           <Link href="/console" aria-label="回到後台" className="pd-btn" style={{ width: 44, padding: 0 }}><Icon name="chevronLeft" size={20} strokeWidth={2} /></Link>
         )}
         <div>
-          <div className="pd-label">中航站</div>
+          <div className="pd-label">台中南屯停車場</div>
           <h1 className="pd-serif" style={{ margin: "2px 0 0", fontSize: 22 }}>{heading}</h1>
         </div>
       </header>

@@ -9,11 +9,20 @@ export type PayuniEnv = "sandbox" | "production";
 
 export interface PayuniConfig extends PayuniKeys { env: PayuniEnv; merId: string }
 
-/** 從環境變數讀設定。金鑰只放 .env.local 或伺服器環境變數，不寫進程式、不寫進 log。 */
-export function loadPayuniConfig(env: NodeJS.ProcessEnv = process.env): PayuniConfig | null {
-  const merId = env.PAYUNI_MER_ID?.trim();
-  const hashKey = env.PAYUNI_HASH_KEY?.trim();
-  const hashIV = env.PAYUNI_HASH_IV?.trim();
+/**
+ * 從環境變數讀設定。金鑰只放 .env.local 或 Secret Manager，不寫進程式、不寫進 log。
+ * 每站可以有自己的商店：PAYUNI_MER_ID_TXG001、PAYUNI_HASH_KEY_TXG001、PAYUNI_HASH_IV_TXG001；
+ * 沒有個別設定的站點用共用的 PAYUNI_MER_ID、PAYUNI_HASH_KEY、PAYUNI_HASH_IV。三個值必須來自同一組。
+ */
+export function loadPayuniConfig(env: NodeJS.ProcessEnv = process.env, siteCode?: string | null): PayuniConfig | null {
+  const sfx = siteCode && /^[A-Za-z0-9]+$/.test(siteCode) ? `_${siteCode.toUpperCase()}` : "";
+  const pick = (k: string) => (sfx && env[`${k}${sfx}`]?.trim()) || "";
+  const own = { merId: pick("PAYUNI_MER_ID"), hashKey: pick("PAYUNI_HASH_KEY"), hashIV: pick("PAYUNI_HASH_IV") };
+  const anyOwn = own.merId || own.hashKey || own.hashIV;
+  if (anyOwn && !(own.merId && own.hashKey && own.hashIV)) throw new Error(`站點 ${siteCode} 的 PAYUNi 設定不完整（MER_ID、HASH_KEY、HASH_IV 要一起設定）`);
+  const merId = anyOwn ? own.merId : env.PAYUNI_MER_ID?.trim();
+  const hashKey = anyOwn ? own.hashKey : env.PAYUNI_HASH_KEY?.trim();
+  const hashIV = anyOwn ? own.hashIV : env.PAYUNI_HASH_IV?.trim();
   if (!merId || !hashKey || !hashIV) return null;
   if (hashKey.length !== 32) throw new Error("PAYUNI_HASH_KEY 長度應為 32 個字元");
   if (hashIV.length !== 16) throw new Error("PAYUNI_HASH_IV 長度應為 16 個字元");
@@ -40,7 +49,7 @@ export const DEFAULT_PARKING_METHODS: UppMethod[] = ["Credit", "ApplePay", "Goog
 export function buildUppForm(cfg: PayuniConfig, order: {
   merTradeNo: string;      // payment_orders.order_no：[A-Za-z0-9_-]，最長 25；10 分鐘內不可重複
   amount: number;          // 新台幣正整數
-  prodDesc: string;        // 必填，例：「中航站 停車費」；最長 550 字
+  prodDesc: string;        // 必填，例：「台中南屯停車場 停車費」；最長 550 字
   returnUrl: string;       // 付款完成導回（只顯示結果，不以此入帳）
   notifyUrl: string;       // 背景通知（入帳依據），只能用 80／443 port
   backUrl?: string;        // 付款頁「返回商店」按鈕
