@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { BrandMark } from "@/components/BrandMark";
+import { accentVars, type Brand } from "@/lib/branding";
 import { INVOICE_LABELS, validateInvoice, type InvoiceChoice } from "@/lib/invoice";
 import { useTaxName } from "@/lib/useTaxName";
 import { TaxHint } from "@/components/TaxHint";
@@ -21,7 +23,7 @@ function mockQuote(plate: string): Quote {
 const fmtTime = (d: Date) => new Intl.DateTimeFormat("zh-TW", { timeZone: "Asia/Taipei", hour: "2-digit", minute: "2-digit", hour12: false }).format(d);
 const normalizePlate = (s: string) => s.toUpperCase().replace(/\s/g, "");
 
-export function PayFlow({ siteCode, siteName, paperEnabled }: { siteCode: string; siteName: string; paperEnabled: boolean }) {
+export function PayFlow({ siteCode, siteName, paperEnabled, brand }: { siteCode: string; siteName: string; paperEnabled: boolean; brand: Brand }) {
   const [step, setStep] = useState<Step>("plate");
   const [plate, setPlate] = useState("");
   const [quote, setQuote] = useState<Quote | null>(null);
@@ -127,10 +129,14 @@ export function PayFlow({ siteCode, siteName, paperEnabled }: { siteCode: string
   );
 
   return (
-    <div style={{ minHeight: "100vh", maxWidth: 480, margin: "0 auto", display: "flex", flexDirection: "column", background: "var(--pd-ground)" }}>
+    <div style={{ minHeight: "100vh", maxWidth: 480, margin: "0 auto", display: "flex", flexDirection: "column", background: "var(--pd-ground)", ...(accentVars(brand.accentColor) as React.CSSProperties) }}>
       <div className="pd-mock-banner" role="note">模擬環境・不會扣款、不會開立發票</div>
       <header style={{ padding: "22px 20px 8px" }}>
-        <div className="pd-label pd-mono">{siteCode}</div>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
+          <BrandMark brand={brand} size={32} />
+          <span style={{ fontWeight: 700 }}>{brand.displayName}</span>
+          <span className="pd-label pd-mono" style={{ marginLeft: "auto" }}>{siteCode}</span>
+        </div>
         <h1 className="pd-serif" style={{ margin: "2px 0 0", fontSize: 24 }}>{siteName}・停車繳費</h1>
       </header>
 

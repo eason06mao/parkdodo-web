@@ -2,7 +2,7 @@
 .pd-mock-banner { font-size: 12px; text-align: center; padding: 6px 12px; background: var(--pd-warn-tint); color: var(--pd-warn-ink); width: 100%; }
 .pd-incident-item { display: flex; gap: 12px; align-items: flex-start; width: 100%; text-align: left; font: inherit; padding: 14px 16px; border-radius: 12px; cursor: pointer; color: var(--pd-ink); background: var(--pd-surface); border: 1px solid transparent; }
 .pd-incident-item:hover { background: var(--pd-surface-sunk); }
-.pd-incident-item[aria-current="true"] { border-color: var(--pd-accent); background: #F3F8F7; }
+.pd-incident-item[aria-current="true"] { border-color: var(--pd-accent); background: color-mix(in srgb, var(--pd-accent) 5%, white); }
 .pd-bar-chart { display: flex; align-items: flex-end; gap: 6px; border-bottom: 1px solid var(--pd-line); }
 .pd-bar { flex: 1; min-width: 0; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; position: relative; }
 .pd-bar-label { position: absolute; bottom: -22px; left: 0; right: 0; text-align: center; font-size: 11px; white-space: nowrap; color: var(--pd-muted); font-family: var(--pd-font-mono); }

@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import type { Brand } from "@/lib/branding";
+import { BrandMark } from "./BrandMark";
 import { Icon } from "./Icon";
 
 const items = [
@@ -14,19 +16,18 @@ const items = [
   { href: "/console/analytics", label: "營收與車輛戰情板", icon: "chart" },
   { href: "/console/sites", label: "場站與設備", icon: "building" },
   { href: "/console/accounts", label: "帳號權限", icon: "lock" },
+  { href: "/console/brand", label: "品牌設定", icon: "palette" },
 ] as const;
 
-export function Sidebar({ openIncidents, hidden = [], userName, userRole }: { openIncidents: number; hidden?: string[]; userName: string; userRole: string }) {
+export function Sidebar({ openIncidents, hidden = [], userName, userRole, brand }: { openIncidents: number; hidden?: string[]; userName: string; userRole: string; brand: Brand }) {
   const pathname = usePathname();
   return (
     <nav aria-label="主選單" className="pd-sidebar">
-      <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "0 8px" }}>
-        <div style={{ width: 40, height: 40, borderRadius: 12, background: "var(--pd-accent)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <Icon name="logo" size={22} strokeWidth={2} />
-        </div>
-        <div>
-          <div className="pd-serif" style={{ fontSize: 18, fontWeight: 700, color: "#fff" }}>ParkDodo</div>
-          <div style={{ fontSize: 12, color: "var(--pd-night-muted)" }}>停車營運中心</div>
+      <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "0 8px", minWidth: 0 }}>
+        <BrandMark brand={brand} />
+        <div style={{ minWidth: 0 }}>
+          <div className="pd-serif" style={{ fontSize: 18, fontWeight: 700, color: "#fff", overflowWrap: "anywhere", lineHeight: 1.3 }}>{brand.displayName}</div>
+          {brand.subtitle && <div style={{ fontSize: 12, color: "var(--pd-night-muted)" }}>{brand.subtitle}</div>}
         </div>
       </div>
 

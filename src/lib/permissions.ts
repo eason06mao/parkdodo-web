@@ -10,7 +10,7 @@ export type Permission =
   | "gate.remote_open" | "gate.hold_open" | "incident.handle" | "monthly.manage"
   | "finance.view" | "refund.request" | "refund.approve" | "settlement.manage"
   | "device.manage" | "edge.pair" | "user.manage_org" | "org.manage"
-  | "license.manage" | "license.view" | "audit.view" | "role.manage" | "platform.admin";
+  | "license.manage" | "license.view" | "audit.view" | "role.manage" | "brand.manage" | "platform.admin";
 
 export const PERMISSION_LABELS: Record<Permission, string> = {
   "site.view": "檢視站點",
@@ -37,6 +37,7 @@ export const PERMISSION_LABELS: Record<Permission, string> = {
   "license.view": "檢視授權",
   "audit.view": "檢視稽核紀錄",
   "role.manage": "建立與修改自訂角色",
+  "brand.manage": "修改品牌（名稱、Logo、主題色）",
   "platform.admin": "平台管理",
 };
 
@@ -45,7 +46,7 @@ export const PERMISSION_GROUPS: { title: string; permissions: Permission[] }[] =
   { title: "站點與設定", permissions: ["site.view", "site.edit", "site.settings", "rate.publish", "device.manage", "site.create", "edge.pair"] },
   { title: "現場營運", permissions: ["dashboard.view", "session.view", "incident.handle", "session.adjust", "gate.remote_open", "gate.hold_open", "monthly.manage"] },
   { title: "財務", permissions: ["finance.view", "refund.request", "refund.approve", "settlement.manage"] },
-  { title: "帳號與稽核", permissions: ["user.manage_org", "role.manage", "audit.view", "license.view"] },
+  { title: "帳號與稽核", permissions: ["user.manage_org", "role.manage", "brand.manage", "audit.view", "license.view"] },
   { title: "平台（僅總部）", permissions: ["org.manage", "license.manage", "platform.admin"] },
 ];
 
@@ -85,7 +86,7 @@ const P = (s: string) => s.split(" ") as Permission[];
 /** 系統預設角色（不能修改） */
 export const ROLES: Role[] = [
   { code: "hq_admin", name: "總部管理員", orgType: "hq", description: "全平台設定、建站、授權與帳號管理",
-    permissions: P("site.view site.edit site.settings site.create rate.publish dashboard.view session.view session.adjust gate.remote_open gate.hold_open incident.handle monthly.manage finance.view refund.request refund.approve settlement.manage device.manage edge.pair user.manage_org org.manage license.manage license.view audit.view platform.admin role.manage") },
+    permissions: P("site.view site.edit site.settings site.create rate.publish dashboard.view session.view session.adjust gate.remote_open gate.hold_open incident.handle monthly.manage finance.view refund.request refund.approve settlement.manage device.manage edge.pair user.manage_org org.manage license.manage license.view audit.view platform.admin role.manage brand.manage") },
   { code: "hq_ops", name: "總部營運", orgType: "hq", description: "所有站點的監控、例外處理、遠端開閘",
     permissions: P("site.view dashboard.view session.view session.adjust gate.remote_open gate.hold_open incident.handle refund.request device.manage license.view audit.view") },
   { code: "hq_support", name: "總部客服", orgType: "hq", description: "對講與客訴處理、遠端開閘",
@@ -93,15 +94,15 @@ export const ROLES: Role[] = [
   { code: "hq_finance", name: "總部財務", orgType: "hq", description: "對帳、退款核准、加盟結算",
     permissions: P("site.view dashboard.view session.view finance.view refund.approve settlement.manage license.view audit.view") },
   { code: "operator_admin", name: "自營站點管理員", orgType: "operator", description: "自己站點的設定、報表、遠端開閘",
-    permissions: P("site.view site.edit site.settings dashboard.view session.view session.adjust gate.remote_open incident.handle monthly.manage finance.view refund.request user.manage_org license.view audit.view role.manage") },
+    permissions: P("site.view site.edit site.settings dashboard.view session.view session.adjust gate.remote_open incident.handle monthly.manage finance.view refund.request user.manage_org license.view audit.view role.manage brand.manage") },
   { code: "operator_staff", name: "自營現場人員", orgType: "operator", description: "自己站點的例外處理、遠端開閘",
     permissions: P("site.view session.view gate.remote_open incident.handle") },
   { code: "franchisee_owner", name: "加盟主", orgType: "franchisee", description: "自己站點的報表、帳號、遠端開閘",
-    permissions: P("site.view site.edit dashboard.view session.view gate.remote_open incident.handle monthly.manage finance.view refund.request user.manage_org license.view audit.view role.manage") },
+    permissions: P("site.view site.edit dashboard.view session.view gate.remote_open incident.handle monthly.manage finance.view refund.request user.manage_org license.view audit.view role.manage brand.manage") },
   { code: "franchisee_staff", name: "加盟現場人員", orgType: "franchisee", description: "自己站點的例外處理、遠端開閘",
     permissions: P("site.view session.view gate.remote_open incident.handle") },
   { code: "licensee_admin", name: "系統客戶管理員", orgType: "licensee", description: "自己站點的設定、費率、報表、帳號、遠端開閘",
-    permissions: P("site.view site.edit site.settings rate.publish dashboard.view session.view session.adjust gate.remote_open incident.handle monthly.manage finance.view refund.request refund.approve device.manage user.manage_org license.view audit.view role.manage") },
+    permissions: P("site.view site.edit site.settings rate.publish dashboard.view session.view session.adjust gate.remote_open incident.handle monthly.manage finance.view refund.request refund.approve device.manage user.manage_org license.view audit.view role.manage brand.manage") },
   { code: "licensee_staff", name: "系統客戶現場人員", orgType: "licensee", description: "自己站點的例外處理、遠端開閘",
     permissions: P("site.view session.view gate.remote_open incident.handle") },
 ];
