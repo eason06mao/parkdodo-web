@@ -1,21 +1,33 @@
 import { NextResponse } from "next/server";
+import { dbConfigured } from "@/lib/db";
 import { features } from "@/lib/features";
 import { validateInvoice, type InvoiceChoice } from "@/lib/invoice";
+import { origin } from "@/lib/memberOAuth";
+import { checkout, PayError } from "@/lib/payments/parking";
 import { currentMember } from "../../members/_util";
+import { mockQuoteValid } from "../_mock";
 
-// Mock：建立付款訂單。正式版：
-//   1. 以 quoteId 取報價（未過期、金額未變），建立 payment_orders（同一停車紀錄只能有一張進行中訂單）
-//   2. 發票選項存在訂單上（統編、載具類型、交付方式分開欄位；載具與統編加密保存）
-//   3. 回傳 PAYUNi UPP 表單（buildUppForm），由瀏覽器自動送出
-//   4. 付款成功（NotifyURL）後才開立發票；開票失敗會重試，不會重複開票、不會重複收款
+// POST { quoteId, invoice }：建立付款訂單，回傳要送到統一金流的表單（瀏覽器自動送出）。
+// 入帳只依 NotifyURL（/api/payments/payuni/notify）；這裡不會把訂單標為已付款。
 export async function POST(req: Request) {
-  const b = (await req.json().catch(() => null)) as { plate?: string; amount?: number; invoice?: InvoiceChoice } | null;
-  if (!b?.plate || !b.invoice || !Number.isInteger(b.amount)) return NextResponse.json({ error: "invalid" }, { status: 400 });
+  const b = (await req.json().catch(() => null)) as { quoteId?: string; invoice?: InvoiceChoice } | null;
+  if (!b?.quoteId || !b.invoice) return NextResponse.json({ error: "invalid" }, { status: 400 });
   const problem = validateInvoice(b.invoice, { paperEnabled: features.cashKiosk });
   if (problem) return NextResponse.json({ error: "invalid_invoice", message: problem }, { status: 422 });
-  // 會員載具：必須已登入會員（發票歸到會員帳號，中獎用 LINE／Email／簡訊通知）
-  if (b.invoice.kind === "member" && !(await currentMember())) {
+  const member = await currentMember();
+  if (b.invoice.kind === "member" && !member) {
     return NextResponse.json({ error: "invalid_invoice", message: "存入會員載具需要先加入會員（LINE、Google 或手機一鍵登入），或改選其他發票方式。" }, { status: 422 });
   }
-  return NextResponse.json({ orderNo: `PD${Date.now()}`, mock: true }, { status: 201 });
+  if (!dbConfigured()) {
+    if (!mockQuoteValid(b.quoteId)) return NextResponse.json({ error: "quote_expired", message: "金額已更新，請重新查詢。" }, { status: 409 });
+    return NextResponse.json({ mock: true, orderNo: `PD${Date.now()}` }, { status: 201 });
+  }
+  try {
+    const r = await checkout({ quoteId: b.quoteId, invoice: b.invoice, memberId: member?.id ?? null, origin: origin(req) });
+    return NextResponse.json(r, { status: 201, headers: { "cache-control": "no-store" } });
+  } catch (e) {
+    if (e instanceof PayError) return NextResponse.json({ error: e.code, message: e.message }, { status: e.status });
+    console.error("[pay checkout]", e);
+    return NextResponse.json({ error: "server_error", message: "建立付款失敗，請再試一次。" }, { status: 500 });
+  }
 }

@@ -13,10 +13,11 @@ const seed_organizations: Organization[] = [
 
 const seed_siteRecords: SiteRecord[] = [
   {
-    id: "site-001", code: "TXG001", name: "中航站", orgId: "org-hq", operationType: "hq_owned", collectionMode: "hq_collect",
-    status: "trial", city: "台中市", district: "沙鹿區", address: "台中市沙鹿區（示範地址）", totalSpaces: 52,
+    id: "site-001", code: "TXG001", name: "台中南屯停車場", orgId: "org-hq", operationType: "hq_owned", collectionMode: "hq_collect",
+    status: "trial", city: "臺中市", district: "南屯區", address: "臺中市南屯區（地址待補）", totalSpaces: 52,
+    invoiceSeller: { taxId: "61079159", name: "車格跳動有限公司台中南屯停車場" },
     lanes: [{ code: "IN-1", name: "入口-1", direction: "entry" }, { code: "OUT-1", name: "出口-1", direction: "exit" }],
-    edge: { name: "中航站工控機", model: "待採購", agentVersion: "0.1.0-mock", status: "online", lastSeenAt: "2026-10-21T01:58:00+08:00" },
+    edge: { name: "南屯工控機", model: "待採購", agentVersion: "0.1.0-mock", status: "online", lastSeenAt: "2026-10-21T01:58:00+08:00" },
     devices: [
       { id: "d1", laneCode: "IN-1", type: "lpr_camera", vendor: "ICE", model: "車牌辨識攝影機", ip: "192.168.1.100", status: "online" },
       { id: "d2", laneCode: "IN-1", type: "led_voice_card", vendor: "FK", model: "顯示語音卡", rs485Address: 100, status: "online" },
@@ -28,7 +29,15 @@ const seed_siteRecords: SiteRecord[] = [
     ],
   },
   {
-    id: "site-002", code: "TXG002", name: "示範二號站", orgId: "org-lic-a", operationType: "licensed", collectionMode: "own_merchant",
+    id: "site-003", code: "TXG002", name: "台中沙鹿停車場", orgId: "org-hq", operationType: "hq_owned", collectionMode: "hq_collect",
+    status: "trial", city: "臺中市", district: "沙鹿區", address: "臺中市沙鹿區（地址待補）", totalSpaces: 0,
+    invoiceSeller: { taxId: "61082892", name: "車格跳動有限公司台中沙鹿停車場" },
+    lanes: [{ code: "IN-1", name: "入口-1", direction: "entry" }, { code: "OUT-1", name: "出口-1", direction: "exit" }],
+    edge: { name: "待配對", status: "provisioning" },
+    devices: [],
+  },
+  {
+    id: "site-002", code: "DEMO02", name: "示範二號站", orgId: "org-lic-a", operationType: "licensed", collectionMode: "own_merchant",
     status: "planning", city: "台中市", address: "台中市（示範地址）", totalSpaces: 30,
     lanes: [{ code: "IN-1", name: "入口-1", direction: "entry" }, { code: "OUT-1", name: "出口-1", direction: "exit" }],
     edge: { name: "待配對", status: "provisioning" },
@@ -65,9 +74,9 @@ const seed_auditEntries: AuditEntry[] = [
   { at: "2026-10-28T20:00:00+08:00", actor: "示範客戶 A 管理員", action: "建立角色", target: "夜班值班：檢視站點、檢視進出紀錄、處理例外、人工結案、調整紀錄、遠端開閘", orgId: "org-lic-a" },
   { at: "2026-10-20T18:31:00+08:00", actor: "示範客戶 A 管理員", action: "邀請帳號", target: "a-staff@example.com・系統客戶現場人員・示範二號站", orgId: "org-lic-a" },
   { at: "2026-10-20T15:12:00+08:00", actor: "示範總部管理員", action: "開立授權", target: "示範二號站・LIC-2026-0001・標準版", orgId: "org-lic-a" },
-  { at: "2026-10-20T15:05:00+08:00", actor: "示範總部管理員", action: "新增站點", target: "示範二號站（TXG002）→ 示範系統客戶 A", orgId: "org-lic-a" },
+  { at: "2026-10-20T15:05:00+08:00", actor: "示範總部管理員", action: "新增站點", target: "示範二號站（DEMO02）→ 示範系統客戶 A", orgId: "org-lic-a" },
   { at: "2026-10-20T15:01:00+08:00", actor: "示範總部管理員", action: "指派管理員", target: "a-admin@example.com・系統客戶管理員", orgId: "org-lic-a" },
-  { at: "2026-10-19T21:42:00+08:00", actor: "示範值班人員", action: "遠端開閘", target: "中航站・出口-1", orgId: "org-hq", reason: "對講求助" },
+  { at: "2026-10-19T21:42:00+08:00", actor: "示範值班人員", action: "遠端開閘", target: "台中南屯停車場・出口-1", orgId: "org-hq", reason: "對講求助" },
 ];
 
 /** 開發用的「預覽身分」，用來確認不同角色看到的畫面 */
@@ -81,6 +90,7 @@ export const mockPersonas: (Principal & { label: string })[] = [
 
 const seed_rateSchedules: Record<string, RateSchedule & { version: number; updatedAt: string; updatedBy: string }> = {
   "site-001": { base: { ...DEFAULT_PLAN }, promotions: [], version: 1, updatedAt: "2026-10-20T10:00:00+08:00", updatedBy: "示範總部管理員" },
+  "site-003": { base: { ...DEFAULT_PLAN }, promotions: [], version: 1, updatedAt: "2026-10-20T10:00:00+08:00", updatedBy: "示範總部管理員" },
   "site-002": { base: { ...DEFAULT_PLAN, unitPrice: 20, dailyCap: 150 }, promotions: [], version: 1, updatedAt: "2026-10-20T15:10:00+08:00", updatedBy: "示範總部管理員" },
 };
 

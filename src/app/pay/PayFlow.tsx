@@ -9,24 +9,33 @@ import { TaxHint } from "@/components/TaxHint";
 
 type Step = "plate" | "confirm" | "redirect" | "done";
 type Kind = InvoiceChoice["kind"];
-interface Quote { plate: string; entryAt: Date; minutes: number; amount: number; expiresAt: Date }
+interface Quote { quoteId: string; plate: string; entryAt: Date; minutes: number; amount: number; expiresAt: Date; overstay: boolean; mock: boolean }
+/** 不用付款的情況：月租車、免費時間內、已付款 */
+interface NoPay { kind: "monthly" | "free" | "paid"; plate: string; minutes: number; validUntil?: string }
 
 const PREF_KEY = "pd_invoice_pref"; // 車主勾選「記住」時，只存在這支手機的瀏覽器，不會上傳
 
-// Mock 報價：進場 2 小時 15 分、每 30 分鐘 30 元。正式版由後端計費。
-function mockQuote(plate: string): Quote {
-  const now = new Date();
-  const minutes = 135;
-  return { plate, entryAt: new Date(now.getTime() - minutes * 60_000), minutes, amount: Math.ceil(minutes / 30) * 30, expiresAt: new Date(now.getTime() + 10 * 60_000) };
+/** 把統一金流的付款表單送出（整頁跳轉到 PAYUNi 付款頁） */
+function submitForm(action: string, fields: Record<string, string>) {
+  const f = document.createElement("form");
+  f.method = "POST"; f.action = action;
+  for (const [k, v] of Object.entries(fields)) {
+    const i = document.createElement("input");
+    i.type = "hidden"; i.name = k; i.value = String(v);
+    f.appendChild(i);
+  }
+  document.body.appendChild(f);
+  f.submit();
 }
 
 const fmtTime = (d: Date) => new Intl.DateTimeFormat("zh-TW", { timeZone: "Asia/Taipei", hour: "2-digit", minute: "2-digit", hour12: false }).format(d);
 const normalizePlate = (s: string) => s.toUpperCase().replace(/\s/g, "");
 
-export function PayFlow({ siteCode, siteName, paperEnabled, brand }: { siteCode: string; siteName: string; paperEnabled: boolean; brand: Brand }) {
+export function PayFlow({ siteCode, siteName, paperEnabled, brand, banner }: { siteCode: string; siteName: string; paperEnabled: boolean; brand: Brand; banner: string | null }) {
   const [step, setStep] = useState<Step>("plate");
   const [plate, setPlate] = useState("");
   const [quote, setQuote] = useState<Quote | null>(null);
+  const [noPay, setNoPay] = useState<NoPay | null>(null);
   const [kind, setKind] = useState<Kind>("member");
   const [barcode, setBarcode] = useState("");
   const [loveCode, setLoveCode] = useState("");
@@ -82,11 +91,31 @@ export function PayFlow({ siteCode, siteName, paperEnabled, brand }: { siteCode:
     }
   };
 
-  const lookup = (e: React.FormEvent) => {
+  /** 向雲端查詢應付金額 */
+  const fetchQuote = async (p: string): Promise<boolean> => {
+    setBusy(true);
+    const res = await fetch("/api/pay/quote", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ site: siteCode, plate: p }) }).catch(() => null);
+    const b = await res?.json().catch(() => ({}));
+    setBusy(false);
+    if (!res?.ok) { setError(b?.message ?? "查詢失敗，請再試一次。"); return false; }
+    if (b.kind === "pay") {
+      setNoPay(null);
+      setQuote({ quoteId: b.quoteId, plate: b.plate, entryAt: new Date(b.entryAt), minutes: b.minutes, amount: b.amount, expiresAt: new Date(b.expiresAt), overstay: !!b.overstay, mock: !!b.mock });
+      setStep("confirm");
+    } else {
+      setQuote(null);
+      setNoPay({ kind: b.kind, plate: b.plate, minutes: b.minutes, validUntil: b.validUntil });
+      setStep("plate");
+    }
+    return true;
+  };
+
+  const lookup = async (e: React.FormEvent) => {
     e.preventDefault();
     const p = normalizePlate(plate);
     if (!/^[A-Z0-9]{2,4}-?[A-Z0-9]{2,4}$/.test(p)) { setError("請輸入完整車牌，例如 ABC-1234。"); return; }
-    setError(""); setQuote(mockQuote(p)); setStep("confirm");
+    setError("");
+    await fetchQuote(p);
   };
 
   const pay = async () => {
@@ -95,14 +124,20 @@ export function PayFlow({ siteCode, siteName, paperEnabled, brand }: { siteCode:
     const problem = validateInvoice(c, { paperEnabled });
     if (problem) { setError(problem); return; }
     if (c.kind === "member" && !member) { setError("存入會員載具需要先加入會員，或改選其他發票方式。"); return; }
-    if (quote.expiresAt.getTime() < Date.now()) { setError("金額已更新，請重新查詢。"); setQuote(mockQuote(quote.plate)); return; }
+    if (quote.expiresAt.getTime() < Date.now()) { await fetchQuote(quote.plate); setError("金額已重新計算，請確認後再付款。"); return; }
     setError(""); setBusy(true);
     try { if (remember) localStorage.setItem(PREF_KEY, JSON.stringify(c)); else localStorage.removeItem(PREF_KEY); } catch { /* 略過 */ }
-    const res = await fetch("/api/pay/checkout", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ plate: quote.plate, amount: quote.amount, invoice: c }) });
-    const body = await res.json().catch(() => ({}));
-    setBusy(false);
-    if (!res.ok) { setError(body.message ?? "目前無法付款，請稍後再試。"); return; }
-    setOrderNo(body.orderNo); setStep("redirect");
+    const res = await fetch("/api/pay/checkout", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ quoteId: quote.quoteId, invoice: c }) }).catch(() => null);
+    const body = await res?.json().catch(() => ({}));
+    if (!res?.ok) {
+      setBusy(false);
+      if (body?.error === "quote_expired") { await fetchQuote(quote.plate); setError("金額已重新計算，請確認後再付款。"); return; }
+      setError(body?.message ?? "目前無法付款，請稍後再試。"); return;
+    }
+    setOrderNo(body.orderNo);
+    if (body.mock) { setBusy(false); setStep("redirect"); return; }
+    setStep("redirect");
+    submitForm(body.form.action, body.form.fields);   // 跳轉到統一金流付款頁；付款後回到 /pay/result
   };
 
   const left = quote ? Math.max(0, Math.floor((quote.expiresAt.getTime() - now) / 1000)) : 0;
@@ -130,7 +165,7 @@ export function PayFlow({ siteCode, siteName, paperEnabled, brand }: { siteCode:
 
   return (
     <div style={{ minHeight: "100vh", maxWidth: 480, margin: "0 auto", display: "flex", flexDirection: "column", background: "var(--pd-ground)", ...(accentVars(brand.accentColor) as React.CSSProperties) }}>
-      <div className="pd-mock-banner" role="note">模擬環境・不會扣款、不會開立發票</div>
+      {banner && <div className="pd-mock-banner" role="note">{banner}</div>}
       <header style={{ padding: "22px 20px 8px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
           <BrandMark brand={brand} size={32} />
@@ -149,8 +184,18 @@ export function PayFlow({ siteCode, siteName, paperEnabled, brand }: { siteCode:
               <input id="plate" className="pd-input pd-input--plate" inputMode="text" autoCapitalize="characters" autoComplete="off"
                 placeholder="ABC-1234" value={plate} onChange={(e) => setPlate(e.target.value)} style={{ fontSize: 24, minHeight: 56, textAlign: "center", letterSpacing: 2 }} />
             </div>
+            {noPay && (
+              <section className="pd-card pd-card--selected" style={{ padding: "16px 18px" }} aria-live="polite">
+                <div className="pd-plate" style={{ fontSize: 20 }}>{noPay.plate}</div>
+                <p style={{ margin: "6px 0 0", fontWeight: 500 }}>
+                  {noPay.kind === "monthly" ? "這是月租車，不用付款，直接開到出口即可。"
+                    : noPay.kind === "free" ? `停車 ${noPay.minutes} 分鐘，還在免費時間內，不用付款。`
+                    : `已經付過款了，請在 ${noPay.validUntil ? fmtTime(new Date(noPay.validUntil)) : "期限"} 前出場。`}
+                </p>
+              </section>
+            )}
             {error && <p role="alert" style={{ margin: 0, color: "var(--pd-danger)" }}>{error}</p>}
-            <button type="submit" className="pd-btn pd-btn--primary pd-btn--block pd-btn--lg">查詢停車費</button>
+            <button type="submit" className="pd-btn pd-btn--primary pd-btn--block pd-btn--lg" disabled={busy}>{busy ? "查詢中…" : "查詢停車費"}</button>
           </form>
         )}
 
@@ -228,10 +273,12 @@ export function PayFlow({ siteCode, siteName, paperEnabled, brand }: { siteCode:
 
         {step === "redirect" && quote && (
           <section className="pd-card" style={{ textAlign: "center", padding: "32px 22px" }} aria-live="polite">
-            <h2 className="pd-serif" style={{ margin: 0, fontSize: 20 }}>即將前往統一金流付款頁</h2>
-            <p style={{ color: "var(--pd-muted)", lineHeight: 1.8 }}>正式版會在這裡自動跳轉。模擬環境請直接按下方按鈕，假裝付款成功。</p>
+            <h2 className="pd-serif" style={{ margin: 0, fontSize: 20 }}>正在前往統一金流付款頁…</h2>
             <p className="pd-label pd-mono">訂單 {orderNo}</p>
-            <button type="button" className="pd-btn pd-btn--primary pd-btn--block pd-btn--lg" onClick={() => setStep("done")}>模擬付款成功</button>
+            {quote.mock && <>
+              <p style={{ color: "var(--pd-muted)", lineHeight: 1.8 }}>本機模擬環境不會真的跳轉，請按下方按鈕假裝付款成功。</p>
+              <button type="button" className="pd-btn pd-btn--primary pd-btn--block pd-btn--lg" onClick={() => setStep("done")}>模擬付款成功</button>
+            </>}
           </section>
         )}
 

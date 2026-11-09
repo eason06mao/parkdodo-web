@@ -31,6 +31,7 @@ const seed_plans: MonthlyPlan[] = [
 const seed_spaces: Record<string, string[]> = {
   "site-001": Array.from({ length: 12 }, (_, i) => `B-${String(i + 1).padStart(2, "0")}`),
   "site-002": [],
+  "site-003": [],
 };
 
 const person = (name: string, phone: string) => ({ type: "person" as const, name, phone, email: "", companyName: "", taxId: "", address: "", note: "" });

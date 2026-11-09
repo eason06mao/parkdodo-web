@@ -40,9 +40,29 @@ INSERT INTO devices (id, site_id, lane_id, device_type, vendor, model, ip_addres
    'led_voice_card', 'FK', '顯示語音卡', NULL, 100, '{"via_camera_485":true}', '{text,voice,qr}')
 ON CONFLICT (id) DO NOTHING;
 
+-- 實際營運的兩站（車格跳動有限公司的兩個營業據點，各自統編開立發票）
+-- 地址、車位數待確認後於後台修改
+UPDATE sites SET name = '台中南屯停車場', address = '臺中市南屯區（地址待補）', city = '臺中市', district = '南屯區',
+  invoice_seller_tax_id = '61079159', invoice_seller_name = '車格跳動有限公司台中南屯停車場', updated_at = now()
+WHERE id = '00000000-0000-4000-8000-000000000201' AND (invoice_seller_tax_id IS NULL OR name = '中航站');
+
+INSERT INTO sites (id, org_id, code, name, operation_type, collection_mode, address, city, district, total_spaces, status,
+                   invoice_seller_tax_id, invoice_seller_name) VALUES
+  ('00000000-0000-4000-8000-000000000202', '00000000-0000-4000-8000-000000000001', 'TXG002', '台中沙鹿停車場',
+   'hq_owned', 'hq_collect', '臺中市沙鹿區（地址待補）', '臺中市', '沙鹿區', 0, 'trial', '61082892', '車格跳動有限公司台中沙鹿停車場')
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO lanes (id, site_id, code, direction) VALUES
+  ('00000000-0000-4000-8000-000000000311', '00000000-0000-4000-8000-000000000202', 'IN-1',  'entry'),
+  ('00000000-0000-4000-8000-000000000312', '00000000-0000-4000-8000-000000000202', 'OUT-1', 'exit')
+ON CONFLICT (id) DO NOTHING;
+
 -- 費率（與 src/lib/billing/fee.ts 的 DEFAULT_PLAN 相同）
 INSERT INTO fee_rate_versions (id, site_id, version_no, rules, effective_from, approved_by) VALUES
   ('00000000-0000-4000-8000-000000000501', '00000000-0000-4000-8000-000000000201', 1,
+   '{"base":{"freeMinutes":10,"unitMinutes":30,"unitPrice":30,"precision":"minute","dailyCap":null,"capWindow":"calendar_day","exitGraceMinutes":15,"promoMode":"entry_time","overstayMode":"recalc_from_entry"},"promotions":[]}',
+   '2026-10-01T00:00:00+08:00', '00000000-0000-4000-8000-000000000101'),
+  ('00000000-0000-4000-8000-000000000502', '00000000-0000-4000-8000-000000000202', 1,
    '{"base":{"freeMinutes":10,"unitMinutes":30,"unitPrice":30,"precision":"minute","dailyCap":null,"capWindow":"calendar_day","exitGraceMinutes":15,"promoMode":"entry_time","overstayMode":"recalc_from_entry"},"promotions":[]}',
    '2026-10-01T00:00:00+08:00', '00000000-0000-4000-8000-000000000101')
 ON CONFLICT (id) DO NOTHING;

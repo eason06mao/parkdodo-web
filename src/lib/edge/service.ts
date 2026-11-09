@@ -113,7 +113,7 @@ export async function heartbeat(db: Db, gw: Gateway, b: HeartbeatBody, ip?: stri
 
 // ---------------------------------------------------------------- 設定下載
 
-async function currentSchedule(db: Db, siteId: string, at = new Date()): Promise<{ id: string; schedule: RateSchedule } | null> {
+export async function currentSchedule(db: Db, siteId: string, at = new Date()): Promise<{ id: string; schedule: RateSchedule } | null> {
   const r = await db.query(
     `SELECT id, rules FROM fee_rate_versions WHERE site_id = $1 AND effective_from <= $2 AND (effective_to IS NULL OR effective_to > $2)
      ORDER BY effective_from DESC, version_no DESC LIMIT 1`, [siteId, at]);

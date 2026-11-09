@@ -186,6 +186,8 @@ export interface SiteRecord {
   devices: DeviceInfo[];
   license?: SiteLicense; // 總部自營站不需要授權
   openedAt?: string;
+  /** 這一站開立發票的營業人（各營業據點有自己的統編） */
+  invoiceSeller?: { taxId: string; name: string };
 }
 
 export interface AccountRecord {

@@ -52,7 +52,7 @@ export function AnalyticsBoard() {
           <h1 className="pd-page-title">營收與車輛戰情板</h1>
         </div>
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "flex-end" }}>
-          <div className="pd-field"><label htmlFor="site">場站</label><select id="site" className="pd-select" style={{ minWidth: 160 }}><option>全部場站</option><option>中航站</option></select></div>
+          <div className="pd-field"><label htmlFor="site">場站</label><select id="site" className="pd-select" style={{ minWidth: 160 }}><option>全部場站</option><option>台中南屯停車場</option><option>台中沙鹿停車場</option></select></div>
           <div className="pd-segmented" role="group" aria-label="統計單位">
             {PERIODS.map((p) => <button key={p.key} type="button" aria-pressed={period === p.key} onClick={() => pick(p.key)}>{p.label}</button>)}
           </div>

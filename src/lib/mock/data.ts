@@ -6,19 +6,19 @@ import type {
 
 export const sites: Site[] = [
   {
-    id: "site-001", code: "TXG001", name: "中航站", address: "台中市沙鹿區",
+    id: "site-001", code: "TXG001", name: "台中南屯停車場", address: "臺中市南屯區",
     totalSpaces: 52, freeSpaces: 51, occupancy: { transient: 1, monthly: 0, special: 0 },
   },
 ];
 
 export const lanes: Lane[] = [
   {
-    id: "lane-in-1", siteId: "site-001", siteName: "中航站", code: "IN-1", name: "入口-1", direction: "entry",
+    id: "lane-in-1", siteId: "site-001", siteName: "台中南屯停車場", code: "IN-1", name: "入口-1", direction: "entry",
     online: true, lastPlate: "ABC-1234", lastAt: "2026-10-19T14:25:20+08:00", confidence: 98,
     result: "放行・臨停", gate: "closed", radar: "clear", ledText: "歡迎光臨",
   },
   {
-    id: "lane-out-1", siteId: "site-001", siteName: "中航站", code: "OUT-1", name: "出口-1", direction: "exit",
+    id: "lane-out-1", siteId: "site-001", siteName: "台中南屯停車場", code: "OUT-1", name: "出口-1", direction: "exit",
     online: true, lastPlate: "XYZ-5678", lastAt: "2026-10-19T21:37:22+08:00", confidence: 96,
     result: "等待付款", gate: "closed", radar: "occupied", ledText: "請掃碼繳費",
     attention: "車輛等待超過 3 分鐘",
@@ -28,14 +28,14 @@ export const lanes: Lane[] = [
 export const incidents: Incident[] = [
   {
     id: "inc-7", code: "EX-0007", level: "critical", status: "open", title: "車輛在出口等待超過 3 分鐘",
-    where: "中航站・出口-1", laneId: "lane-out-1", plate: "XYZ-5678", confidence: 96,
+    where: "台中南屯停車場・出口-1", laneId: "lane-out-1", plate: "XYZ-5678", confidence: 96,
     openedAt: "2026-10-19T21:40:10+08:00",
     reason: "車輛已在出口停留，未完成付款，也未掃描出口 QR。可能不會操作手機付款，或付款頁面發生問題。",
     timeline: [{ at: "2026-10-19T21:40:10+08:00", text: "系統建立事件，已推播 LINE 值班群組" }],
   },
   {
     id: "inc-6", code: "EX-0006", level: "warning", status: "open", title: "出口車牌信心值偏低",
-    where: "中航站・出口-1", laneId: "lane-out-1", plate: "ABC-1Z34", confidence: 62,
+    where: "台中南屯停車場・出口-1", laneId: "lane-out-1", plate: "ABC-1Z34", confidence: 62,
     openedAt: "2026-10-19T21:36:00+08:00",
     reason: "辨識信心值 62%，低於場站設定的 85%。找不到相符的進場紀錄，疑似把 2 誤判成 Z。",
     timeline: [
@@ -51,7 +51,7 @@ export const incidents: Incident[] = [
   },
   {
     id: "inc-4", code: "EX-0004", level: "info", status: "acknowledged", title: "字幕機心跳中斷",
-    where: "中航站・入口-1", laneId: "lane-in-1", openedAt: "2026-10-19T21:15:00+08:00",
+    where: "台中南屯停車場・入口-1", laneId: "lane-in-1", openedAt: "2026-10-19T21:15:00+08:00",
     reason: "FK 字幕機連續 3 次未回應版本查詢。開閘與辨識不受影響，但入口無法顯示文字與播放語音。",
     timeline: [
       { at: "2026-10-19T21:15:00+08:00", text: "系統建立事件" },
@@ -119,7 +119,7 @@ export function buildAnalytics(period: Period): AnalyticsData {
       { label: "街口支付", pct: 9 }, { label: "人工收費", pct: 5 },
     ],
     sites: [
-      { name: "中航站", revenue: Math.round(revenue * 0.46), turnover: 3.4, occupancyPct: 71 },
+      { name: "台中南屯停車場", revenue: Math.round(revenue * 0.46), turnover: 3.4, occupancyPct: 71 },
       { name: "示範站 B", revenue: Math.round(revenue * 0.31), turnover: 2.8, occupancyPct: 64 },
       { name: "示範站 C", revenue: Math.round(revenue * 0.23), turnover: 2.1, occupancyPct: 52 },
     ],
