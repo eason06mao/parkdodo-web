@@ -194,3 +194,17 @@ ICE 相機（車牌辨識、繼電器開閘、雷達 IO、FK 顯示卡 RS-485）
 - 套用範圍：該組織帳號的後台左上角與按鈕顏色；該組織站點的車主繳費頁、會員頁。總部與總部的站點維持 ParkDodo。
 - Logo：PNG、JPG、WebP（以檔案內容判斷格式，不收 SVG），最大 512 KB，存在雲端資料庫 `org_branding`。
 - 主題色必須與白字對比至少 4.5:1，太淺的顏色會被擋下（避免按鈕字看不清楚）。
+
+## 停車繳費（統一金流 PAYUNi）
+
+流程：車主在 `/pay?site=TXG001` 輸入車牌 → 雲端找出在場紀錄並計費（報價 10 分鐘有效）→ 建立付款訂單 → 跳轉統一金流 UPP 付款頁
+→ **NotifyURL（`/api/payments/payuni/notify?site=…`）驗證後入帳** → 建立出場授權（寬限時間內出口自動開閘）與待開立發票 → 車主回到 `/pay/result` 看結果。
+
+- 入帳只依 NotifyURL 或交易查詢；ReturnURL 只用來導回結果頁。重複通知只處理一次，金額不符或簽章錯誤不入帳。
+- 同一台車有付款進行中時，不會再建立第二張訂單（避免重複扣款）。
+- 發票開立主體＝該站統編：TXG001 台中南屯停車場（61079159）、TXG002 台中沙鹿停車場（61082892）。
+- 商店金鑰：
+  1. Google Cloud Shell 執行 `bash scripts/gcp-payuni-secrets.sh <專案ID>`（兩站共用商店），或 `bash scripts/gcp-payuni-secrets.sh <專案ID> TXG002`（某站用自己的商店）。金鑰用鍵盤輸入，不會留在畫面或紀錄。
+  2. GitHub Variables 設 `PAYUNI_SECRETS=on`（個別站點再設 `PAYUNI_SITES="TXG002"`）。
+  3. 測試站預設 `PAYUNI_ENV=sandbox`；正式扣款要另外設 `PAYUNI_ENV=production`，並在統一金流商店後台把 NotifyURL 網域設為正式網址。
+- 本機測試：`DATABASE_URL=... npm run test:payments`（用假金鑰模擬統一金流通知）。
