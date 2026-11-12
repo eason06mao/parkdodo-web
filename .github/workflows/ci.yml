@@ -76,6 +76,7 @@ jobs:
           psql -v ON_ERROR_STOP=1 -q -f db/migrations/0007_members.sql
           psql -v ON_ERROR_STOP=1 -q -f db/migrations/0008_org_branding.sql
           psql -v ON_ERROR_STOP=1 -q -f db/migrations/0009_parking_payments.sql
+          psql -v ON_ERROR_STOP=1 -q -f db/migrations/0010_late_payment.sql
       - name: 約束測試
         run: |
           psql -v ON_ERROR_STOP=1 -f db/tests/0001_constraints_test.sql | tee t1.log
