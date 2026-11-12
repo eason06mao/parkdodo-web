@@ -146,7 +146,9 @@ export async function checkout(a: {
 async function settlePendingBeforeRetry(quoteId: string) {
   const r = (await pool().query(
     `SELECT o.order_no, o.amount, o.status, s.code FROM parking_fee_quotes q JOIN payment_orders o ON o.session_id = q.session_id
-     JOIN sites s ON s.id = o.site_id WHERE q.id = $1 AND o.status IN ('created','pending') AND o.expires_at > now()`, [quoteId])).rows[0];
+     JOIN sites s ON s.id = o.site_id
+     WHERE q.id = $1 AND q.status = 'active' AND q.expires_at > now()      -- 只有真的要建立新訂單時才處理
+       AND o.status IN ('created','pending') AND o.expires_at > now()`, [quoteId])).rows[0];
   if (!r) return;
   const cfg = loadPayuniConfig(process.env, r.code);
   if (!cfg) return;

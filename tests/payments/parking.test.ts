@@ -11,6 +11,13 @@ process.env.PAYUNI_HASH_KEY = "12345678901234567890123456789012";
 process.env.PAYUNI_HASH_IV = "1234567890123456";
 delete process.env.PAYUNI_ENV;
 
+// 預設模擬統一金流「查無交易」（CI 可以連外，不能真的打到統一金流測試區）
+const nativeFetch = globalThis.fetch;
+globalThis.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
+  if (String(input).includes("payuni.com.tw")) return new Response(JSON.stringify({ Status: "QUERY01001", Message: "查無資料" }), { status: 200 });
+  return nativeFetch(input, init);
+}) as typeof fetch;
+
 const SITE = "00000000-0000-4000-8000-000000000201"; // 台中南屯停車場 TXG001
 const ORG = "00000000-0000-4000-8000-000000000001";
 const plate = `T${Math.floor(Math.random() * 1e6).toString().padStart(6, "0")}`;
@@ -176,10 +183,17 @@ test("重新付款：統一金流查無上一筆交易 → 舊訂單作廢、可
     const second = await pay.checkout({ quoteId: q2.quoteId, invoice: { kind: "donate", loveCode: "919" }, memberId: null, origin: "https://pd.example" });
     assert.notEqual(second.orderNo, first.orderNo);
     assert.equal((await pay.getOrder(first.orderNo))?.status, "expired");
+    // 晚到的付款通知（舊訂單已作廢，但車主其實付了）：仍要入帳，之後由後台處理退款
+    globalThis.fetch = realFetch;
+    const late = await notify(first.orderNo, q.amount, "T-LATE");
+    assert.equal(late.status, 200);
+    assert.equal((await pay.getOrder(first.orderNo))?.status, "paid");
   } finally {
     globalThis.fetch = realFetch;
     const p = await db();
     const s = (await p.query("SELECT id FROM parking_sessions WHERE plate_no = $1", [plate4])).rows.map((r) => r.id);
+    await p.query("DELETE FROM invoice_records WHERE payment_order_id IN (SELECT id FROM payment_orders WHERE session_id = ANY($1))", [s]);
+    await p.query("DELETE FROM exit_authorizations WHERE session_id = ANY($1)", [s]);
     await p.query("DELETE FROM payment_transactions WHERE payment_order_id IN (SELECT id FROM payment_orders WHERE session_id = ANY($1))", [s]);
     await p.query("DELETE FROM payment_orders WHERE session_id = ANY($1)", [s]);
     await p.query("DELETE FROM parking_fee_quotes WHERE session_id = ANY($1)", [s]);
