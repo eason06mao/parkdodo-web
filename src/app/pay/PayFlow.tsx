@@ -132,6 +132,7 @@ export function PayFlow({ siteCode, siteName, paperEnabled, brand, banner }: { s
     if (!res?.ok) {
       setBusy(false);
       if (body?.error === "quote_expired") { await fetchQuote(quote.plate); setError("金額已重新計算，請確認後再付款。"); return; }
+      if (body?.error === "already_paid") { await fetchQuote(quote.plate); return; }
       setError(body?.message ?? "目前無法付款，請稍後再試。"); return;
     }
     setOrderNo(body.orderNo);

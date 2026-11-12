@@ -119,7 +119,15 @@ test("金額不符、簽章錯誤不入帳；付款進行中不重複建立訂�
 
   const q2 = await pay.quoteByPlate("TXG001", plate2);
   if (q2.kind !== "pay") throw new Error("應為待付款");
-  await assert.rejects(() => pay.checkout({ quoteId: q2.quoteId, invoice: { kind: "donate", loveCode: "919" }, memberId: null, origin: "https://pd.example" }), /正在確認中/);
+  // 向統一金流查詢失敗時（網路問題）：寧可擋下，不重複建立訂單
+  const realFetch = globalThis.fetch;
+  globalThis.fetch = (async (input: RequestInfo | URL) => {
+    if (String(input).includes("payuni.com.tw")) throw new Error("network down");
+    return realFetch(input);
+  }) as typeof fetch;
+  try {
+    await assert.rejects(() => pay.checkout({ quoteId: q2.quoteId, invoice: { kind: "donate", loveCode: "919" }, memberId: null, origin: "https://pd.example" }), /正在確認中/);
+  } finally { globalThis.fetch = realFetch; }
 
   const bad = await notify(co.orderNo, q.amount + 1, "T-2");
   assert.equal(bad.status, 400);
@@ -147,4 +155,34 @@ test("每站可以設定自己的商店金鑰", async () => {
   assert.equal(loadPayuniConfig(env, "TXG002")?.merId, "S2");
   assert.equal(loadPayuniConfig(env, "TXG002")?.env, "production");
   assert.throws(() => loadPayuniConfig({ ...env, PAYUNI_HASH_IV_TXG002: "" } as NodeJS.ProcessEnv, "TXG002"), /不完整/);
+});
+
+test("重新付款：統一金流查無上一筆交易 → 舊訂單作廢、可以重新付款", { skip }, async () => {
+  const pay = await import("../../src/lib/payments/parking");
+  const plate4 = `R${Math.floor(Math.random() * 1e6).toString().padStart(6, "0")}`;
+  await newSession(plate4, 60);
+  const q = await pay.quoteByPlate("TXG001", plate4);
+  if (q.kind !== "pay") throw new Error("應為待付款");
+  const first = await pay.checkout({ quoteId: q.quoteId, invoice: { kind: "donate", loveCode: "919" }, memberId: null, origin: "https://pd.example" });
+
+  const realFetch = globalThis.fetch;
+  globalThis.fetch = (async (input: RequestInfo | URL) => {
+    if (String(input).includes("payuni.com.tw/api/trade/query")) return new Response(JSON.stringify({ Status: "QUERY01001", Message: "查無資料" }), { status: 200 });
+    return realFetch(input);
+  }) as typeof fetch;
+  try {
+    const q2 = await pay.quoteByPlate("TXG001", plate4);
+    if (q2.kind !== "pay") throw new Error("應為待付款");
+    const second = await pay.checkout({ quoteId: q2.quoteId, invoice: { kind: "donate", loveCode: "919" }, memberId: null, origin: "https://pd.example" });
+    assert.notEqual(second.orderNo, first.orderNo);
+    assert.equal((await pay.getOrder(first.orderNo))?.status, "expired");
+  } finally {
+    globalThis.fetch = realFetch;
+    const p = await db();
+    const s = (await p.query("SELECT id FROM parking_sessions WHERE plate_no = $1", [plate4])).rows.map((r) => r.id);
+    await p.query("DELETE FROM payment_transactions WHERE payment_order_id IN (SELECT id FROM payment_orders WHERE session_id = ANY($1))", [s]);
+    await p.query("DELETE FROM payment_orders WHERE session_id = ANY($1)", [s]);
+    await p.query("DELETE FROM parking_fee_quotes WHERE session_id = ANY($1)", [s]);
+    await p.query("DELETE FROM parking_sessions WHERE id = ANY($1)", [s]);
+  }
 });

@@ -90,6 +90,7 @@ export async function checkout(a: {
 }): Promise<{ orderNo: string; amount: number; form: { action: string; fields: Record<string, string> } }> {
   if (!/^[0-9a-f-]{36}$/.test(a.quoteId)) throw new PayError("報價不存在，請重新查詢。", 404, "quote_not_found");
   const now = a.now ?? new Date();
+  await settlePendingBeforeRetry(a.quoteId);
   return tx(async (c) => {
     const q = (await c.query(
       `SELECT q.*, s.site_id, s.org_id, s.plate_no, s.id AS sid FROM parking_fee_quotes q JOIN parking_sessions s ON s.id = q.session_id
@@ -135,6 +136,40 @@ export async function checkout(a: {
     });
     return { orderNo, amount, form: { action: form.action, fields: form.fields as unknown as Record<string, string> } };
   });
+}
+
+/**
+ * 車主重新付款時（例如在付款頁按「上一頁」），同一台車還有未到期的付款訂單：先向統一金流查詢那一筆。
+ *   已付款 → 入帳並告訴車主已經付過；失敗、未付款、查無交易 → 把舊訂單標為逾期，讓車主重新付款；
+ *   查詢失敗或結果不明 → 維持擋下（寧可請車主稍候，也不要重複扣款）。
+ */
+async function settlePendingBeforeRetry(quoteId: string) {
+  const r = (await pool().query(
+    `SELECT o.order_no, o.amount, o.status, s.code FROM parking_fee_quotes q JOIN payment_orders o ON o.session_id = q.session_id
+     JOIN sites s ON s.id = o.site_id WHERE q.id = $1 AND o.status IN ('created','pending') AND o.expires_at > now()`, [quoteId])).rows[0];
+  if (!r) return;
+  const cfg = loadPayuniConfig(process.env, r.code);
+  if (!cfg) return;
+  let row;
+  try {
+    const res = await queryTrade(cfg, r.order_no);
+    row = queryRows(res.data)[0];
+  } catch (e) {
+    console.warn("[pay retry] 查詢失敗，維持擋下", r.order_no, e instanceof Error ? e.message : e);
+    return;
+  }
+  if (row) {
+    let outcome: OrderOutcome;
+    try { outcome = mapQueryResult(row, { merTradeNo: r.order_no, amount: Number(r.amount) }); } catch { return; }
+    if (outcome.kind === "paid") {
+      await applyOutcome(r.order_no, outcome, "query", maskRaw(row));
+      throw new PayError("這台車剛才已經付款完成，不用再付。請在 15 分鐘內出場。", 409, "already_paid");
+    }
+    if (outcome.kind === "unknown") return;
+    if (outcome.kind === "failed") { await applyOutcome(r.order_no, outcome, "query", maskRaw(row)); return; }
+  }
+  // 查無交易（付款頁沒建立成功）或還沒付款（車主離開付款頁）：舊訂單作廢，可以重新付款
+  await pool().query("UPDATE payment_orders SET status = 'expired', updated_at = now() WHERE order_no = $1 AND status IN ('created','pending')", [r.order_no]);
 }
 
 /** 金流商店帳號（payment_provider_accounts）：依環境變數自動登記，只存商店代號與金鑰的參照名稱 */
