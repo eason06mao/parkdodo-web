@@ -63,6 +63,9 @@ export interface ParkingSession {
   method?: string;
   invoiceNo?: string;
   status: SessionStatus;
+  /** 雲端資料庫版才有：所屬站點、入場來源（相機辨識／後台補登） */
+  siteName?: string;
+  source?: "相機" | "補登";
 }
 
 export type ContractStatus = "有效" | "即將到期" | "已過期";
