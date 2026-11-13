@@ -27,6 +27,10 @@ public sealed class EdgeAgent : IAsyncDisposable
     private SimServer? _sim;
     private bool _keyRejected;
     private DateTimeOffset _offlineFrom = DateTimeOffset.MaxValue;   // 第一次連不上雲端的時間（之後發生的事件都標為補傳）
+    // 內部心跳：每個背景迴圈每跑完一輪就記一次時間。超過 StallLimit 沒動＝卡死，程式自行結束讓排程立刻重啟
+    private readonly System.Collections.Concurrent.ConcurrentDictionary<string, DateTimeOffset> _beats = new();
+    public static readonly TimeSpan StallLimit = TimeSpan.FromSeconds(120);
+    private readonly SemaphoreSlim _syncFlush = new(1, 1);
 
     public EdgeAgent(Settings s, string deviceKey)
     {
@@ -57,6 +61,50 @@ public sealed class EdgeAgent : IAsyncDisposable
         _ = Loop("出口確認", TimeSpan.FromSeconds(2), () => { foreach (var l in _lanes.Values) if (l.IsExit) l.Tick(); return Task.CompletedTask; });
         _ = Loop("照片", TimeSpan.FromSeconds(10), UploadImages);
         _ = FlushLoop();
+        StartWatchdog();
+    }
+
+    /// <summary>卡死偵測：用獨立執行緒（不靠執行緒池，執行緒池塞住時也能運作）</summary>
+    private void StartWatchdog()
+    {
+        new Thread(() =>
+        {
+            while (!_stop.IsCancellationRequested)
+            {
+                Thread.Sleep(10_000);
+                var stalled = StalledLoops(DateTimeOffset.Now);
+                if (stalled.Count == 0) continue;
+                Log.Error($"偵測到程式卡住（{string.Join("、", stalled)} 超過 {StallLimit.TotalSeconds:0} 秒沒有動作），自動結束並由排程重新啟動");
+                Log.Drain();
+                Environment.Exit(75);
+            }
+        }) { IsBackground = true, Name = "watchdog" }.Start();
+    }
+
+    public List<string> StalledLoops(DateTimeOffset now) =>
+        _beats.Where(b => now - b.Value > StallLimit).Select(b => b.Key).ToList();
+
+    private void Beat(string name) => _beats[name] = DateTimeOffset.Now;
+
+    /// <summary>
+    /// 出口用：雲端說「查無入場」時，先把本機還沒上傳的事件（例如剛剛的入場）立刻補傳。
+    /// 最多等 3 秒；成功回傳 true。
+    /// </summary>
+    public bool FlushPendingNow(string? exceptUid)
+    {
+        if (!_syncFlush.Wait(TimeSpan.FromSeconds(3))) return false;
+        try
+        {
+            var batch = _outbox.Peek(100).Where(b => b.Event.Uid != exceptUid).ToList();
+            if (batch.Count == 0) return true;
+            var res = _cloud.Events(batch.Select(b => b.Event).ToList(), TimeSpan.FromSeconds(3), _stop.Token).GetAwaiter().GetResult();
+            CloudOk();
+            HandleResults(batch, res);
+            Log.Info($"出口補傳本機事件 {batch.Count} 筆");
+            return true;
+        }
+        catch (Exception e) { CloudFail(e, "補傳事件"); return false; }
+        finally { _syncFlush.Release(); }
     }
 
     public void FlushNow() => _flushSignal.Release();
@@ -89,7 +137,7 @@ public sealed class EdgeAgent : IAsyncDisposable
         foreach (var l in _lanes.Values) l.Dispose();
         _lanes.Clear();
         _laneSignature = sig;
-        var ctx = new LaneController.Context(_s, _outbox, _state, () => CloudOnline || _lastCloudOk == DateTimeOffset.MinValue ? _cloud : null, _siteCode, FlushNow);
+        var ctx = new LaneController.Context(_s, _outbox, _state, () => CloudOnline || _lastCloudOk == DateTimeOffset.MinValue ? _cloud : null, _siteCode, FlushNow, FlushPendingNow);
         foreach (var lane in cfg.Lanes)
         {
             var cam = lane.Devices.FirstOrDefault(d => d.Type == "lpr_camera");
@@ -128,6 +176,7 @@ public sealed class EdgeAgent : IAsyncDisposable
     {
         while (!_stop.IsCancellationRequested)
         {
+            Beat("上傳事件");
             await _flushSignal.WaitAsync(TimeSpan.FromSeconds(5), _stop.Token).ContinueWith(_ => { });
             while (_flushSignal.CurrentCount > 0) await _flushSignal.WaitAsync(0);
             try
@@ -138,17 +187,16 @@ public sealed class EdgeAgent : IAsyncDisposable
                     if (batch.Count == 0) break;
                     foreach (var (_, e) in batch)
                         if (e.OccurredAt >= _offlineFrom.AddSeconds(-5) || DateTimeOffset.Now - e.OccurredAt > TimeSpan.FromMinutes(1)) e.Replayed = true;
-                    var res = await _cloud.Events(batch.Select(b => b.Event).ToList(), TimeSpan.FromSeconds(15), _stop.Token);
-                    CloudOk();
-                    var byUid = res.Results.ToDictionary(r => r.Uid);
-                    foreach (var (file, e) in batch)
+                    EventsResponse res;
+                    await _syncFlush.WaitAsync(_stop.Token);
+                    try
                     {
-                        if (!byUid.TryGetValue(e.Uid, out var r)) continue;
-                        if (r.Status == "rejected") Log.Warn($"雲端拒絕事件 {e.Type}（{e.LaneCode} {e.Plate}）：{r.Error}");
-                        if (r.Status == "accepted" && e.Type == "plate_read" && r.SessionId is not null && e.Plate is not null
-                            && _lanes.TryGetValue(e.LaneCode, out var lane) && !lane.IsExit) _state.Entered(e.Plate, e.OccurredAt, r.SessionId);
-                        _outbox.Ack(file);
+                        res = await _cloud.Events(batch.Select(b => b.Event).ToList(), TimeSpan.FromSeconds(15), _stop.Token);
+                        CloudOk();
+                        HandleResults(batch, res);
                     }
+                    finally { _syncFlush.Release(); }
+                    Beat("上傳事件");
                     if (batch.Count < 100) break;
                 }
                 if (_offlineFrom != DateTimeOffset.MaxValue && _lastCloudOk > _offlineFrom && _outbox.EventCount == 0)
@@ -158,6 +206,19 @@ public sealed class EdgeAgent : IAsyncDisposable
                 }
             }
             catch (Exception e) { CloudFail(e, "上傳事件"); await Task.Delay(TimeSpan.FromSeconds(5)).ContinueWith(_ => { }); }
+        }
+    }
+
+    private void HandleResults(List<(string File, EdgeEvent Event)> batch, EventsResponse res)
+    {
+        var byUid = res.Results.ToDictionary(r => r.Uid);
+        foreach (var (file, e) in batch)
+        {
+            if (!byUid.TryGetValue(e.Uid, out var r)) continue;
+            if (r.Status == "rejected") Log.Warn($"雲端拒絕事件 {e.Type}（{e.LaneCode} {e.Plate}）：{r.Error}");
+            if (r.Status == "accepted" && e.Type == "plate_read" && r.SessionId is not null && e.Plate is not null
+                && _lanes.TryGetValue(e.LaneCode, out var lane) && !lane.IsExit) _state.Entered(e.Plate, e.OccurredAt, r.SessionId);
+            _outbox.Ack(file);
         }
     }
 
@@ -190,6 +251,7 @@ public sealed class EdgeAgent : IAsyncDisposable
             {
                 await _cloud.UploadImage(uid, kind, await File.ReadAllBytesAsync(file), _stop.Token);
                 File.Delete(file);
+                Beat("照片");   // 網路慢時一輪可能很久，每張都回報還活著
             }
             catch (Exception e) { CloudFail(e, "上傳照片"); return; }
         }
@@ -222,6 +284,7 @@ public sealed class EdgeAgent : IAsyncDisposable
         while (!_stop.IsCancellationRequested)
         {
             try { await body(); } catch (Exception e) { Log.Error($"{name}迴圈錯誤", e); }
+            Beat(name);
             await Task.Delay(every, _stop.Token).ContinueWith(_ => { });
         }
     }

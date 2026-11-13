@@ -34,6 +34,7 @@ public static partial class Program
             Log.Error($"{cmd} 失敗", e);
             return 1;
         }
+        finally { Log.Drain(); }
     }
 
     private static async Task<int> Pair(Settings s, string[] args)
@@ -57,6 +58,7 @@ public static partial class Program
     {
         var key = KeyStore.Load(s.DataDir);
         if (key is null) { Log.Error("尚未配對：請先在後台按「配對工控機」取得配對碼，再執行 pair <配對碼>。"); return 3; }
+        ConsoleQuickEdit.Disable();
         await using var agent = new EdgeAgent(s, key);
         await agent.StartAsync();
         var done = new TaskCompletionSource();
