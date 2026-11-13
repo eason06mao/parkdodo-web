@@ -41,6 +41,8 @@ jobs:
         run: npm run test:members
       - name: 品牌設定測試
         run: npm run test:branding
+      - name: 車牌搜尋與認車照片測試
+        run: npm run test:platesearch
       - name: 正式建置
         run: npm run build
 
@@ -77,6 +79,7 @@ jobs:
           psql -v ON_ERROR_STOP=1 -q -f db/migrations/0008_org_branding.sql
           psql -v ON_ERROR_STOP=1 -q -f db/migrations/0009_parking_payments.sql
           psql -v ON_ERROR_STOP=1 -q -f db/migrations/0010_late_payment.sql
+          psql -v ON_ERROR_STOP=1 -q -f db/migrations/0011_front_images.sql
       - name: 約束測試
         run: |
           psql -v ON_ERROR_STOP=1 -f db/tests/0001_constraints_test.sql | tee t1.log

@@ -9,6 +9,6 @@ export function mockQuote(siteName: string, plate: string) {
   const expiresAt = Date.now() + 10 * 60_000;
   g.__pdMockQuotes!.set(quoteId, { plate, amount, expiresAt });
   return { kind: "pay" as const, quoteId, plate, siteName, entryAt: new Date(Date.now() - minutes * 60_000).toISOString(), minutes, amount,
-    expiresAt: new Date(expiresAt).toISOString(), overstay: false, mock: true };
+    expiresAt: new Date(expiresAt).toISOString(), overstay: false, mock: true, photo: null };
 }
 export const mockQuoteValid = (id: string) => (g.__pdMockQuotes!.get(id)?.expiresAt ?? 0) > Date.now();

@@ -11,6 +11,7 @@ import { exitCheck, planAt, quote } from "../billing/fee";
 import { pool, tx } from "../db";
 import { currentSchedule, displayPlate, normalizePlate } from "../edge/service";
 import type { InvoiceChoice } from "../invoice";
+import { MAX_CANDIDATES, maskPlate, matchPlates, normalizeQuery } from "./plateSearch";
 import { buildUppForm, loadPayuniConfig, mapQueryResult, queryRows, queryTrade, type OrderOutcome, type PayuniConfig } from "./payuni/client";
 
 export class PayError extends Error {
@@ -19,11 +20,23 @@ export class PayError extends Error {
 
 export const QUOTE_TTL_MIN = 10;
 
+/** photo：繳費頁認車用照片網址（入場時拍的車牌＋車頭）；沒有照片為 null */
+interface QuoteBase { plate: string; siteName: string; entryAt: string; minutes: number; photo: string | null }
 export type QuoteResult =
-  | { kind: "pay"; quoteId: string; plate: string; siteName: string; entryAt: string; minutes: number; amount: number; expiresAt: string; overstay: boolean }
-  | { kind: "monthly"; plate: string; siteName: string; entryAt: string; minutes: number }
-  | { kind: "free"; plate: string; siteName: string; entryAt: string; minutes: number; validUntil: string }
-  | { kind: "paid"; plate: string; siteName: string; entryAt: string; minutes: number; validUntil: string };
+  | ({ kind: "pay"; quoteId: string; amount: number; expiresAt: string; overstay: boolean } & QuoteBase)
+  | ({ kind: "monthly" } & QuoteBase)
+  | ({ kind: "free"; validUntil: string } & QuoteBase)
+  | ({ kind: "paid"; validUntil: string } & QuoteBase);
+
+/** 只輸入數字或車牌有誤差時，讓車主從候選車中選（車牌部分遮蔽） */
+export interface Candidate { ref: string; plate: string; entryAt: string; minutes: number; photo: string | null }
+export type SearchResult = QuoteResult | { kind: "choose"; siteName: string; mode: "digits" | "fuzzy"; candidates: Candidate[] };
+
+const OPEN_STATUSES = "('open','paid','exiting','exception')";
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+export const photoUrl = (sessionId: string) => `/api/pay/photo?s=${sessionId}`;
+// 照片：入場事件有「車牌＋車頭」或車牌特寫才算有照片
+const HAS_PHOTO_SQL = `EXISTS (SELECT 1 FROM event_images i WHERE i.event_uid = s.entry_event_uid AND i.kind IN ('front','plate'))`;
 
 interface SiteRow { id: string; org_id: string; code: string; name: string; invoice_seller_tax_id: string | null; invoice_seller_name: string | null }
 
@@ -35,18 +48,63 @@ async function siteByCode(c: Pick<PoolClient, "query">, code: string): Promise<S
 
 const minutesBetween = (a: string | Date, b: string | Date) => Math.max(0, Math.floor((new Date(b).getTime() - new Date(a).getTime()) / 60_000));
 
-/** 車主輸入車牌：找出在場紀錄並計算應付金額（臨停才建立報價） */
+/** 車主輸入完整車牌：找出在場紀錄並計算應付金額（臨停才建立報價） */
 export async function quoteByPlate(siteCode: string, rawPlate: string, now = new Date()): Promise<QuoteResult> {
   const plate = normalizePlate(rawPlate);
   if (plate.length < 4) throw new PayError("請輸入完整車牌。", 422, "invalid_plate");
   return tx(async (c) => {
     const site = await siteByCode(c, siteCode);
+    const id = (await c.query(`SELECT id FROM parking_sessions WHERE site_id = $1 AND plate_no = $2 AND status IN ${OPEN_STATUSES}`, [site.id, plate])).rows[0]?.id;
+    if (!id) throw new PayError("找不到這台車的入場紀錄，請確認車牌，或按出口的對講機求助。", 404, "no_session");
+    return quoteSession(c, site, id, now);
+  });
+}
+
+/**
+ * 繳費頁搜尋：完整車牌（可省略 -）直接報價；只打數字或車牌有辨識誤差時，回傳候選車讓車主選。
+ * 候選只露出部分車牌，並以車牌＋車頭照片給車主確認。
+ */
+export async function searchByPlate(siteCode: string, input: string, now = new Date()): Promise<SearchResult> {
+  if (normalizeQuery(input).length < 3) throw new PayError("請輸入完整車牌，或車牌上的 4 個數字。", 422, "invalid_plate");
+  return tx(async (c) => {
+    const site = await siteByCode(c, siteCode);
+    const rows = (await c.query(
+      `SELECT s.id, s.plate_no, s.entry_at, ${HAS_PHOTO_SQL} AS has_photo FROM parking_sessions s
+       WHERE s.site_id = $1 AND s.status IN ${OPEN_STATUSES}`, [site.id])).rows as { id: string; plate_no: string; entry_at: Date; has_photo: boolean }[];
+    const m = matchPlates(input, rows.map((r) => r.plate_no))!;
+    if (m.mode === "exact") return quoteSession(c, site, rows.find((r) => r.plate_no === m.plates[0])!.id, now);
+    if (m.plates.length === 0) {
+      throw new PayError(m.mode === "digits"
+        ? `找不到車牌有「${normalizeQuery(input)}」的車，請改輸入完整車牌，或按出口的對講機求助。`
+        : "找不到這台車的入場紀錄，請確認車牌，或按出口的對講機求助。", 404, "no_session");
+    }
+    if (m.plates.length > MAX_CANDIDATES) throw new PayError("符合的車太多，請輸入完整車牌。", 422, "too_many");
+    const candidates = m.plates.map((p) => rows.find((r) => r.plate_no === p)!).map((r) => {
+      const entryAt = new Date(r.entry_at).toISOString();
+      return { ref: r.id, plate: maskPlate(r.plate_no), entryAt, minutes: minutesBetween(entryAt, now), photo: r.has_photo ? photoUrl(r.id) : null };
+    });
+    return { kind: "choose", siteName: site.name, mode: m.mode, candidates };
+  });
+}
+
+/** 車主從候選中點選自己的車 */
+export async function quoteBySessionRef(siteCode: string, ref: string, now = new Date()): Promise<QuoteResult> {
+  if (!UUID_RE.test(ref)) throw new PayError("找不到這台車，請重新查詢。", 404, "no_session");
+  return tx(async (c) => {
+    const site = await siteByCode(c, siteCode);
+    return quoteSession(c, site, ref, now);
+  });
+}
+
+async function quoteSession(c: PoolClient, site: SiteRow, sessionId: string, now: Date): Promise<QuoteResult> {
+  {
     const s = (await c.query(
-      "SELECT * FROM parking_sessions WHERE site_id = $1 AND plate_no = $2 AND status IN ('open','paid','exiting','exception') FOR UPDATE",
-      [site.id, plate])).rows[0];
-    if (!s) throw new PayError("找不到這台車的入場紀錄，請確認車牌，或按出口的對講機求助。", 404, "no_session");
+      `SELECT s.*, ${HAS_PHOTO_SQL} AS has_photo FROM parking_sessions s WHERE s.id = $1 AND s.site_id = $2 AND s.status IN ${OPEN_STATUSES} FOR UPDATE`,
+      [sessionId, site.id])).rows[0];
+    if (!s) throw new PayError("找不到這台車的入場紀錄，請重新查詢，或按出口的對講機求助。", 404, "no_session");
+    const plate = s.plate_no as string;
     const entryAt = new Date(s.entry_at).toISOString();
-    const base = { plate: displayPlate(plate), siteName: site.name, entryAt, minutes: minutesBetween(entryAt, now) };
+    const base = { plate: displayPlate(plate), siteName: site.name, entryAt, minutes: minutesBetween(entryAt, now), photo: s.has_photo ? photoUrl(s.id) : null };
     if (s.session_type !== "transient") return { kind: "monthly", ...base };
 
     const rate = await currentSchedule(c, site.id, new Date(entryAt));
@@ -84,7 +142,7 @@ export async function quoteByPlate(siteCode: string, rawPlate: string, now = new
        VALUES ($1, $2, $3, $4, $4, $5, $6) RETURNING id`,
       [s.id, rate.id, now, amount, JSON.stringify({ overstay, paidBefore: paid }), expiresAt]);
     return { kind: "pay", ...base, quoteId: q.rows[0].id, amount, expiresAt: expiresAt.toISOString(), overstay };
-  });
+  }
 }
 
 const newOrderNo = () => `PD${Date.now().toString(36).toUpperCase()}${randomBytes(4).toString("hex").toUpperCase()}`; // ≤ 25 字
