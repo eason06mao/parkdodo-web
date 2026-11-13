@@ -188,10 +188,14 @@ export function PayFlow({ siteCode, siteName, paperEnabled, brand, banner }: { s
             {noPay && (
               <section className="pd-card pd-card--selected" style={{ padding: "16px 18px" }} aria-live="polite">
                 <div className="pd-plate" style={{ fontSize: 20 }}>{noPay.plate}</div>
-                <p style={{ margin: "6px 0 0", fontWeight: 500 }}>
-                  {noPay.kind === "monthly" ? "這是月租車，不用付款，直接開到出口即可。"
-                    : noPay.kind === "free" ? `停車 ${noPay.minutes} 分鐘，還在免費時間內，不用付款。`
-                    : `已經付過款了，請在 ${noPay.validUntil ? fmtTime(new Date(noPay.validUntil)) : "期限"} 前出場。`}
+                <p style={{ margin: "8px 0 0", fontSize: 20, fontWeight: 600, color: "var(--pd-accent)" }}>
+                  {noPay.kind === "monthly" ? "月租車，不用繳費" : noPay.kind === "free" ? "免費時間內，不用繳費" : "已完成繳費"}
+                </p>
+                <p style={{ margin: "6px 0 0", fontWeight: 500, lineHeight: 1.7 }}>
+                  {noPay.kind === "monthly" ? "請直接開到出口，柵欄會自動開啟。"
+                    : noPay.kind === "free"
+                      ? `已停車 ${noPay.minutes} 分鐘。請盡速離場${noPay.validUntil ? `，${fmtTime(new Date(noPay.validUntil))} 前出場免費` : ""}，超過將從入場時間開始計費。`
+                      : `請在 ${noPay.validUntil ? fmtTime(new Date(noPay.validUntil)) : "期限"} 前出場，柵欄會自動開啟。`}
                 </p>
               </section>
             )}
