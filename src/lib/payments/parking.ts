@@ -21,7 +21,8 @@ export const QUOTE_TTL_MIN = 10;
 
 export type QuoteResult =
   | { kind: "pay"; quoteId: string; plate: string; siteName: string; entryAt: string; minutes: number; amount: number; expiresAt: string; overstay: boolean }
-  | { kind: "monthly" | "free"; plate: string; siteName: string; entryAt: string; minutes: number }
+  | { kind: "monthly"; plate: string; siteName: string; entryAt: string; minutes: number }
+  | { kind: "free"; plate: string; siteName: string; entryAt: string; minutes: number; validUntil: string }
   | { kind: "paid"; plate: string; siteName: string; entryAt: string; minutes: number; validUntil: string };
 
 interface SiteRow { id: string; org_id: string; code: string; name: string; invoice_seller_tax_id: string | null; invoice_seller_name: string | null }
@@ -69,7 +70,11 @@ export async function quoteByPlate(siteCode: string, rawPlate: string, now = new
       overstay = true;
     } else {
       amount = quote(rate.schedule, entryAt, now.toISOString()).amount;
-      if (amount === 0) return { kind: "free", ...base };
+      if (amount === 0) {
+        // 免費時間到期點：入場 + freeMinutes；超過就從入場起算收費
+        const freeMin = planAt(rate.schedule, entryAt).plan.freeMinutes;
+        return { kind: "free", ...base, validUntil: new Date(Date.parse(entryAt) + freeMin * 60_000).toISOString() };
+      }
     }
 
     await c.query("UPDATE parking_fee_quotes SET status = 'superseded' WHERE session_id = $1 AND status = 'active'", [s.id]);
