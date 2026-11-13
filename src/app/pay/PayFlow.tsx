@@ -62,6 +62,14 @@ export function PayFlow({ siteCode, siteName, paperEnabled, brand, banner }: { s
   const [now, setNow] = useState(() => Date.now());
   const [member, setMember] = useState<{ name: string; providers: string[] } | null | undefined>(undefined); // undefined＝讀取中
 
+  // 從付款失敗頁「重新付款」或出口顯示的 QR 進來時，網址帶 plate=：自動帶入並查詢
+  useEffect(() => {
+    let p = "";
+    try { p = new URLSearchParams(window.location.search).get("plate") ?? ""; } catch { /* 略過 */ }
+    p = p.toUpperCase().replace(/[^A-Z0-9]/g, "");
+    if (p.length >= 4 && p.length <= 8) { setPlate(p); void fetchQuote(p); }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   useEffect(() => {
     fetch("/api/members/me").then((r) => r.json()).then((b) => setMember(b.member ?? null)).catch(() => setMember(null));
   }, []);

@@ -148,6 +148,7 @@ jobs:
           PAYUNI: ${{ vars.PAYUNI_SECRETS }}
           PAYUNI_SITES: ${{ vars.PAYUNI_SITES }}
           PAYUNI_ENV: ${{ vars.PAYUNI_ENV || 'sandbox' }}
+          PAYUNI_METHODS: ${{ vars.PAYUNI_METHODS }}
         run: |
           SECRETS="STAGING_BASIC_AUTH=staging-basic-auth:latest"
           [ -n "$CLOUDSQL" ] && SECRETS="$SECRETS,DATABASE_URL=staging-database-url:latest"
@@ -158,8 +159,11 @@ jobs:
             c=$(echo "$c" | tr -cd 'A-Za-z0-9' | tr a-z A-Z); l=$(echo "$c" | tr A-Z a-z)
             [ -n "$c" ] && SECRETS="$SECRETS,PAYUNI_MER_ID_$c=payuni-mer-id-$l:latest,PAYUNI_HASH_KEY_$c=payuni-hash-key-$l:latest,PAYUNI_HASH_IV_$c=payuni-hash-iv-$l:latest"
           done
+          # 環境變數以 @ 分隔（gcloud 的 ^@^ 語法），因為 PAYUNI_METHODS 的值本身含逗號
           ENVS="PAYUNI_ENV=$PAYUNI_ENV"
-          [ -n "$BUCKET" ] && ENVS="$ENVS,EDGE_IMAGE_BUCKET=$BUCKET"
+          [ -n "$BUCKET" ] && ENVS="$ENVS@EDGE_IMAGE_BUCKET=$BUCKET"
+          [ -n "$PAYUNI_METHODS" ] && ENVS="$ENVS@PAYUNI_METHODS=$(echo "$PAYUNI_METHODS" | tr -d ' ')"
+          ENVS="^@^$ENVS"
           SQL_FLAG=""
           [ -n "$CLOUDSQL" ] && SQL_FLAG="--add-cloudsql-instances=$(echo "$CLOUDSQL" | tr -d '[:space:]')"
           gcloud run deploy parkdodo-staging \

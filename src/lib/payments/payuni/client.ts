@@ -45,6 +45,17 @@ function envelope(cfg: PayuniConfig, inner: Params, version = "1.0") {
 /** 停車繳費只開「當下完成」的付款方式；ATM、超商代碼要等很久才入帳，車主不能等，不開。 */
 export type UppMethod = "Credit" | "ApplePay" | "GooglePay" | "SamsungPay" | "LinePay" | "JKoPay" | "ICash";
 export const DEFAULT_PARKING_METHODS: UppMethod[] = ["Credit", "ApplePay", "GooglePay", "LinePay"];
+const ALL_METHODS: UppMethod[] = ["Credit", "ApplePay", "GooglePay", "SamsungPay", "LinePay", "JKoPay", "ICash"];
+
+/**
+ * 付款頁要開哪些方式：環境變數 PAYUNI_METHODS（逗號分隔，例 "Credit,ApplePay,GooglePay,LinePay,JKoPay"）。
+ * 只列在統一金流商店後台「已開通」的方式；沒設定用 DEFAULT_PARKING_METHODS。不認得的名稱略過。
+ */
+export function parkingMethods(env: Record<string, string | undefined>): UppMethod[] {
+  const list = (env.PAYUNI_METHODS ?? "").split(",").map((x) => x.trim()).filter(Boolean);
+  const picked = ALL_METHODS.filter((m) => list.some((x) => x.toLowerCase() === m.toLowerCase()));
+  return picked.length ? picked : DEFAULT_PARKING_METHODS;
+}
 
 export function buildUppForm(cfg: PayuniConfig, order: {
   merTradeNo: string;      // payment_orders.order_no：[A-Za-z0-9_-]，最長 25；10 分鐘內不可重複
