@@ -12,7 +12,7 @@ import { pool, tx } from "../db";
 import { currentSchedule, displayPlate, normalizePlate } from "../edge/service";
 import type { InvoiceChoice } from "../invoice";
 import { MAX_CANDIDATES, maskPlate, matchPlates, normalizeQuery } from "./plateSearch";
-import { buildUppForm, loadPayuniConfig, mapQueryResult, queryRows, queryTrade, type OrderOutcome, type PayuniConfig } from "./payuni/client";
+import { buildUppForm, loadPayuniConfig, parkingMethods, mapQueryResult, queryRows, queryTrade, type OrderOutcome, type PayuniConfig } from "./payuni/client";
 
 export class PayError extends Error {
   constructor(message: string, public status = 422, public code = "invalid") { super(message); }
@@ -195,7 +195,7 @@ export async function checkout(a: {
     const form = buildUppForm(cfg, {
       merTradeNo: orderNo, amount, prodDesc: `${site.name} 停車費 ${displayPlate(q.plate_no)}`,
       returnUrl: `${a.origin}/api/payments/payuni/return?${qs}`, notifyUrl: `${a.origin}/api/payments/payuni/notify?${qs}`,
-      backUrl: `${a.origin}/pay?${qs}`, expireSec: QUOTE_TTL_MIN * 60,
+      backUrl: `${a.origin}/pay?${qs}`, expireSec: QUOTE_TTL_MIN * 60, methods: parkingMethods(process.env),
     });
     return { orderNo, amount, form: { action: form.action, fields: form.fields as unknown as Record<string, string> } };
   });
@@ -312,18 +312,25 @@ async function markPaid(c: PoolClient, o: Record<string, unknown>, p: Extract<Or
 export interface OrderView {
   orderNo: string; status: string; amount: number; plate: string; siteCode: string; siteName: string;
   paidAt: string | null; exitUntil: string | null; method: string | null;
+  /** 付款失敗時：統一金流回覆的原因、這台車最近 1 小時失敗幾次（給車主換卡或改按對講機的提示） */
+  failReason: string | null; recentFailures: number; plateNo: string;
 }
 
 export async function getOrder(orderNo: string): Promise<OrderView | null> {
   if (!/^PD[A-Z0-9]{8,23}$/.test(orderNo)) return null;
   const r = (await pool().query(
     `SELECT o.order_no, o.status, o.amount, o.plate_no, o.paid_at, o.method, s.code, s.name,
-       (SELECT valid_until FROM exit_authorizations e WHERE e.payment_order_id = o.id ORDER BY created_at DESC LIMIT 1) AS exit_until
+       (SELECT valid_until FROM exit_authorizations e WHERE e.payment_order_id = o.id ORDER BY created_at DESC LIMIT 1) AS exit_until,
+       (SELECT raw_payload->>'Message' FROM payment_transactions t WHERE t.payment_order_id = o.id AND t.result_status = 'failed'
+         ORDER BY t.created_at DESC LIMIT 1) AS fail_reason,
+       (SELECT count(*) FROM payment_orders f WHERE f.session_id = o.session_id AND f.status IN ('failed','expired')
+         AND f.created_at > now() - interval '1 hour') AS recent_failures
      FROM payment_orders o JOIN sites s ON s.id = o.site_id WHERE o.order_no = $1`, [orderNo])).rows[0];
   if (!r) return null;
   return {
     orderNo: r.order_no, status: r.status, amount: Number(r.amount), plate: displayPlate(r.plate_no ?? ""), siteCode: r.code, siteName: r.name,
     paidAt: r.paid_at ? new Date(r.paid_at).toISOString() : null, exitUntil: r.exit_until ? new Date(r.exit_until).toISOString() : null, method: r.method,
+    failReason: r.fail_reason ?? null, recentFailures: Number(r.recent_failures ?? 0), plateNo: r.plate_no ?? "",
   };
 }
 

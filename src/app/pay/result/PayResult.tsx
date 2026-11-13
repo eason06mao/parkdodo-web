@@ -2,7 +2,10 @@
 
 import { useEffect, useState } from "react";
 
-interface Order { orderNo: string; status: string; amount: number; plate: string; siteCode: string; siteName: string; paidAt: string | null; exitUntil: string | null; method: string | null }
+interface Order {
+  orderNo: string; status: string; amount: number; plate: string; siteCode: string; siteName: string; paidAt: string | null; exitUntil: string | null; method: string | null;
+  failReason?: string | null; recentFailures?: number; plateNo?: string;
+}
 const fmtTime = (iso: string) => new Intl.DateTimeFormat("zh-TW", { timeZone: "Asia/Taipei", hour: "2-digit", minute: "2-digit", hour12: false }).format(new Date(iso));
 
 export function PayResult({ orderNo }: { orderNo: string }) {
@@ -61,10 +64,25 @@ export function PayResult({ orderNo }: { orderNo: string }) {
     </dl>
     <p className="pd-label" style={{ margin: 0 }}>電子發票會在付款後開立；如有問題請按出口對講機。</p>
   </>);
+  // 付款失敗：說明原因、可以換卡或改用 Apple Pay／Google Pay；連續失敗就請車主按對講機
+  const retry = `/pay?site=${encodeURIComponent(o.siteCode)}${o.plateNo ? `&plate=${encodeURIComponent(o.plateNo)}` : ""}`;
+  const many = (o.recentFailures ?? 0) >= 3;
   return card(<>
     <div className="pd-chip pd-chip--warn">付款未完成</div>
     <h1 className="pd-serif" style={{ margin: 0, fontSize: 22 }}>這筆付款沒有成功</h1>
-    <p style={{ margin: 0, color: "var(--pd-muted)" }}>沒有扣款。請回到繳費頁重新付款。</p>
-    <a className="pd-btn pd-btn--primary pd-btn--block pd-btn--lg" href={`/pay?site=${encodeURIComponent(o.siteCode)}`}>重新付款</a>
+    <p style={{ margin: 0, color: "var(--pd-muted)", lineHeight: 1.8 }}>
+      沒有扣款。{o.status === "expired" ? "付款頁停留太久，訂單已逾時。" : o.failReason ? `原因：${o.failReason}。` : ""}
+    </p>
+    <div className="pd-card" style={{ padding: "12px 16px", display: "grid", gap: 6 }}>
+      <strong>可以這樣重新付款</strong>
+      <span>・換一張信用卡</span>
+      <span>・改用其他付款方式（行動支付、電子錢包）</span>
+      <span className="pd-label">付款頁會列出這個停車場可以用的所有方式，再選一次就好。</span>
+    </div>
+    <a className="pd-btn pd-btn--primary pd-btn--block pd-btn--lg" href={retry}>換卡或改用其他方式付款</a>
+    <p style={{ margin: 0, color: many ? "var(--pd-danger)" : "var(--pd-muted)", lineHeight: 1.8 }}>
+      {many ? "已經失敗好幾次了，請直接按出口的對講機，我們會協助你出場。" : "一直付不成功，請按出口的對講機，我們會協助你出場。"}
+    </p>
+    <p className="pd-label pd-mono" style={{ margin: 0 }}>{o.plate}・NT${o.amount}・訂單 {o.orderNo}</p>
   </>);
 }

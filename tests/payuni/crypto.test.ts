@@ -139,3 +139,12 @@ test("官方 PHP 範例：EncryptInfo 開頭一致，解密為 MerID=AAA&MerTrad
   assert.ok(e.startsWith("47396636346f66735853533167396942344f587a3775696b34752b596e70452b3a3a3a4373354a5a5143306"));
   assert.deepEqual(decrypt(e, docKeys), { MerID: "AAA", MerTradeNo: "BBB" });
 });
+
+test("付款方式：PAYUNI_METHODS 設定、忽略未知名稱、未設定用預設", async () => {
+  const { parkingMethods, DEFAULT_PARKING_METHODS } = await import("../../src/lib/payments/payuni/client");
+  assert.deepEqual(parkingMethods({}), DEFAULT_PARKING_METHODS);
+  assert.deepEqual(parkingMethods({ PAYUNI_METHODS: "credit, jkopay ,LinePay,Bitcoin" }), ["Credit", "LinePay", "JKoPay"]);
+  assert.deepEqual(parkingMethods({ PAYUNI_METHODS: "Bitcoin" }), DEFAULT_PARKING_METHODS);
+  const { buildUppForm } = await import("../../src/lib/payments/payuni/client");
+  assert.ok(buildUppForm);
+});
