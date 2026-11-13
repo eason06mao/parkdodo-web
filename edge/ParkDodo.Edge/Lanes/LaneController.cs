@@ -13,7 +13,8 @@ namespace ParkDodo.Edge.Lanes;
 /// </summary>
 public sealed class LaneController : IDisposable
 {
-    public sealed record Context(Settings Settings, Outbox Outbox, LocalState State, Func<CloudClient?> Cloud, string SiteCode, Action FlushNow);
+    public sealed record Context(Settings Settings, Outbox Outbox, LocalState State, Func<CloudClient?> Cloud, string SiteCode, Action FlushNow,
+        Func<string?, bool>? FlushPendingNow = null);
 
     private readonly Context _ctx;
     private readonly ILaneCamera _camera;
@@ -100,6 +101,22 @@ public sealed class LaneController : IDisposable
                 }
             }
             catch (Exception e) { Log.Warn($"車道 {Code} 雲端查詢失敗，改用本機判斷：{e.Message}"); }
+
+            // 雲端查無入場、但本機有入場紀錄：多半是入場事件還沒傳上去（網路延遲、剛進場就出場）。
+            // 先把本機事件補傳，再問一次，不要直接擋車。
+            if (d is { Action: "hold", Reason: "no_entry_record" } && _ctx.State.Inside(plate) is not null && _ctx.FlushPendingNow is { } flush)
+            {
+                Log.Info($"車道 {Code} 雲端查無 {plate} 入場，本機有紀錄，補傳後重新確認");
+                if (flush(ev.Uid))
+                {
+                    try
+                    {
+                        var again = cloud.ExitCheck(Code, plate, CancellationToken.None).GetAwaiter().GetResult();
+                        if (again.Decision is { } d2) { d = d2; sessionId = again.SessionId ?? sessionId; }
+                    }
+                    catch (Exception e) { Log.Warn($"車道 {Code} 重新確認失敗：{e.Message}"); }
+                }
+            }
         }
         var offline = d is null;
         d ??= _ctx.State.OfflineExit(plate, r.At);

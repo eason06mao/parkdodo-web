@@ -2,7 +2,7 @@
 #   powershell -ExecutionPolicy Bypass -File .\install-service.ps1
 # 做的事：
 #   1. 建立工作排程「ParkDodo Edge」：開機時以 SYSTEM 身分執行 ParkDodo.Edge.exe run，不需要登入 Windows
-#   2. 每 5 分鐘檢查一次：程式沒在跑就重新啟動（當機或被關掉也會自己回來）
+#   2. 每 1 分鐘檢查一次：程式沒在跑就重新啟動（當機、被關掉、或程式偵測到自己卡住而結束，都會在 1 分鐘內回來）
 #   3. 限制資料夾權限：只有 SYSTEM 與系統管理員能讀取裝置金鑰與資料
 $ErrorActionPreference = "Stop"
 $dir = Split-Path -Parent $MyInvocation.MyCommand.Path
@@ -14,7 +14,7 @@ icacls $data /inheritance:r /grant:r "SYSTEM:(OI)(CI)F" "Administrators:(OI)(CI)
 
 $action   = New-ScheduledTaskAction -Execute $exe -Argument "run" -WorkingDirectory $dir
 $atBoot   = New-ScheduledTaskTrigger -AtStartup
-$watchdog = New-ScheduledTaskTrigger -Once -At (Get-Date).AddMinutes(1) -RepetitionInterval (New-TimeSpan -Minutes 5)
+$watchdog = New-ScheduledTaskTrigger -Once -At (Get-Date).AddMinutes(1) -RepetitionInterval (New-TimeSpan -Minutes 1)
 $settings = New-ScheduledTaskSettingsSet -MultipleInstances IgnoreNew -ExecutionTimeLimit ([TimeSpan]::Zero) `
   -RestartCount 999 -RestartInterval (New-TimeSpan -Minutes 1) -StartWhenAvailable -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries
 $principal = New-ScheduledTaskPrincipal -UserId "SYSTEM" -LogonType ServiceAccount -RunLevel Highest
