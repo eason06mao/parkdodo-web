@@ -24,6 +24,7 @@
     "test:members": "tsx --test tests/members/members.test.ts",
     "test:branding": "tsx --test tests/branding/branding.test.ts",
     "test:payments": "tsx --test tests/payments/parking.test.ts",
+    "test:platesearch": "tsx --test tests/platesearch/platesearch.test.ts tests/frontcrop/frontcrop.test.ts",
     "db:migrate:url": "node scripts/migrate.mjs"
   },
   "engines": {
@@ -33,7 +34,8 @@
     "next": "^15.5.28",
     "pg": "^8.23.1",
     "react": "^19.1.1",
-    "react-dom": "^19.1.1"
+    "react-dom": "^19.1.1",
+    "sharp": "^0.34.5"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.7",

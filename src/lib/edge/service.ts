@@ -403,7 +403,7 @@ export async function requestGateCommand(db: Db, a: {
 
 // ---------------------------------------------------------------- 照片
 
-export async function recordImage(db: Db, gw: Gateway, a: { eventUid: string; kind: "plate" | "full"; storagePath: string; bytes: number; sha256: string }) {
+export async function recordImage(db: Db, gw: Gateway, a: { eventUid: string; kind: "plate" | "full" | "front"; storagePath: string; bytes: number; sha256: string }) {
   const ev = await db.query("SELECT 1 FROM device_events WHERE event_uid = $1 AND site_id = $2", [a.eventUid, gw.siteId]);
   if (!ev.rowCount) throw new EdgeError("event_not_found", "請先上傳事件，再上傳照片。", 404);
   await db.query(

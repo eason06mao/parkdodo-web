@@ -23,6 +23,7 @@ const ORG = "00000000-0000-4000-8000-000000000001";
 const plate = `T${Math.floor(Math.random() * 1e6).toString().padStart(6, "0")}`;
 const plate2 = `U${Math.floor(Math.random() * 1e6).toString().padStart(6, "0")}`;
 const plate3 = `M${Math.floor(Math.random() * 1e6).toString().padStart(6, "0")}`;
+const plate4 = `ES${Math.floor(Math.random() * 1e4).toString().padStart(4, "0")}`;
 
 async function db() { return (await import("../../src/lib/db")).pool(); }
 async function newSession(p: string, minutesAgo: number, type = "transient") {
@@ -47,7 +48,7 @@ async function notify(orderNo: string, amount: number, tradeNo: string) {
 after(async () => {
   if (!url) return;
   const p = await db();
-  for (const pl of [plate, plate2, plate3]) {
+  for (const pl of [plate, plate2, plate3, plate4]) {
     const s = (await p.query("SELECT id FROM parking_sessions WHERE plate_no = $1", [pl])).rows.map((r) => r.id);
     if (!s.length) continue;
     await p.query("DELETE FROM invoice_records WHERE payment_order_id IN (SELECT id FROM payment_orders WHERE session_id = ANY($1))", [s]);
@@ -199,4 +200,32 @@ test("重新付款：統一金流查無上一筆交易 → 舊訂單作廢、可
     await p.query("DELETE FROM parking_fee_quotes WHERE session_id = ANY($1)", [s]);
     await p.query("DELETE FROM parking_sessions WHERE id = ANY($1)", [s]);
   }
+});
+
+test("繳費頁搜尋：省略 -、只打數字選車、辨識混淆", { skip }, async () => {
+  const pay = await import("../../src/lib/payments/parking");
+  const sid = await newSession(plate4, 95);
+  const digits = plate4.slice(2);
+
+  const exact = await pay.searchByPlate("TXG001", `${plate4.slice(0, 2).toLowerCase()} ${digits}`);
+  assert.equal(exact.kind, "pay");
+  if (exact.kind === "pay") { assert.equal(exact.plate, `ES-${digits}`); assert.equal(exact.photo, null); }
+
+  const byDigits = await pay.searchByPlate("TXG001", digits);
+  assert.equal(byDigits.kind, "choose");
+  if (byDigits.kind !== "choose") return;
+  const mine = byDigits.candidates.find((c) => c.ref === sid);
+  assert.ok(mine, "候選要包含這台車");
+  assert.equal(mine!.plate, `E*-${digits}`, "候選車牌要遮蔽");
+
+  const picked = await pay.quoteBySessionRef("TXG001", sid);
+  assert.equal(picked.kind, "pay");
+  if (picked.kind === "pay") assert.equal(picked.amount, 120);
+
+  const confused = await pay.searchByPlate("TXG001", `E5${digits}`);   // S 被看成 5
+  assert.equal(confused.kind, "choose");
+  if (confused.kind === "choose") assert.ok(confused.candidates.some((c) => c.ref === sid));
+
+  await assert.rejects(() => pay.quoteBySessionRef("TXG002", sid), /找不到這台車/, "別的場站不能用這個 ref");
+  await assert.rejects(() => pay.searchByPlate("TXG001", "12"), /4 個數字/);
 });

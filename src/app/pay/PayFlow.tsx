@@ -7,11 +7,13 @@ import { INVOICE_LABELS, validateInvoice, type InvoiceChoice } from "@/lib/invoi
 import { useTaxName } from "@/lib/useTaxName";
 import { TaxHint } from "@/components/TaxHint";
 
-type Step = "plate" | "confirm" | "redirect" | "done";
+type Step = "plate" | "choose" | "confirm" | "redirect" | "done";
 type Kind = InvoiceChoice["kind"];
-interface Quote { quoteId: string; plate: string; entryAt: Date; minutes: number; amount: number; expiresAt: Date; overstay: boolean; mock: boolean }
+interface Quote { quoteId: string; plate: string; entryAt: Date; minutes: number; amount: number; expiresAt: Date; overstay: boolean; mock: boolean; photo: string | null }
+/** 只打數字或車牌有誤差時的候選車（車牌部分遮蔽） */
+interface Candidate { ref: string; plate: string; entryAt: string; minutes: number; photo: string | null }
 /** 不用付款的情況：月租車、免費時間內、已付款 */
-interface NoPay { kind: "monthly" | "free" | "paid"; plate: string; minutes: number; validUntil?: string }
+interface NoPay { kind: "monthly" | "free" | "paid"; plate: string; minutes: number; validUntil?: string; photo?: string | null }
 
 const PREF_KEY = "pd_invoice_pref"; // 車主勾選「記住」時，只存在這支手機的瀏覽器，不會上傳
 
@@ -36,6 +38,9 @@ export function PayFlow({ siteCode, siteName, paperEnabled, brand, banner }: { s
   const [plate, setPlate] = useState("");
   const [quote, setQuote] = useState<Quote | null>(null);
   const [noPay, setNoPay] = useState<NoPay | null>(null);
+  const [candidates, setCandidates] = useState<{ mode: "digits" | "fuzzy"; list: Candidate[] } | null>(null);
+  // 從候選中選的車：之後畫面一律顯示遮蔽的車牌（避免只打數字就看到別人的完整車牌）
+  const [shownPlate, setShownPlate] = useState<string | null>(null);
   const [kind, setKind] = useState<Kind>("member");
   const [barcode, setBarcode] = useState("");
   const [loveCode, setLoveCode] = useState("");
@@ -92,19 +97,24 @@ export function PayFlow({ siteCode, siteName, paperEnabled, brand, banner }: { s
   };
 
   /** 向雲端查詢應付金額 */
-  const fetchQuote = async (p: string): Promise<boolean> => {
+  const fetchQuote = async (p: string, ref?: string): Promise<boolean> => {
     setBusy(true);
-    const res = await fetch("/api/pay/quote", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ site: siteCode, plate: p }) }).catch(() => null);
+    const res = await fetch("/api/pay/quote", { method: "POST", headers: { "content-type": "application/json" },
+      body: JSON.stringify(ref ? { site: siteCode, ref } : { site: siteCode, plate: p }) }).catch(() => null);
     const b = await res?.json().catch(() => ({}));
     setBusy(false);
     if (!res?.ok) { setError(b?.message ?? "查詢失敗，請再試一次。"); return false; }
-    if (b.kind === "pay") {
+    if (b.kind === "choose") {
+      setQuote(null); setNoPay(null);
+      setCandidates({ mode: b.mode, list: b.candidates });
+      setStep("choose");
+    } else if (b.kind === "pay") {
       setNoPay(null);
-      setQuote({ quoteId: b.quoteId, plate: b.plate, entryAt: new Date(b.entryAt), minutes: b.minutes, amount: b.amount, expiresAt: new Date(b.expiresAt), overstay: !!b.overstay, mock: !!b.mock });
+      setQuote({ quoteId: b.quoteId, plate: b.plate, entryAt: new Date(b.entryAt), minutes: b.minutes, amount: b.amount, expiresAt: new Date(b.expiresAt), overstay: !!b.overstay, mock: !!b.mock, photo: b.photo ?? null });
       setStep("confirm");
     } else {
       setQuote(null);
-      setNoPay({ kind: b.kind, plate: b.plate, minutes: b.minutes, validUntil: b.validUntil });
+      setNoPay({ kind: b.kind, plate: b.plate, minutes: b.minutes, validUntil: b.validUntil, photo: b.photo ?? null });
       setStep("plate");
     }
     return true;
@@ -113,8 +123,9 @@ export function PayFlow({ siteCode, siteName, paperEnabled, brand, banner }: { s
   const lookup = async (e: React.FormEvent) => {
     e.preventDefault();
     const p = normalizePlate(plate);
-    if (!/^[A-Z0-9]{2,4}-?[A-Z0-9]{2,4}$/.test(p)) { setError("請輸入完整車牌，例如 ABC-1234。"); return; }
-    setError("");
+    const q = p.replace(/[^A-Z0-9]/g, "");
+    if (!/^\d{3,4}$/.test(q) && !/^[A-Z0-9]{4,8}$/.test(q)) { setError("請輸入完整車牌（例如 ABC-1234），或車牌上的 4 個數字。"); return; }
+    setError(""); setShownPlate(null);
     await fetchQuote(p);
   };
 
@@ -179,15 +190,16 @@ export function PayFlow({ siteCode, siteName, paperEnabled, brand, banner }: { s
       <main style={{ flex: 1, padding: "12px 20px 32px", display: "flex", flexDirection: "column", gap: 16 }}>
         {step === "plate" && (
           <form onSubmit={lookup} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            <p style={{ margin: 0, color: "var(--pd-muted)", lineHeight: 1.8 }}>輸入車牌查詢停車費。付款後 15 分鐘內出場，柵欄會自動開啟。</p>
+            <p style={{ margin: 0, color: "var(--pd-muted)", lineHeight: 1.8 }}>輸入車牌查詢停車費，不用打「-」；記不清楚英文也可以只打 4 個數字。付款後 15 分鐘內出場，柵欄會自動開啟。</p>
             <div className="pd-field">
               <label htmlFor="plate">車牌號碼</label>
               <input id="plate" className="pd-input pd-input--plate" inputMode="text" autoCapitalize="characters" autoComplete="off"
-                placeholder="ABC-1234" value={plate} onChange={(e) => setPlate(e.target.value)} style={{ fontSize: 24, minHeight: 56, textAlign: "center", letterSpacing: 2 }} />
+                placeholder="ABC-1234 或 1234" value={plate} onChange={(e) => setPlate(e.target.value)} style={{ fontSize: 24, minHeight: 56, textAlign: "center", letterSpacing: 2 }} />
             </div>
             {noPay && (
               <section className="pd-card pd-card--selected" style={{ padding: "16px 18px" }} aria-live="polite">
-                <div className="pd-plate" style={{ fontSize: 20 }}>{noPay.plate}</div>
+                {noPay.photo && <div style={{ marginBottom: 10 }}><CarPhoto src={noPay.photo} width="100%" /></div>}
+                <div className="pd-plate" style={{ fontSize: 20 }}>{shownPlate ?? noPay.plate}</div>
                 <p style={{ margin: "8px 0 0", fontSize: 20, fontWeight: 600, color: "var(--pd-accent)" }}>
                   {noPay.kind === "monthly" ? "月租車，不用繳費" : noPay.kind === "free" ? "免費時間內，不用繳費" : "已完成繳費"}
                 </p>
@@ -204,11 +216,38 @@ export function PayFlow({ siteCode, siteName, paperEnabled, brand, banner }: { s
           </form>
         )}
 
+        {step === "choose" && candidates && (
+          <section style={{ display: "flex", flexDirection: "column", gap: 12 }} aria-label="選擇你的車">
+            <h2 className="pd-serif" style={{ fontSize: 20, margin: 0 }}>哪一台是你的車？</h2>
+            <p style={{ margin: 0, color: "var(--pd-muted)", lineHeight: 1.7 }}>
+              {candidates.mode === "digits" ? `車牌有「${normalizePlate(plate).replace(/[^A-Z0-9]/g, "")}」的車有 ${candidates.list.length} 台，請看照片點選。` : "找不到完全一樣的車牌，下面是相近的車，請看照片點選。"}
+            </p>
+            {candidates.list.map((c) => (
+              <button key={c.ref} type="button" className="pd-card" disabled={busy} onClick={() => { setError(""); setShownPlate(c.plate); void fetchQuote("", c.ref); }}
+                style={{ display: "flex", gap: 14, alignItems: "center", textAlign: "left", padding: 12, cursor: "pointer", font: "inherit", color: "inherit" }}>
+                <CarPhoto src={c.photo} width={132} />
+                <span style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                  <span className="pd-plate" style={{ fontSize: 20 }}>{c.plate}</span>
+                  <span className="pd-label">進場 {fmtTime(new Date(c.entryAt))}・已停 {Math.floor(c.minutes / 60)} 時 {c.minutes % 60} 分</span>
+                </span>
+              </button>
+            ))}
+            {error && <p role="alert" style={{ margin: 0, color: "var(--pd-danger)" }}>{error}</p>}
+            <button type="button" className="pd-btn pd-btn--block" onClick={() => { setStep("plate"); setCandidates(null); setError(""); }}>都不是，重新輸入完整車牌</button>
+          </section>
+        )}
+
         {step === "confirm" && quote && (
           <>
+            {quote.photo && (
+              <figure style={{ margin: 0, display: "flex", flexDirection: "column", gap: 6 }}>
+                <CarPhoto src={quote.photo} width="100%" />
+                <figcaption className="pd-label">入場時拍的照片，請確認是你的車</figcaption>
+              </figure>
+            )}
             <section className="pd-card" aria-label="停車費">
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 12 }}>
-                <span className="pd-plate" style={{ fontSize: 20 }}>{quote.plate}</span>
+                <span className="pd-plate" style={{ fontSize: 20 }}>{shownPlate ?? quote.plate}</span>
                 <button type="button" className="pd-btn" style={{ minHeight: 36 }} onClick={() => { setStep("plate"); setError(""); }}>不是我的車</button>
               </div>
               <dl style={{ display: "grid", gridTemplateColumns: "max-content 1fr", gap: "8px 16px", margin: "14px 0 0" }}>
@@ -305,3 +344,14 @@ export function PayFlow({ siteCode, siteName, paperEnabled, brand, banner }: { s
   );
 }
 
+
+/** 認車照片（入場時拍的車牌＋車頭）；沒有照片或載入失敗時顯示文字 */
+function CarPhoto({ src, width }: { src: string | null; width: number | string }) {
+  const [failed, setFailed] = useState(false);
+  const box: React.CSSProperties = { width, aspectRatio: "16 / 9", borderRadius: 10, flexShrink: 0, background: "var(--pd-accent-tint)", objectFit: "cover" };
+  if (!src || failed) {
+    return <span className="pd-label" style={{ ...box, display: "flex", alignItems: "center", justifyContent: "center", textAlign: "center", padding: 6 }}>沒有照片</span>;
+  }
+  // eslint-disable-next-line @next/next/no-img-element
+  return <img src={src} alt="入場時拍的車牌與車頭" style={box} onError={() => setFailed(true)} />;
+}
