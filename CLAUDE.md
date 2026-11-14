@@ -36,13 +36,16 @@
 - IPC 硬體：AMI Aptio BIOS、IT8786 Super IO、4 個 Intel I226-V 網路孔。
 
 ## 四、環境
-| | 測試站（已上線） | 正式站（建置中） |
+| | 測試站（已上線） | 正式站（已建置，尚未對外） |
 |---|---|---|
-| 專案 | parkdodo-staging | parkdodo-prod-tw（尚未建立成功） |
-| 網址 | parkdodo-staging-617659344056.asia-east1.run.app（之後 staging.parkdodo.tw） | pay.parkdodo.tw、admin.parkdodo.tw |
+| 專案 | parkdodo-staging | parkdodo-prod-tw（11/15 建立，資料庫高可用） |
+| 網址 | parkdodo-staging-617659344056.asia-east1.run.app（之後 staging.parkdodo.tw） | 目前 parkdodo-yqbxzd2w6q-de.a.run.app；之後 pay.parkdodo.tw、admin.parkdodo.tw |
 | 部署 | main 合併、自動檢查通過後自動部署 | Actions「部署正式站」手動 |
 | 說明 | | `docs/production.md` |
 
+正式站目前：統一金流仍為測試區（sandbox）、尚未接網域、尚未設定正式金鑰與離線通知。
+GitHub Variables（正式站）：PROD_GCP_PROJECT_ID、PROD_GCP_WIF_PROVIDER、PROD_GCP_DEPLOY_SA、PROD_CLOUDSQL_INSTANCE、PROD_EDGE_IMAGE_BUCKET；
+GitHub Environment「production」需業主核准、只允許 main。
 GitHub Variables（測試站）：GCP_*、CLOUDSQL_INSTANCE、EDGE_IMAGE_BUCKET、PAYUNI_SECRETS=on、
 PAYUNI_METHODS=Credit,ApplePay,GooglePay,SamsungPay,LinePay,JKoPay、ALERTS=on。
 
@@ -64,6 +67,7 @@ PAYUNI_METHODS=Credit,ApplePay,GooglePay,SamsungPay,LinePay,JKoPay、ALERTS=on�
 6. 正式站：真卡小額付款＋退款
 
 ## 七、已知缺口（上線前要補）
+- 正式站建置腳本：後台密碼太短時直接結束，應改成重新輸入（小修）。
 - **後台沒有正式帳號登入**：測試站靠整站門禁；正式站暫用 ADMIN_GATE 擋後台。需做個人帳號＋兩步驟驗證。
 - 後台仍是示範資料的頁面：營運總覽、營收戰情板、例外處理、即時監控、月租管理、帳號權限。
 - 電子發票只建立待開立紀錄，尚未串接加值中心實際開立。
