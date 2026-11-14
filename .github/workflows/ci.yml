@@ -80,6 +80,7 @@ jobs:
           psql -v ON_ERROR_STOP=1 -q -f db/migrations/0009_parking_payments.sql
           psql -v ON_ERROR_STOP=1 -q -f db/migrations/0010_late_payment.sql
           psql -v ON_ERROR_STOP=1 -q -f db/migrations/0011_front_images.sql
+          psql -v ON_ERROR_STOP=1 -q -f db/migrations/0012_edge_offline_alert.sql
       - name: 約束測試
         run: |
           psql -v ON_ERROR_STOP=1 -f db/tests/0001_constraints_test.sql | tee t1.log
@@ -104,6 +105,10 @@ jobs:
         env:
           DATABASE_URL: postgres://parkdodo:ci_only@localhost:5432/pdedge
         run: npm run test:payments
+      - name: 工控機離線通知測試
+        env:
+          DATABASE_URL: postgres://parkdodo:ci_only@localhost:5432/pdedge
+        run: npm run test:alerts
 
   # main 合併後、兩項檢查都通過才部署測試站。尚未設定 GCP 變數時自動略過。
   deploy-staging:
@@ -149,12 +154,15 @@ jobs:
           PAYUNI_SITES: ${{ vars.PAYUNI_SITES }}
           PAYUNI_ENV: ${{ vars.PAYUNI_ENV || 'sandbox' }}
           PAYUNI_METHODS: ${{ vars.PAYUNI_METHODS }}
+          ALERTS: ${{ vars.ALERTS }}
         run: |
           SECRETS="STAGING_BASIC_AUTH=staging-basic-auth:latest"
           [ -n "$CLOUDSQL" ] && SECRETS="$SECRETS,DATABASE_URL=staging-database-url:latest"
           if [ "$PAYUNI" = "on" ]; then
             SECRETS="$SECRETS,PAYUNI_MER_ID=payuni-mer-id:latest,PAYUNI_HASH_KEY=payuni-hash-key:latest,PAYUNI_HASH_IV=payuni-hash-iv:latest"
           fi
+          # 系統通知：執行過 scripts/gcp-alerts-setup.sh 後，GitHub Variables 設 ALERTS=on
+          [ "$ALERTS" = "on" ] && SECRETS="$SECRETS,SMTP_PASS=smtp-pass:latest,CRON_SECRET=cron-secret:latest"
           for c in $PAYUNI_SITES; do
             c=$(echo "$c" | tr -cd 'A-Za-z0-9' | tr a-z A-Z); l=$(echo "$c" | tr A-Z a-z)
             [ -n "$c" ] && SECRETS="$SECRETS,PAYUNI_MER_ID_$c=payuni-mer-id-$l:latest,PAYUNI_HASH_KEY_$c=payuni-hash-key-$l:latest,PAYUNI_HASH_IV_$c=payuni-hash-iv-$l:latest"
