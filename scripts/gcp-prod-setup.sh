@@ -30,7 +30,9 @@ CONN="${PROJECT_ID}:${REGION}:${INSTANCE}"
 
 echo "▶ 專案 ${PROJECT_ID}"
 if ! gcloud projects describe "$PROJECT_ID" >/dev/null 2>&1; then
-  gcloud projects create "$PROJECT_ID" --name "ParkDodo 正式站" || { echo "建立失敗：專案 ID 可能已被使用，請換一個再執行"; exit 1; }
+  # 專案顯示名稱只能用英文、數字、空白、連字號（不能用中文）
+  gcloud projects create "$PROJECT_ID" --name "ParkDodo Production" \
+    || { echo "建立失敗：請看上面的錯誤訊息；若是 ID 已被使用（already exists／in use），換一個專案 ID 再執行"; exit 1; }
 fi
 BILLING="$(gcloud billing projects describe "$STAGING_ID" --format='value(billingAccountName)')"
 [ -n "$BILLING" ] || { echo "找不到測試站 ${STAGING_ID} 的帳單帳戶"; exit 1; }
