@@ -32,25 +32,24 @@ read -rsp "信箱密碼：" SMTP_PASS; echo
 if [ -n "$SMTP_PASS" ]; then put smtp-pass "$SMTP_PASS"; elif ! gcloud secrets describe smtp-pass >/dev/null 2>&1; then echo "還沒有存過信箱密碼"; exit 1; fi
 unset SMTP_PASS
 
-if gcloud secrets describe cron-secret >/dev/null 2>&1; then
-  CRON_SECRET=$(gcloud secrets versions access latest --secret cron-secret)
-  echo "  ✓ cron-secret（沿用）"
-else
-  CRON_SECRET=$(openssl rand -hex 24)
-  put cron-secret "$CRON_SECRET"
-fi
+# 每次執行都換一組新的呼叫密碼（舊的若曾外流也立即失效；重新部署後生效）
+CRON_SECRET=$(openssl rand -hex 24)
+put cron-secret "$CRON_SECRET"
 
 URL=$(gcloud run services describe "$SERVICE" --region "$REGION" --format='value(status.url)')
 [ -n "$URL" ] || { echo "找不到 Cloud Run 服務 $SERVICE"; exit 1; }
 JOB=edge-offline-check
-ARGS=(--location "$REGION" --schedule "* * * * *" --time-zone "Asia/Taipei" --uri "$URL/api/cron/edge-offline"
-      --http-method POST --headers "Authorization=Bearer $CRON_SECRET" --attempt-deadline 30s)
+COMMON=(--location "$REGION" --schedule "* * * * *" --time-zone "Asia/Taipei" --uri "$URL/api/cron/edge-offline"
+        --http-method POST --attempt-deadline 30s)
+# 建立用 --headers、更新用 --update-headers（gcloud 兩者參數不同）；錯誤訊息不顯示，避免把密碼印在畫面上
 if gcloud scheduler jobs describe "$JOB" --location "$REGION" >/dev/null 2>&1; then
-  gcloud scheduler jobs update http "$JOB" "${ARGS[@]}" >/dev/null
+  gcloud scheduler jobs update http "$JOB" "${COMMON[@]}" --update-headers "Authorization=Bearer $CRON_SECRET" >/dev/null 2>&1 \
+    || { echo "更新排程失敗，請把這行錯誤訊息之外的畫面截圖給管理員"; exit 1; }
 else
-  gcloud scheduler jobs create http "$JOB" "${ARGS[@]}" >/dev/null
+  gcloud scheduler jobs create http "$JOB" "${COMMON[@]}" --headers "Authorization=Bearer $CRON_SECRET" >/dev/null 2>&1 \
+    || { echo "建立排程失敗：請確認專案已啟用 Cloud Scheduler"; exit 1; }
 fi
 unset CRON_SECRET
 echo "  ✓ 每分鐘檢查：$URL/api/cron/edge-offline"
 echo
-echo "完成。接著到 GitHub Variables 新增 ALERTS=on，然後到 Actions 重新執行最新一次「自動檢查」部署。"
+echo "完成。呼叫密碼已更換，請到 Actions 重新執行最新一次「自動檢查」部署讓它生效（第一次設定還要先在 GitHub Variables 新增 ALERTS=on）。"
