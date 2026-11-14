@@ -44,7 +44,12 @@ function envelope(cfg: PayuniConfig, inner: Params, version = "1.0") {
  */
 /** 停車繳費只開「當下完成」的付款方式；ATM、超商代碼要等很久才入帳，車主不能等，不開。 */
 export type UppMethod = "Credit" | "ApplePay" | "GooglePay" | "SamsungPay" | "LinePay" | "JKoPay" | "ICash";
-export const DEFAULT_PARKING_METHODS: UppMethod[] = ["Credit", "ApplePay", "GooglePay", "LinePay"];
+// 預設只開目前商店已開通的方式；LINE Pay、街口等開通後再用 PAYUNI_METHODS 加上
+export const DEFAULT_PARKING_METHODS: UppMethod[] = ["Credit", "ApplePay", "GooglePay"];
+export const METHOD_LABELS: Record<UppMethod, string> = {
+  Credit: "信用卡", ApplePay: "Apple Pay", GooglePay: "Google Pay", SamsungPay: "Samsung Pay",
+  LinePay: "LINE Pay", JKoPay: "街口支付", ICash: "icash Pay",
+};
 const ALL_METHODS: UppMethod[] = ["Credit", "ApplePay", "GooglePay", "SamsungPay", "LinePay", "JKoPay", "ICash"];
 
 /**

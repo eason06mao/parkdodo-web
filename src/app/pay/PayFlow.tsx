@@ -33,7 +33,11 @@ function submitForm(action: string, fields: Record<string, string>) {
 const fmtTime = (d: Date) => new Intl.DateTimeFormat("zh-TW", { timeZone: "Asia/Taipei", hour: "2-digit", minute: "2-digit", hour12: false }).format(d);
 const normalizePlate = (s: string) => s.toUpperCase().replace(/\s/g, "");
 
-export function PayFlow({ siteCode, siteName, paperEnabled, brand, banner }: { siteCode: string; siteName: string; paperEnabled: boolean; brand: Brand; banner: string | null }) {
+export function PayFlow({ siteCode, siteName, paperEnabled, brand, banner, methodNames }: {
+  siteCode: string; siteName: string; paperEnabled: boolean; brand: Brand; banner: string | null;
+  /** 這個停車場付款頁會出現的付款方式（依 PAYUNI_METHODS） */
+  methodNames: string[];
+}) {
   const [step, setStep] = useState<Step>("plate");
   const [plate, setPlate] = useState("");
   const [quote, setQuote] = useState<Quote | null>(null);
@@ -319,7 +323,7 @@ export function PayFlow({ siteCode, siteName, paperEnabled, brand, banner }: { s
             <button type="button" className="pd-btn pd-btn--primary pd-btn--block pd-btn--lg" onClick={pay} disabled={busy}>
               {busy ? "處理中…" : <>前往付款 NT$<span className="pd-mono">{quote.amount}</span></>}
             </button>
-            <p className="pd-label" style={{ margin: 0, textAlign: "center" }}>付款由統一金流 PAYUNi 處理，可使用信用卡、Apple Pay、Google Pay、LINE Pay。</p>
+            <p className="pd-label" style={{ margin: 0, textAlign: "center" }}>付款由統一金流 PAYUNi 處理，可使用{methodNames.join("、")}。</p>
           </>
         )}
 
