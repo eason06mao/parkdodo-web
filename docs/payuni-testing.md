@@ -18,6 +18,7 @@
 ## 付款方式要和商店後台一致
 繳費頁與付款頁顯示的方式由 GitHub 變數 `PAYUNI_METHODS` 決定（未設定時：信用卡、Apple Pay、Google Pay）。
 只能列商店後台已「啟用」的方式，例如 `Credit,ApplePay,GooglePay,SamsungPay,LinePay,JKoPay`。
+可用名稱（UPP Ver 2.0 參數）：Credit、CreditUnionPay（銀聯）、ApplePay、GooglePay、SamsungPay、LinePay、JKoPay、ICash。ATM、CVS 刻意不開（入帳慢，車主不能在出口等）。
 
 ## 付款後自動開閘（工控機模擬器）
 1. 模擬器 http://localhost:8787 選出口車道、輸入車牌，按「模擬辨識到車牌」→ 日誌出現請繳費

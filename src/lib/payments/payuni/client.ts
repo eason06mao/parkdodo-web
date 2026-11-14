@@ -43,14 +43,15 @@ function envelope(cfg: PayuniConfig, inner: Params, version = "1.0") {
  * 車主在 PAYUNi 頁面選付款方式；結果以 NotifyURL（背景，權威）與 ReturnURL（導回頁面，只顯示）回傳。
  */
 /** 停車繳費只開「當下完成」的付款方式；ATM、超商代碼要等很久才入帳，車主不能等，不開。 */
-export type UppMethod = "Credit" | "ApplePay" | "GooglePay" | "SamsungPay" | "LinePay" | "JKoPay" | "ICash";
+export type UppMethod = "Credit" | "CreditUnionPay" | "ApplePay" | "GooglePay" | "SamsungPay" | "LinePay" | "JKoPay" | "ICash";
 // 預設只開目前商店已開通的方式；LINE Pay、街口等開通後再用 PAYUNI_METHODS 加上
 export const DEFAULT_PARKING_METHODS: UppMethod[] = ["Credit", "ApplePay", "GooglePay"];
 export const METHOD_LABELS: Record<UppMethod, string> = {
-  Credit: "信用卡", ApplePay: "Apple Pay", GooglePay: "Google Pay", SamsungPay: "Samsung Pay",
+  Credit: "信用卡", CreditUnionPay: "銀聯卡", ApplePay: "Apple Pay", GooglePay: "Google Pay", SamsungPay: "Samsung Pay",
   LinePay: "LINE Pay", JKoPay: "街口支付", ICash: "icash Pay",
 };
-const ALL_METHODS: UppMethod[] = ["Credit", "ApplePay", "GooglePay", "SamsungPay", "LinePay", "JKoPay", "ICash"];
+// 參數名稱依《UPP 整合式支付頁 Ver 2.0》請求參數（1=啟用）
+const ALL_METHODS: UppMethod[] = ["Credit", "CreditUnionPay", "ApplePay", "GooglePay", "SamsungPay", "LinePay", "JKoPay", "ICash"];
 
 /**
  * 付款頁要開哪些方式：環境變數 PAYUNI_METHODS（逗號分隔，例 "Credit,ApplePay,GooglePay,LinePay,JKoPay"）。
