@@ -1,0 +1,102 @@
+# 正式站部署：只能手動執行（Actions →「部署正式站」→ Run workflow），而且只部署 main。
+# 先確認這個版本在測試站的自動檢查全部通過，才會建置與部署。
+# 需要先執行 scripts/gcp-prod-setup.sh，並在 GitHub Variables 設好 PROD_* 變數、建立 production 環境。
+name: 部署正式站
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: "確認部署到正式站（車主會立即使用新版本），請輸入：部署"
+        required: true
+
+permissions:
+  contents: read
+  checks: read
+  id-token: write
+
+concurrency: production
+
+jobs:
+  deploy:
+    name: 部署正式站
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: production
+    env:
+      REGION: asia-east1
+      SERVICE: parkdodo
+      IMAGE: asia-east1-docker.pkg.dev/${{ vars.PROD_GCP_PROJECT_ID }}/parkdodo/web:${{ github.sha }}
+    steps:
+      - name: 確認輸入
+        if: inputs.confirm != '部署'
+        run: echo "請在 confirm 欄位輸入「部署」" && exit 1
+      - name: 確認正式站已建置
+        if: vars.PROD_GCP_PROJECT_ID == '' || vars.PROD_CLOUDSQL_INSTANCE == ''
+        run: echo "還沒設定 PROD_GCP_PROJECT_ID / PROD_CLOUDSQL_INSTANCE，請先執行 scripts/gcp-prod-setup.sh" && exit 1
+      - name: 確認這個版本的自動檢查都通過
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ok=$(gh api "repos/${{ github.repository }}/commits/${{ github.sha }}/check-runs" \
+            --jq '[.check_runs[] | select(.name=="程式檢查與建置" or .name=="資料表約束測試") | select(.conclusion=="success")] | length')
+          if [ "$ok" != "2" ]; then echo "這個版本的「程式檢查與建置」「資料表約束測試」尚未全部通過，不部署正式站"; exit 1; fi
+          echo "自動檢查通過"
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.PROD_GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.PROD_GCP_DEPLOY_SA }}
+      - uses: google-github-actions/setup-gcloud@v2
+      - name: 更新正式站資料表（不寫入任何示範資料）
+        run: |
+          curl -sSLo cloud-sql-proxy https://storage.googleapis.com/cloud-sql-connectors/cloud-sql-proxy/v2.14.1/cloud-sql-proxy.linux.amd64
+          chmod +x cloud-sql-proxy
+          ./cloud-sql-proxy --port 5432 "${{ vars.PROD_CLOUDSQL_INSTANCE }}" &
+          for i in $(seq 1 30); do (echo > /dev/tcp/127.0.0.1/5432) 2>/dev/null && break; sleep 1; done
+          npm ci --omit=dev --ignore-scripts
+          DATABASE_URL="$(gcloud secrets versions access latest --secret database-migrate-url)" node scripts/migrate.mjs --seed=prod
+      - name: 建置並上傳映像檔
+        run: |
+          gcloud auth configure-docker asia-east1-docker.pkg.dev --quiet
+          docker build -t "$IMAGE" .
+          docker push "$IMAGE"
+      - name: 部署到 Cloud Run（台灣）
+        env:
+          CLOUDSQL: ${{ vars.PROD_CLOUDSQL_INSTANCE }}
+          BUCKET: ${{ vars.PROD_EDGE_IMAGE_BUCKET }}
+          PAYUNI: ${{ vars.PROD_PAYUNI_SECRETS }}
+          PAYUNI_SITES: ${{ vars.PROD_PAYUNI_SITES }}
+          PAYUNI_ENV: ${{ vars.PROD_PAYUNI_ENV || 'sandbox' }}
+          PAYUNI_METHODS: ${{ vars.PROD_PAYUNI_METHODS }}
+          ALERTS: ${{ vars.PROD_ALERTS }}
+          PUBLIC_BASE_URL: ${{ vars.PROD_PUBLIC_BASE_URL }}
+        run: |
+          SECRETS="ADMIN_GATE=admin-gate:latest,DATABASE_URL=database-url:latest"
+          if [ "$PAYUNI" = "on" ]; then
+            SECRETS="$SECRETS,PAYUNI_MER_ID=payuni-mer-id:latest,PAYUNI_HASH_KEY=payuni-hash-key:latest,PAYUNI_HASH_IV=payuni-hash-iv:latest"
+          fi
+          for c in $PAYUNI_SITES; do
+            c=$(echo "$c" | tr -cd 'A-Za-z0-9' | tr a-z A-Z); l=$(echo "$c" | tr A-Z a-z)
+            [ -n "$c" ] && SECRETS="$SECRETS,PAYUNI_MER_ID_$c=payuni-mer-id-$l:latest,PAYUNI_HASH_KEY_$c=payuni-hash-key-$l:latest,PAYUNI_HASH_IV_$c=payuni-hash-iv-$l:latest"
+          done
+          [ "$ALERTS" = "on" ] && SECRETS="$SECRETS,SMTP_PASS=smtp-pass:latest,CRON_SECRET=cron-secret:latest"
+          # 環境變數以 @ 分隔（gcloud 的 ^@^ 語法），因為 PAYUNI_METHODS 的值含逗號
+          ENVS="PAYUNI_ENV=$PAYUNI_ENV@EDGE_IMAGE_BUCKET=$BUCKET"
+          [ -n "$PAYUNI_METHODS" ] && ENVS="$ENVS@PAYUNI_METHODS=$(echo "$PAYUNI_METHODS" | tr -d ' ')"
+          [ -n "$PUBLIC_BASE_URL" ] && ENVS="$ENVS@PUBLIC_BASE_URL=$PUBLIC_BASE_URL"
+          gcloud run deploy "$SERVICE" \
+            --image "$IMAGE" --region "$REGION" \
+            --service-account "parkdodo-run@${{ vars.PROD_GCP_PROJECT_ID }}.iam.gserviceaccount.com" \
+            --allow-unauthenticated \
+            --min-instances 1 --max-instances 4 --memory 1Gi --cpu 1 \
+            --set-secrets "$SECRETS" \
+            --add-cloudsql-instances "$(echo "$CLOUDSQL" | tr -d '[:space:]')" \
+            --set-env-vars "^@^$ENVS" \
+            --quiet
+          echo "正式站網址：$(gcloud run services describe "$SERVICE" --region "$REGION" --format='value(status.url)')" >> "$GITHUB_STEP_SUMMARY"
+          echo "統一金流：$PAYUNI_ENV（production 才會真的扣款）" >> "$GITHUB_STEP_SUMMARY"
