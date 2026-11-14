@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { brandForSite } from "@/lib/brandingServer";
 import { dbConfigured } from "@/lib/db";
 import { features } from "@/lib/features";
+import { METHOD_LABELS, parkingMethods } from "@/lib/payments/payuni/client";
 import { siteRecords } from "@/lib/mock/tenancy";
 import { PayFlow } from "./PayFlow";
 
@@ -16,5 +17,6 @@ export default async function PayPage({ searchParams }: { searchParams: Promise<
   const banner = !dbConfigured() ? "模擬環境・不會扣款、不會開立發票"
     : process.env.PAYUNI_ENV !== "production" ? "測試環境・使用統一金流測試區，不會真的扣款" : null;
   return <PayFlow siteCode={code} siteName={siteRecords.find((x) => x.code === code)?.name ?? "停車場"} paperEnabled={features.cashKiosk}
-    brand={await brandForSite(code)} banner={banner} />;
+    brand={await brandForSite(code)} banner={banner}
+    methodNames={parkingMethods(process.env).map((m) => METHOD_LABELS[m])} />;
 }
