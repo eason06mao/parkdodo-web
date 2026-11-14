@@ -6,18 +6,27 @@ import { NextResponse, type NextRequest } from "next/server";
 //   2. HTTP Basic Auth：給 curl、腳本使用
 // cookie 用 STAGING_BASIC_AUTH 做 HMAC 簽章；換密碼後舊的登入自動失效。
 // 例外：統一金流的背景通知必須能直接打進來（它自己有 HashInfo 驗證）；工控機 API 用裝置金鑰。
-// 正式站不設這個變數，改用正式登入與 MFA。
+// 正式站：不設 STAGING_BASIC_AUTH，改設 ADMIN_GATE="帳號:密碼"：車主用的頁面（繳費、會員、工控機、付款通知）公開，
+// 後台與其他頁面需要先登入。這是正式帳號登入（含 MFA）完成前的暫時保護。
 // /api/edge/ 由工控機的裝置金鑰驗證（不用門禁帳密）
 // /api/cron/ 由 CRON_SECRET 驗證（Cloud Scheduler 呼叫）
 const OPEN_PATHS = ["/api/payments/payuni/notify", "/api/payments/payuni/return", "/api/edge/", "/api/cron/"];
+// 正式站（ADMIN_GATE）額外公開給車主的路徑
+const PUBLIC_PATHS = ["/pay", "/join", "/api/pay/", "/api/payments/", "/api/members/", "/api/tax-id/", "/robots.txt"];
 const GATE = "/__gate";
 const COOKIE = "pd_staging_gate";
 const MAX_AGE = 12 * 60 * 60;
+/** 門禁畫面上的名稱：只依環境變數決定（每個部署固定） */
+const gateLabel = () => (process.env.STAGING_BASIC_AUTH ? "測試站" : "管理後台");
 
 export async function middleware(req: NextRequest) {
-  const expected = process.env.STAGING_BASIC_AUTH;
+  const staging = process.env.STAGING_BASIC_AUTH;
+  const expected = staging || process.env.ADMIN_GATE;
   const { pathname } = req.nextUrl;
   if (!expected || OPEN_PATHS.some((p) => pathname.startsWith(p))) return NextResponse.next();
+  if (!staging && PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(p.endsWith("/") ? p : `${p}/`) || pathname.startsWith(`${p}?`))) {
+    return NextResponse.next();
+  }
 
   if (pathname === GATE) return gate(req, expected);
 
@@ -38,7 +47,7 @@ export async function middleware(req: NextRequest) {
     url.search = `?next=${encodeURIComponent(pathname + req.nextUrl.search)}`;
     return NextResponse.redirect(url, 303);
   }
-  return new NextResponse("需要登入測試站", {
+  return new NextResponse(`需要登入${gateLabel()}`, {
     status: 401,
     headers: { "WWW-Authenticate": 'Basic realm="ParkDodo staging", charset="UTF-8"', "X-Robots-Tag": "noindex" },
   });
@@ -120,8 +129,9 @@ function safeEqual(a: string, b: string) {
 const esc = (s: string) => s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
 
 function page(error: string, next: string, status: number) {
+  const label = gateLabel();
   const html = `<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="robots" content="noindex"><title>登入測試站・ParkDodo</title>
+<meta name="robots" content="noindex"><title>登入${label}・ParkDodo</title>
 <style>
 :root{color-scheme:light dark;--bg:#F5F3EF;--card:#fff;--ink:#1D2A2E;--muted:#5E6B6E;--line:#D9D4CC;--accent:#1F7A6D;--danger:#B4442F}
 @media (prefers-color-scheme:dark){:root{--bg:#141B1D;--card:#1D2629;--ink:#E8ECEC;--muted:#9AA7A9;--line:#33403F;--accent:#3FA796;--danger:#E07A63}}
@@ -134,8 +144,8 @@ input:focus{outline:2px solid var(--accent);outline-offset:1px}button{font:inher
 .err{color:var(--danger)}
 </style></head><body>
 <form method="post" action="${GATE}?next=${esc(encodeURIComponent(next))}">
-<h1>ParkDodo 測試站</h1>
-<p>這是內部測試環境，請輸入測試站帳號與密碼。登入會保留 12 小時。</p>
+<h1>ParkDodo ${label}</h1>
+<p>${label === "測試站" ? "這是內部測試環境，請輸入測試站帳號與密碼。" : "僅限內部人員，請輸入管理帳號與密碼。"}登入會保留 12 小時。</p>
 ${error ? `<p class="err" role="alert">${esc(error)}</p>` : ""}
 <label>帳號<input name="user" autocomplete="username" required autofocus></label>
 <label>密碼<input name="pass" type="password" autocomplete="current-password" required></label>

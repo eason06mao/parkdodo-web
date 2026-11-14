@@ -1,6 +1,7 @@
 // 用 DATABASE_URL 直接套用 migration（雲端與 CI 用；本機 Docker 請用 npm run db:migrate）。
 //   node scripts/migrate.mjs            只套用還沒跑過的 migration
 //   node scripts/migrate.mjs --seed     另外寫入測試站種子資料（可重複執行）
+//   node scripts/migrate.mjs --seed=prod 寫入正式站基本資料（公司、兩站、費率；沒有示範資料）
 import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import pg from "pg";
@@ -25,7 +26,10 @@ try {
     console.log(`已套用 ${v}`); n++;
   }
   console.log(n ? `資料表更新完成（${n} 個）。` : "資料表已是最新。");
-  if (process.argv.includes("--seed")) {
+  if (process.argv.includes("--seed=prod")) {
+    await c.query(readFileSync(new URL("../db/seed/prod_seed.sql", import.meta.url).pathname, "utf8"));
+    console.log("已寫入正式站基本資料。");
+  } else if (process.argv.includes("--seed")) {
     await c.query(readFileSync(new URL("../db/seed/staging_seed.sql", import.meta.url).pathname, "utf8"));
     console.log("已寫入測試站種子資料。");
   }
