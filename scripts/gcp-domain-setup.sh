@@ -3,7 +3,7 @@
 #   bash scripts/gcp-domain-setup.sh <正式站專案ID> [測試站專案ID]
 # 會接上：
 #   staging.parkdodo.tw → 測試站（parkdodo-staging 專案的 parkdodo-staging 服務）
-#   pay.parkdodo.tw、admin.parkdodo.tw → 正式站（parkdodo 服務；正式站部署過一次之後才接得上）
+#   parkdodo.tw、www.parkdodo.tw（公司網站）、pay.parkdodo.tw（繳費）、admin.parkdodo.tw（後台）→ 正式站 parkdodo 服務
 # 第一次要先證明你擁有 parkdodo.tw：腳本會給一個網址，照畫面在 Gandi 加一筆 TXT 記錄後再執行一次。
 # 最後印出要在 Gandi「DNS 記錄」新增的 CNAME。HTTPS 憑證由 Google 自動配發（DNS 生效後約 15 分鐘到數小時）。
 set -euo pipefail
@@ -36,16 +36,23 @@ map() {
 
 echo "▶ 接上網址"
 map "$STAGING_ID" parkdodo-staging "staging.${DOMAIN}"
+map "$PROD_ID" parkdodo "${DOMAIN}"
+map "$PROD_ID" parkdodo "www.${DOMAIN}"
 map "$PROD_ID" parkdodo "pay.${DOMAIN}"
 map "$PROD_ID" parkdodo "admin.${DOMAIN}"
 
 echo
 echo "▶ 請到 Gandi → 網域 → ${DOMAIN} → DNS 記錄，新增下面的記錄（已存在的不用重複加）："
-for pair in "$STAGING_ID staging" "$PROD_ID pay" "$PROD_ID admin"; do
+# 依 Google 回傳的記錄逐筆列出（網域本身會給 A／AAAA，子網域給 CNAME）
+for pair in "$STAGING_ID staging" "$PROD_ID @" "$PROD_ID www" "$PROD_ID pay" "$PROD_ID admin"; do
   set -- $pair
-  gcloud beta run domain-mappings describe --domain "$2.${DOMAIN}" --region "$REGION" --project "$1" \
-    --format='value(status.resourceRecords[].type,status.resourceRecords[].rrdata)' 2>/dev/null \
-    | awk -v n="$2" -F'\t' 'NF{print "   類型 " $1 "　名稱 " n "　值 " $2}'
+  host="$2.${DOMAIN}"; [ "$2" = "@" ] && host="$DOMAIN"
+  gcloud beta run domain-mappings describe --domain "$host" --region "$REGION" --project "$1" \
+    --format='json(status.resourceRecords)' 2>/dev/null \
+    | python3 -c 'import json,sys
+d=json.load(sys.stdin) or {}
+for r in (d.get("status") or {}).get("resourceRecords") or []:
+    print("   類型 %-5s 名稱 %-8s 值 %s" % (r.get("type"), sys.argv[1], r.get("rrdata")))' "$2" 2>/dev/null || true
 done
 echo
 echo "加好之後，用這個指令看憑證進度（Ready 為 True 就可以用 https 開啟）："
