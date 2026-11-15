@@ -61,4 +61,10 @@ INSERT INTO fee_rate_versions (id, site_id, version_no, rules, effective_from, a
    '2026-11-01T00:00:00+08:00', '00000000-0000-4000-8000-000000000101')
 ON CONFLICT (id) DO NOTHING;
 
+-- 補上場站地址與車位數（業主 2026-11-15 提供）。只在仍是「地址待補」時更新，之後在後台改過的不會被蓋掉。
+UPDATE sites SET address = '408臺中市南屯區惠中里大墩十二街458號', total_spaces = 30
+ WHERE id = '00000000-0000-4000-8000-000000000201' AND address LIKE '%待補%';
+UPDATE sites SET address = '433臺中市沙鹿區竹林里中山路128-33號', total_spaces = 30
+ WHERE id = '00000000-0000-4000-8000-000000000202' AND address LIKE '%待補%';
+
 COMMIT;
