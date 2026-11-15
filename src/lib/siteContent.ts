@@ -8,7 +8,7 @@ export const COMPANY = {
   taxId: "62171653",
   address: "臺中市西區大昌街216號1樓",
   email: "service@parkdodo.tw",
-  phone: null as string | null,           // 客服電話：業主決定是否公開
+  phone: null as string | null,           // 客服電話：業主之後決定是否公開；null 時網站不顯示這一列
   policyDate: "2026 年 11 月 15 日",       // 政策公告日期
 };
 
@@ -20,8 +20,8 @@ export interface PublicSite {
 }
 
 export const SITES: PublicSite[] = [
-  { code: "TXG001", name: "台中南屯停車場", taxId: "61079159", address: null, hours: null, spaces: null },
-  { code: "TXG002", name: "台中沙鹿停車場", taxId: "61082892", address: null, hours: null, spaces: null },
+  { code: "TXG001", name: "台中南屯停車場", taxId: "61079159", address: "408臺中市南屯區惠中里大墩十二街458號", hours: "24 小時", spaces: 30 },
+  { code: "TXG002", name: "台中沙鹿停車場", taxId: "61082892", address: "433臺中市沙鹿區竹林里中山路128-33號", hours: "24 小時", spaces: 30 },
 ];
 
 /** 收費標準（與計費程式同一份設定，改費率時網站自動一致） */
@@ -35,12 +35,13 @@ export const RATE = {
 
 /** 退款：業主確認後把 confirmed 改成 true */
 export const REFUND = {
-  confirmed: false,
+  confirmed: true,   // 業主 2026-11-15 確認
   days: 7,   // 查證後幾個工作天內退款
 };
 
 /** 月租：業主決定要不要放、怎麼申請 */
 export const MONTHLY = {
   show: true,
-  howTo: "月租請來信洽詢，或在場內掃描會員 QR Code 登記「我想租月租」，我們會與你聯絡。",
+  lineUrl: null as string | null,   // LINE 官方帳號加好友連結（例：https://lin.ee/xxxx）；提供後顯示
+  howTo: "月租請來信 service@parkdodo.tw 洽詢，或在場內掃描會員 QR Code 登記「我想租月租」，我們會與你聯絡。",
 };

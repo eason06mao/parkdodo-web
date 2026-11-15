@@ -36,7 +36,7 @@ export default function HomePage() {
               <dl className="site-dl">
                 <dt>地址</dt><dd>{orTodo(s.address)}</dd>
                 <dt>營業時間</dt><dd>{orTodo(s.hours)}</dd>
-                <dt>車位</dt><dd>{orTodo(s.spaces, " 格")}</dd>
+                <dt>車位</dt><dd>{s.spaces ? `約 ${s.spaces} 格` : <Todo />}</dd>
                 <dt>發票開立</dt><dd>{COMPANY.name}（統編 {s.taxId}）</dd>
               </dl>
               {s.address && (
@@ -63,7 +63,12 @@ export default function HomePage() {
             </tbody>
           </table>
         </div>
-        {MONTHLY.show && <p style={{ margin: "16px 0 0", lineHeight: 1.8 }}><b>月租：</b>{MONTHLY.howTo}</p>}
+        {MONTHLY.show && (
+          <p style={{ margin: "16px 0 0", lineHeight: 1.8 }}>
+            <b>月租：</b>{MONTHLY.howTo}
+            {MONTHLY.lineUrl && <> 也可以<a href={MONTHLY.lineUrl} target="_blank" rel="noreferrer">加入 LINE 官方帳號</a>詢問。</>}
+          </p>
+        )}
       </section>
 
       <section id="how" className="site-wrap site-sec">
@@ -97,7 +102,7 @@ export default function HomePage() {
           <dt>統一編號</dt><dd>{COMPANY.taxId}</dd>
           <dt>公司地址</dt><dd>{COMPANY.address}</dd>
           <dt>客服信箱</dt><dd>{COMPANY.email}</dd>
-          <dt>客服電話</dt><dd>{COMPANY.phone ?? <Todo label="待決定是否公開" />}</dd>
+          {COMPANY.phone && <><dt>客服電話</dt><dd>{COMPANY.phone}</dd></>}
           <dt>現場求助</dt><dd>各停車場出口設有對講機</dd>
         </dl>
         {!REFUND.confirmed && <p style={{ margin: "16px 0 0" }}><Todo label="退款規則待公司確認" /></p>}
