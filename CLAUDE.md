@@ -20,10 +20,14 @@
 - 兩個營運站（同公司、各自統編開發票）：
   - 台中南屯停車場：統編 61079159，代號 **TXG001**
   - 台中沙鹿停車場：統編 61082892，代號 **TXG002**
-  - 地址、車位數、車道數待業主提供。「中航站」只是早期示範資料。
+  - 南屯：408臺中市南屯區惠中里大墩十二街458號；沙鹿：433臺中市沙鹿區竹林里中山路128-33號。
+    兩站 24 小時、約 30 格。車道數待確認。「中航站」只是早期示範資料。
 - 電子發票字軌：兩站 2026 年 11–12 月已配號（各 50 本）。加值中心尚未決定（關貿或統一金流）。
 - 時程：IPC 11/13 到貨；**攝影機、柵欄、車牌辨識 11/15 到貨測試；月底正式上線**。
 - 網域：**parkdodo.tw**（Gandi 註冊）；公司信箱 **service@parkdodo.tw**（Gandi 信箱）。
+- 公司網站（統一金流審核需要）：首頁＋隱私權／退款與申訴／服務條款，內容只改 `src/lib/siteContent.ts`。
+  **維護方式：業主口頭告訴 Claude 要改什麼 → Claude 開 PR → 業主合併並部署正式站**（11/15 決定）。
+  之後有正式後台登入再考慮做「官網內容」管理頁。客服電話暫不公開；LINE 官方帳號「候補」。
 
 ## 三、系統組成
 - 雲端：Next.js 15＋PostgreSQL 16（Cloud SQL），部署在 Google Cloud Run（台灣 asia-east1）。
@@ -39,11 +43,15 @@
 | | 測試站（已上線） | 正式站（已建置，尚未對外） |
 |---|---|---|
 | 專案 | parkdodo-staging | parkdodo-prod-tw（11/15 建立，資料庫高可用） |
-| 網址 | parkdodo-staging-617659344056.asia-east1.run.app（之後 staging.parkdodo.tw） | 目前 parkdodo-yqbxzd2w6q-de.a.run.app；之後 pay.parkdodo.tw、admin.parkdodo.tw |
+| 網址 | staging.parkdodo.tw（原 parkdodo-staging-617659344056.asia-east1.run.app） | parkdodo.tw／www（官網）、pay.parkdodo.tw（繳費）、admin.parkdodo.tw（後台）；run.app 網址不對外使用 |
 | 部署 | main 合併、自動檢查通過後自動部署 | Actions「部署正式站」手動 |
 | 說明 | | `docs/production.md` |
 
-正式站目前：統一金流仍為測試區（sandbox）、尚未接網域、尚未設定正式金鑰與離線通知。
+正式站目前：統一金流仍為測試區（sandbox）、尚未設定正式金鑰與離線通知。
+網域（11/15）：Google 已驗證 parkdodo.tw；Cloud Run 網址對應已建；Gandi DNS：A @ 216.239.32.21（Gandi 介面一筆只能一個值，
+其餘 3 個 A 與 AAAA 暫不加，不影響使用）、CNAME www/pay/admin/staging → ghs.googlehosted.com.；
+信箱相關記錄（MX、SPF、DMARC、gm1–3、mailsa、webmail、SRV、google-site-verification）不可動。
+11/15 17:36 DomainRoutable=True，HTTPS 憑證發放中。
 GitHub Variables（正式站）：PROD_GCP_PROJECT_ID、PROD_GCP_WIF_PROVIDER、PROD_GCP_DEPLOY_SA、PROD_CLOUDSQL_INSTANCE、PROD_EDGE_IMAGE_BUCKET；
 GitHub Environment「production」需業主核准、只允許 main。
 GitHub Variables（測試站）：GCP_*、CLOUDSQL_INSTANCE、EDGE_IMAGE_BUCKET、PAYUNI_SECRETS=on、
@@ -65,6 +73,7 @@ PAYUNI_METHODS=Credit,ApplePay,GooglePay,SamsungPay,LinePay,JKoPay、ALERTS=on�
    之後找原廠工具再開。
 5. 車頭照片裁切（需實際攝影機照片）
 6. 正式站：真卡小額付款＋退款
+7. 網域憑證 Ready=True 後：確認統一金流導回／通知網址指向 pay.parkdodo.tw；之後才印場內 QR Code
 
 ## 七、已知缺口（上線前要補）
 - 正式站建置腳本：後台密碼太短時直接結束，應改成重新輸入（小修）。
