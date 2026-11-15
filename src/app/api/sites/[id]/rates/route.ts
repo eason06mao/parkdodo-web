@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
+import { actorEmail } from "@/lib/actor";
 import { getCurrentUser } from "@/lib/auth";
 import { validatePlan, type Promotion, type RatePlan } from "@/lib/billing/fee";
 import { dbConfigured, tx } from "@/lib/db";
-import { accounts, auditEntries, rateSchedules, siteRecords } from "@/lib/mock/tenancy";
+import { auditEntries, rateSchedules, siteRecords } from "@/lib/mock/tenancy";
 import { can } from "@/lib/permissions";
 
 // Mock：儲存場站費率並「下發」到 Edge。
@@ -38,7 +39,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
 
   // 有雲端資料庫：新增一個費率版本（舊版本保留、結束生效），工控機下次心跳會看到設定版本變更並重新下載
   if (dbConfigured()) {
-    const email = accounts.find((a) => a.id === user.id)?.email ?? "";
+    const email = actorEmail(user.id);
     const saved = await tx(async (c) => {
       const s = (await c.query("SELECT id FROM sites WHERE code = $1", [site.code])).rows[0];
       if (!s) return false;

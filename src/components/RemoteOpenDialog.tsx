@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { sendGateCommand, watchGateCommand } from "@/lib/gateClient";
 import { GATE_REASONS, type GateReason } from "@/lib/types";
 
 /**
@@ -16,9 +17,9 @@ export function RemoteOpenButton({ siteId, laneCode, laneName, plate, variant = 
   const [error, setError] = useState("");
   const [phase, setPhase] = useState<Phase>("form");
   const [detail, setDetail] = useState("");
-  const timer = useRef<ReturnType<typeof setInterval> | null>(null);
+  const stopWatch = useRef<(() => void) | null>(null);
 
-  const stop = () => { if (timer.current) clearInterval(timer.current); timer.current = null; };
+  const stop = () => { stopWatch.current?.(); stopWatch.current = null; };
   const open = () => { stop(); setPhase("form"); setError(""); setDetail(""); ref.current?.showModal(); };
   const close = () => { stop(); ref.current?.close(); };
 
@@ -29,24 +30,16 @@ export function RemoteOpenButton({ siteId, laneCode, laneName, plate, variant = 
       return;
     }
     setError(""); setPhase("sending");
-    const res = await fetch("/api/gate-commands", {
-      method: "POST", headers: { "content-type": "application/json" },
-      body: JSON.stringify({ siteId, laneCode, plate, reasonCode: reason, reasonNote: note, idempotencyKey: crypto.randomUUID() }),
-    }).catch(() => null);
-    const body = await res?.json().catch(() => ({}));
-    if (!res?.ok) { setPhase("form"); setError(body?.message ?? "送出失敗，請再試一次。"); return; }
-    if (body.mock) { setPhase("mock"); return; }
+    let sent: { id: string | null; expiresAt: number };
+    try { sent = await sendGateCommand({ siteId, laneCode, plate, reasonCode: reason, reasonNote: note }); }
+    catch (err) { setPhase("form"); setError((err as Error).message); return; }
+    if (!sent.id) { setPhase("mock"); return; }
     setPhase("waiting");
-    const until = Date.parse(body.expiresAt) + 3000;
-    timer.current = setInterval(async () => {
-      const r = await fetch(`/api/gate-commands/${body.id}`, { cache: "no-store" }).then((x) => x.json()).catch(() => null);
-      const st = r?.status as string | undefined;
-      if (st === "executed" || st === "failed" || st === "expired") {
-        stop(); setPhase(st); setDetail(r?.result?.detail ?? "");
-      } else if (Date.now() > until) {
-        stop(); setPhase("expired");
-      }
-    }, 1000);
+    stopWatch.current = watchGateCommand(sent.id, sent.expiresAt, (o) => {
+      stopWatch.current = null;
+      if (o.kind === "failed") setDetail(o.detail);
+      setPhase(o.kind);
+    });
   };
 
   const RESULT: Record<Exclude<Phase, "form" | "sending">, { title: string; text: string }> = {
