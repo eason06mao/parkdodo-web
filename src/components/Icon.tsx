@@ -15,6 +15,10 @@ const paths: Record<string, React.ReactNode> = {
   chevronLeft: (<path d="M15 18l-6-6 6-6" />),
   chevronRight: (<path d="M9 18l6-6-6-6" />),
   logo: (<path d="M7 20V4h6a5 5 0 0 1 0 10H7" />),
+  camera: (<><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" /><circle cx="12" cy="13" r="4" /></>),
+  phone: (<><rect x="5" y="2" width="14" height="20" rx="2" /><path d="M12 18h.01" /></>),
+  cloud: (<path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z" />),
+  shield: (<><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /><path d="M9 12l2 2 4-4" /></>),
 };
 
 export function Icon({ name, size = 18, strokeWidth = 1.8 }: { name: keyof typeof paths | string; size?: number; strokeWidth?: number }) {

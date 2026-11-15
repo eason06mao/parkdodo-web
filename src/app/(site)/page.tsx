@@ -1,6 +1,8 @@
 import Link from "next/link";
+import { Icon } from "@/components/Icon";
 import { METHOD_LABELS, parkingMethods } from "@/lib/payments/payuni/client";
 import { COMPANY, MONTHLY, RATE, REFUND, SITES } from "@/lib/siteContent";
+import { LaneArt } from "./LaneArt";
 import { orTodo, Todo } from "./Todo";
 
 // 付款方式依正式站設定（PAYUNI_METHODS）即時顯示
@@ -11,19 +13,54 @@ export default function HomePage() {
   const firstUnit = `${RATE.freeMinutes + 1}–${RATE.unitMinutes} 分鐘`;
   return (
     <>
-      <section className="site-wrap site-hero">
-        <div>
-          <h1>停車不用找零，<br />掃碼付款，柵欄自己開。</h1>
-          <p>
-            {`${COMPANY.name}經營的無人自助停車場。入口以車牌辨識自動記錄進場時間；離場前用手機掃描場內 QR Code、輸入車牌，線上付款後開到出口，柵欄就會自動開啟。`}
-          </p>
+      <section className="site-hero-band">
+        <div className="site-wrap site-hero">
+          <div>
+            <p className="eyebrow">SMART PARKING・SEAMLESS EXIT</p>
+            <h1>智慧停車，<br />車到，柵欄就開。</h1>
+            <p>
+              {`${COMPANY.brand} 以 AI 車牌辨識與雲端管理，打造 24 小時無人自助停車場。不用取票、不用找零，手機掃碼就能付款，付完開到出口自動放行。`}
+            </p>
+            <div className="cta">
+              <Link href="/#sites" className="pd-btn pd-btn--primary pd-btn--lg">找停車場</Link>
+              <Link href="/#how" className="pd-btn pd-btn--lg ghost">怎麼付款</Link>
+            </div>
+          </div>
+          <LaneArt />
         </div>
-        <div className="ticket" aria-label="繳費畫面示意">
-          <div className="row"><span>停車場</span><b>{SITES[0].name}</b></div>
-          <div className="plate">ABC-1234</div>
-          <div className="row"><span>停車時間</span><b>1 時 20 分</b></div>
-          <div className="row"><span>應付金額</span><b>NT$ {Math.ceil(80 / RATE.unitMinutes) * RATE.unitPrice}</b></div>
-          <div className="row"><span>付款後</span><b>{RATE.graceMinutes} 分鐘內出場</b></div>
+        <div className="site-wrap">
+          <div className="site-stats">
+            <div><b>24H</b><span>無人自助營運</span></div>
+            <div><b>0 張</b><span>停車票卡，車牌就是通行證</span></div>
+            <div><b>3 步</b><span>掃碼、輸入車牌、付款</span></div>
+            <div><b>{methods.length} 種</b><span>線上付款方式</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="features" className="site-wrap site-sec">
+        <h2>為什麼停 ParkDodo</h2>
+        <div className="site-features">
+          <article>
+            <div className="ic" aria-hidden="true"><Icon name="camera" /></div>
+            <h3>AI 車牌辨識</h3>
+            <p>入口自動記錄進場時間，出口辨識後放行。不用取票，也不怕票卡遺失。</p>
+          </article>
+          <article>
+            <div className="ic" aria-hidden="true"><Icon name="phone" /></div>
+            <h3>掃碼即付，免下載 App</h3>
+            <p>手機相機掃描場內 QR Code 就能繳費，支援信用卡與多種行動支付，電子發票自動開立。</p>
+          </article>
+          <article>
+            <div className="ic" aria-hidden="true"><Icon name="cloud" /></div>
+            <h3>雲端即時管理</h3>
+            <p>每個場站的車道、付款與設備狀態即時回報雲端，異常時主動通知值班人員，遠端就能協助開閘。</p>
+          </article>
+          <article>
+            <div className="ic" aria-hidden="true"><Icon name="shield" /></div>
+            <h3>斷網也不停擺</h3>
+            <p>場站主機保存當下資料，網路短暫中斷時車道照常運作，恢復後自動補傳，不漏任何一筆紀錄。</p>
+          </article>
         </div>
       </section>
 
@@ -93,6 +130,16 @@ export default function HomePage() {
         <details><summary>付款後來不及在時間內出場？</summary><p>超過付款後 {RATE.graceMinutes} 分鐘才出場，出口會顯示需要補繳的金額，掃碼補繳後即可離場。</p></details>
         <details><summary>重複付款或金額有問題？</summary><p>請寄信到 {COMPANY.email}，附上車牌、停車場與付款時間。處理方式請見<Link href="/refund">退款與申訴</Link>。</p></details>
         <details><summary>發票在哪裡？</summary><p>依你付款時選擇的方式：存入載具的可在財政部電子發票 App 查詢；公司統編發票會寄到你填寫的 Email。</p></details>
+      </section>
+
+      <section className="site-wrap site-sec">
+        <div className="site-partner">
+          <div>
+            <h2>你的停車場，也可以無人化</h2>
+            <p>從車牌辨識、柵欄、場站主機到雲端管理與線上收款，ParkDodo 提供一套完整的無人停車系統。土地或停車場業者歡迎來信洽談合作。</p>
+          </div>
+          <a className="pd-btn pd-btn--primary pd-btn--lg" href={`mailto:${COMPANY.email}?subject=${encodeURIComponent("停車場合作洽詢")}`}>來信洽談</a>
+        </div>
       </section>
 
       <section id="contact" className="site-wrap site-sec">

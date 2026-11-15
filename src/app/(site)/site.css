@@ -59,3 +59,50 @@
   .site-hero { grid-template-columns: 1fr; padding-block: 36px 28px; }
   .site-nav { font-size: 13px; gap: 12px; }
 }
+
+/* ---------- 首頁主視覺（深色帶） ---------- */
+.site-hero-band { background: var(--pd-night); color: var(--pd-night-ink); }
+.site-hero-band .site-hero { padding-block: 64px 56px; }
+.site-hero-band .eyebrow { font-family: var(--pd-font-mono); font-size: 13px; letter-spacing: .12em; color: #7FC4BC; margin: 0 0 14px; }
+.site-hero-band h1 { color: #fff; }
+.site-hero-band p { color: #C9D1D6; }
+.site-hero-band .cta { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 26px; }
+.site-hero-band .cta a { text-decoration: none; }
+.site-hero-band .cta .ghost { border-color: #3A4B55; background: transparent; color: var(--pd-night-ink); }
+.site-hero-band .cta .ghost:hover { background: var(--pd-night-2); }
+.lane-art { width: 100%; height: auto; display: block; max-width: 100%; }
+
+.site-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid #2A3B45; }
+.site-stats div { padding: 18px 16px; border-right: 1px solid #2A3B45; }
+.site-stats div:last-child { border-right: 0; }
+.site-stats b { display: block; font-family: var(--pd-font-mono); font-size: 22px; color: #fff; }
+.site-stats span { font-size: 13px; color: var(--pd-night-muted); }
+
+.site-features { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
+.site-features article { background: var(--pd-surface); border: 1px solid var(--pd-line); border-radius: 14px; padding: 22px; }
+.site-features .ic { width: 40px; height: 40px; border-radius: 10px; background: var(--pd-accent-tint); color: var(--pd-accent); display: grid; place-items: center; margin-bottom: 12px; }
+.site-features h3 { margin: 0 0 6px; font-size: 17px; }
+.site-features p { margin: 0; color: var(--pd-ink-2); line-height: 1.75; font-size: 15px; }
+
+.site-partner { background: var(--pd-accent-tint); border: 1px solid #B9DCD7; border-radius: 16px; padding: 26px; display: flex; gap: 16px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+.site-partner h2 { margin: 0 0 6px; }
+.site-partner p { margin: 0; color: var(--pd-ink-2); line-height: 1.8; max-width: 40em; }
+
+/* 動畫：車輛靠近 → 光束掃描 → 雲端確認 → 柵欄開啟 → 車輛通過 */
+.la-car { animation: la-car 8s ease-in-out infinite; }
+.la-beam { animation: la-beam 8s ease-in-out infinite; }
+.la-link { animation: la-link 8s linear infinite; }
+.la-arm { transform-box: view-box; transform-origin: 372px 244px; animation: la-arm 8s ease-in-out infinite; }
+@keyframes la-car { 0% { transform: translateX(-120px); opacity: 0; } 6% { opacity: 1; } 30%, 50% { transform: translateX(0); } 72% { transform: translateX(230px); opacity: 1; } 76%, 100% { transform: translateX(230px); opacity: 0; } }
+@keyframes la-beam { 0%, 25% { opacity: 0; } 32%, 42% { opacity: 1; } 48%, 100% { opacity: 0; } }
+@keyframes la-link { 0%, 36% { stroke-dashoffset: 0; opacity: .2; } 44% { opacity: 1; } 52% { stroke-dashoffset: -36; opacity: 1; } 60%, 100% { opacity: .2; } }
+@keyframes la-arm { 0%, 46% { transform: rotate(0deg); } 54%, 80% { transform: rotate(90deg); } 92%, 100% { transform: rotate(0deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .la-car, .la-beam, .la-link, .la-arm { animation: none; }
+  .la-beam { opacity: 1; }
+}
+@media (max-width: 720px) {
+  .site-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .site-stats div:nth-child(2) { border-right: 0; }
+  .site-stats div:nth-child(-n+2) { border-bottom: 1px solid #2A3B45; }
+}
