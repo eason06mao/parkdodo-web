@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
+import { actorEmail } from "@/lib/actor";
 import { getCurrentUser } from "@/lib/auth";
 import { dbConfigured, tx } from "@/lib/db";
 import { EdgeError, requestGateCommand } from "@/lib/edge/service";
-import { accounts, auditEntries, siteRecords } from "@/lib/mock/tenancy";
+import { auditEntries, siteRecords } from "@/lib/mock/tenancy";
 import { can } from "@/lib/permissions";
 import { GATE_REASONS } from "@/lib/types";
 
@@ -29,7 +30,7 @@ export async function POST(req: Request) {
   try {
     const r = await tx((c) => requestGateCommand(c, {
       siteCode: site.code, laneCode: b.laneCode!, reasonCode: b.reasonCode!, reasonNote: b.reasonNote?.trim() || undefined,
-      requestedByEmail: accounts.find((a) => a.id === user.id)?.email ?? "", requestedRole: binding?.role ?? "hq_ops",
+      requestedByEmail: actorEmail(user.id), requestedRole: binding?.role ?? "hq_ops",
       idempotencyKey: b.idempotencyKey!, plate: b.plate,
     }));
     auditEntries.unshift({ at: new Date().toISOString(), actor: user.name, action: "遠端開閘", target: `${site.name}・${b.laneCode}`, orgId: site.orgId,
