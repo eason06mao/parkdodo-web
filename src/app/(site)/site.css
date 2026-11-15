@@ -1,0 +1,108 @@
+/* 公司網站（parkdodo.tw）：沿用後台與繳費頁的配色與字型，手機優先 */
+.site { background: var(--pd-ground); color: var(--pd-ink); min-height: 100vh; }
+.site-wrap { max-width: 1040px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.site-head { border-bottom: 1px solid var(--pd-line); background: var(--pd-surface); }
+.site-head .site-wrap { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 64px; flex-wrap: wrap; }
+.site-logo { display: flex; align-items: center; gap: 10px; color: var(--pd-ink); text-decoration: none; }
+.site-logo b { font-family: var(--pd-font-serif); font-size: 20px; }
+.site-logo span.mark { width: 34px; height: 34px; border-radius: 9px; background: var(--pd-accent); color: #fff; display: grid; place-items: center; font-weight: 700; }
+.site-nav { display: flex; gap: 16px; flex-wrap: wrap; font-size: 14px; }
+.site-nav a { color: var(--pd-ink-2); text-decoration: none; }
+.site-nav a:hover { color: var(--pd-accent); }
+
+.site-hero { padding-block: 56px 40px; display: grid; gap: 28px; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); align-items: center; }
+.site-hero h1 { font-family: var(--pd-font-serif); font-size: clamp(30px, 5vw, 44px); line-height: 1.35; margin: 0; text-wrap: balance; }
+.site-hero p { font-size: 17px; line-height: 1.85; color: var(--pd-ink-2); margin: 16px 0 0; max-width: 34em; }
+.site-hero .ticket { background: var(--pd-night); color: var(--pd-night-ink); border-radius: 18px; padding: 24px; display: grid; gap: 14px; }
+.site-hero .ticket .plate { font-family: var(--pd-font-mono); font-size: 28px; letter-spacing: 3px; color: #fff; background: rgba(255,255,255,.06); border: 1px solid #3A4B55; border-radius: 10px; padding: 10px 14px; text-align: center; }
+.site-hero .ticket .row { display: flex; justify-content: space-between; font-size: 14px; color: var(--pd-night-muted); }
+.site-hero .ticket .row b { color: #fff; font-family: var(--pd-font-mono); font-weight: 600; }
+
+.site-sec { padding-block: 40px; border-top: 1px solid var(--pd-line-soft); }
+.site-sec h2 { font-family: var(--pd-font-serif); font-size: 24px; margin: 0 0 18px; }
+.site-sec .lead { color: var(--pd-muted); margin: -8px 0 20px; line-height: 1.8; }
+.site-grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+.site-grid > * { min-width: 0; }
+.site-steps { counter-reset: s; display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); list-style: none; padding: 0; margin: 0; }
+.site-steps li { background: var(--pd-surface); border: 1px solid var(--pd-line); border-radius: 14px; padding: 20px; }
+.site-steps li::before { counter-increment: s; content: counter(s); display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--pd-accent-tint); color: var(--pd-accent); font-weight: 700; margin-bottom: 10px; }
+.site-steps b { display: block; font-size: 17px; margin-bottom: 6px; }
+.site-steps span { color: var(--pd-ink-2); line-height: 1.75; font-size: 15px; }
+
+.site-dl { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 8px 16px; margin: 12px 0 0; font-size: 15px; }
+.site-dl dt { color: var(--pd-muted); }
+.site-dl dd { margin: 0; }
+.todo { display: inline-block; background: var(--pd-warn-tint); color: var(--pd-warn-ink); border: 1px solid var(--pd-warn-line); border-radius: 6px; padding: 0 6px; font-size: 13px; }
+
+.rate-table { width: 100%; border-collapse: collapse; background: var(--pd-surface); border: 1px solid var(--pd-line); border-radius: 14px; overflow: hidden; font-size: 15px; }
+.rate-table th, .rate-table td { text-align: left; padding: 12px 16px; border-bottom: 1px solid var(--pd-line-soft); }
+.rate-table th { color: var(--pd-muted); font-weight: 500; width: 40%; }
+.rate-table tr:last-child th, .rate-table tr:last-child td { border-bottom: 0; }
+.rate-table td { font-variant-numeric: tabular-nums; }
+
+.site-faq details { background: var(--pd-surface); border: 1px solid var(--pd-line); border-radius: 12px; padding: 14px 18px; }
+.site-faq details + details { margin-top: 10px; }
+.site-faq summary { cursor: pointer; font-weight: 500; }
+.site-faq p { margin: 10px 0 0; color: var(--pd-ink-2); line-height: 1.8; }
+
+.site-foot { background: var(--pd-night); color: var(--pd-night-muted); margin-top: 40px; padding-block: 32px; font-size: 14px; line-height: 1.9; }
+.site-foot a { color: var(--pd-night-ink); }
+.site-foot .links { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 10px; }
+
+.site-doc { max-width: 760px; padding-block: 40px; }
+.site-doc h1 { font-family: var(--pd-font-serif); font-size: 28px; margin: 0 0 6px; }
+.site-doc h2 { font-size: 19px; margin: 28px 0 8px; }
+.site-doc p, .site-doc li { line-height: 1.9; color: var(--pd-ink-2); }
+.site-doc .date { color: var(--pd-muted); font-size: 14px; }
+
+@media (max-width: 720px) {
+  .site-hero { grid-template-columns: 1fr; padding-block: 36px 28px; }
+  .site-nav { font-size: 13px; gap: 12px; }
+}
+
+/* ---------- 首頁主視覺（深色帶） ---------- */
+.site-hero-band { background: var(--pd-night); color: var(--pd-night-ink); }
+.site-hero-band .site-hero { padding-block: 64px 56px; }
+.site-hero-band .eyebrow { font-family: var(--pd-font-mono); font-size: 13px; letter-spacing: .12em; color: #7FC4BC; margin: 0 0 14px; }
+.site-hero-band h1 { color: #fff; }
+.site-hero-band p { color: #C9D1D6; }
+.site-hero-band .cta { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 26px; }
+.site-hero-band .cta a { text-decoration: none; }
+.site-hero-band .cta .ghost { border-color: #3A4B55; background: transparent; color: var(--pd-night-ink); }
+.site-hero-band .cta .ghost:hover { background: var(--pd-night-2); }
+.lane-art { width: 100%; height: auto; display: block; max-width: 100%; }
+
+.site-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid #2A3B45; }
+.site-stats div { padding: 18px 16px; border-right: 1px solid #2A3B45; }
+.site-stats div:last-child { border-right: 0; }
+.site-stats b { display: block; font-family: var(--pd-font-mono); font-size: 22px; color: #fff; }
+.site-stats span { font-size: 13px; color: var(--pd-night-muted); }
+
+.site-features { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
+.site-features article { background: var(--pd-surface); border: 1px solid var(--pd-line); border-radius: 14px; padding: 22px; }
+.site-features .ic { width: 40px; height: 40px; border-radius: 10px; background: var(--pd-accent-tint); color: var(--pd-accent); display: grid; place-items: center; margin-bottom: 12px; }
+.site-features h3 { margin: 0 0 6px; font-size: 17px; }
+.site-features p { margin: 0; color: var(--pd-ink-2); line-height: 1.75; font-size: 15px; }
+
+.site-partner { background: var(--pd-accent-tint); border: 1px solid #B9DCD7; border-radius: 16px; padding: 26px; display: flex; gap: 16px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+.site-partner h2 { margin: 0 0 6px; }
+.site-partner p { margin: 0; color: var(--pd-ink-2); line-height: 1.8; max-width: 40em; }
+
+/* 動畫：車輛靠近 → 光束掃描 → 雲端確認 → 柵欄開啟 → 車輛通過 */
+.la-car { animation: la-car 8s ease-in-out infinite; }
+.la-beam { animation: la-beam 8s ease-in-out infinite; }
+.la-link { animation: la-link 8s linear infinite; }
+.la-arm { transform-box: view-box; transform-origin: 372px 244px; animation: la-arm 8s ease-in-out infinite; }
+@keyframes la-car { 0% { transform: translateX(-120px); opacity: 0; } 6% { opacity: 1; } 30%, 50% { transform: translateX(0); } 72% { transform: translateX(230px); opacity: 1; } 76%, 100% { transform: translateX(230px); opacity: 0; } }
+@keyframes la-beam { 0%, 25% { opacity: 0; } 32%, 42% { opacity: 1; } 48%, 100% { opacity: 0; } }
+@keyframes la-link { 0%, 36% { stroke-dashoffset: 0; opacity: .2; } 44% { opacity: 1; } 52% { stroke-dashoffset: -36; opacity: 1; } 60%, 100% { opacity: .2; } }
+@keyframes la-arm { 0%, 46% { transform: rotate(0deg); } 54%, 80% { transform: rotate(90deg); } 92%, 100% { transform: rotate(0deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .la-car, .la-beam, .la-link, .la-arm { animation: none; }
+  .la-beam { opacity: 1; }
+}
+@media (max-width: 720px) {
+  .site-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .site-stats div:nth-child(2) { border-right: 0; }
+  .site-stats div:nth-child(-n+2) { border-bottom: 1px solid #2A3B45; }
+}

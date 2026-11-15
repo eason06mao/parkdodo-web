@@ -12,7 +12,10 @@ import { NextResponse, type NextRequest } from "next/server";
 // /api/cron/ 由 CRON_SECRET 驗證（Cloud Scheduler 呼叫）
 const OPEN_PATHS = ["/api/payments/payuni/notify", "/api/payments/payuni/return", "/api/edge/", "/api/cron/"];
 // 正式站（ADMIN_GATE）額外公開給車主的路徑
-const PUBLIC_PATHS = ["/pay", "/join", "/api/pay/", "/api/payments/", "/api/members/", "/api/tax-id/", "/robots.txt"];
+const PUBLIC_PATHS = ["/pay", "/join", "/api/pay/", "/api/payments/", "/api/members/", "/api/tax-id/", "/robots.txt",
+  "/privacy", "/refund", "/terms"];
+// 公司網站首頁（parkdodo.tw）只開放「/」本身
+const PUBLIC_EXACT = ["/"];
 const GATE = "/__gate";
 const COOKIE = "pd_staging_gate";
 const MAX_AGE = 12 * 60 * 60;
@@ -20,10 +23,15 @@ const MAX_AGE = 12 * 60 * 60;
 const gateLabel = () => (process.env.STAGING_BASIC_AUTH ? "測試站" : "管理後台");
 
 export async function middleware(req: NextRequest) {
+  // admin.parkdodo.tw 開首頁直接進後台
+  if (req.nextUrl.pathname === "/" && (req.headers.get("host") ?? "").startsWith("admin.")) {
+    const url = req.nextUrl.clone(); url.pathname = "/console"; return NextResponse.redirect(url, 307);
+  }
   const staging = process.env.STAGING_BASIC_AUTH;
   const expected = staging || process.env.ADMIN_GATE;
   const { pathname } = req.nextUrl;
   if (!expected || OPEN_PATHS.some((p) => pathname.startsWith(p))) return NextResponse.next();
+  if (!staging && PUBLIC_EXACT.includes(pathname)) return NextResponse.next();
   if (!staging && PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(p.endsWith("/") ? p : `${p}/`) || pathname.startsWith(`${p}?`))) {
     return NextResponse.next();
   }
