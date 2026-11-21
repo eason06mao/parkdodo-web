@@ -57,6 +57,23 @@ INSERT INTO lanes (id, site_id, code, direction) VALUES
   ('00000000-0000-4000-8000-000000000312', '00000000-0000-4000-8000-000000000202', 'OUT-1', 'exit')
 ON CONFLICT (id) DO NOTHING;
 
+-- 沙鹿站的攝影機與顯示卡（與正式站相同；IP 等現場確認後在後台修改）。
+-- 新加入時讓已配對的工控機重新下載設定（設定版本 +1），不用重開程式。
+WITH ins AS (
+  INSERT INTO devices (id, site_id, lane_id, device_type, vendor, model, ip_address, rs485_address, connection, capabilities) VALUES
+    ('00000000-0000-4000-8000-000000000411', '00000000-0000-4000-8000-000000000202', '00000000-0000-4000-8000-000000000311',
+     'lpr_camera', 'ICE', '車牌辨識攝影機', '192.168.1.100', NULL, '{"gate_relay":0,"pass_io_input":1}', '{open_gate,io_input,rs485_passthrough}'),
+    ('00000000-0000-4000-8000-000000000412', '00000000-0000-4000-8000-000000000202', '00000000-0000-4000-8000-000000000311',
+     'led_voice_card', 'FK', '顯示語音卡', NULL, 100, '{"via_camera_485":true}', '{text,voice}'),
+    ('00000000-0000-4000-8000-000000000413', '00000000-0000-4000-8000-000000000202', '00000000-0000-4000-8000-000000000312',
+     'lpr_camera', 'ICE', '車牌辨識攝影機', '192.168.1.101', NULL, '{"gate_relay":0,"pass_io_input":1}', '{open_gate,io_input,rs485_passthrough}'),
+    ('00000000-0000-4000-8000-000000000414', '00000000-0000-4000-8000-000000000202', '00000000-0000-4000-8000-000000000312',
+     'led_voice_card', 'FK', '顯示語音卡', NULL, 100, '{"via_camera_485":true}', '{text,voice,qr}')
+  ON CONFLICT (id) DO NOTHING
+  RETURNING site_id)
+UPDATE edge_gateways SET config_version = config_version + 1
+ WHERE status <> 'retired' AND site_id IN (SELECT site_id FROM ins);
+
 -- 費率（與 src/lib/billing/fee.ts 的 DEFAULT_PLAN 相同）
 INSERT INTO fee_rate_versions (id, site_id, version_no, rules, effective_from, approved_by) VALUES
   ('00000000-0000-4000-8000-000000000501', '00000000-0000-4000-8000-000000000201', 1,
