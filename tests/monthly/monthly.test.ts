@@ -1,6 +1,6 @@
 // npm run test:monthly — 月租建檔規則
 import assert from "node:assert/strict";
-import { test } from "node:test";
+import { mock, test } from "node:test";
 import { amounts, contractState, emptyCustomer, endsOn, hasErrors, validateContract, type ContractInput, type MonthlyPlan } from "../../src/lib/monthly";
 import { createContract, updateContract } from "../../src/lib/monthlyServer";
 import type { Principal } from "../../src/lib/permissions";
@@ -8,6 +8,8 @@ import type { Principal } from "../../src/lib/permissions";
 const shared: MonthlyPlan = { id: "plan-001-shared", siteId: "site-001", name: "共用月租", type: "shared", monthlyPrice: 2200, maxContracts: 20, active: true };
 const fixed: MonthlyPlan = { id: "plan-001-fixed", siteId: "site-001", name: "固定車位", type: "fixed", monthlyPrice: 3000, active: true };
 const TODAY = "2026-10-30";
+// 測試資料的日期以 TODAY 為準：把系統時間固定在這天，避免日子過了以後「生效日不能早於一個月前」讓測試失敗
+mock.timers.enable({ apis: ["Date"], now: Date.parse(`${TODAY}T12:00:00+08:00`) });
 const draft = (o: Partial<ContractInput> = {}): ContractInput => ({
   siteId: "site-001", planId: shared.id, space: "", customer: { ...emptyCustomer(), name: "王小明", phone: "0912-345-678" },
   vehicles: [{ plate: "TST-0001", kind: "car", brand: "", color: "" }], startsOn: "2026-11-01", activatesOn: "2026-11-01", months: 1,
