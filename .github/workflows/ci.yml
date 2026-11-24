@@ -154,6 +154,7 @@ jobs:
           PAYUNI_SITES: ${{ vars.PAYUNI_SITES }}
           PAYUNI_ENV: ${{ vars.PAYUNI_ENV || 'sandbox' }}
           PAYUNI_METHODS: ${{ vars.PAYUNI_METHODS }}
+          PAYUNI_INVOICE: ${{ vars.PAYUNI_INVOICE }}
           ALERTS: ${{ vars.ALERTS }}
         run: |
           SECRETS="STAGING_BASIC_AUTH=staging-basic-auth:latest"
@@ -171,6 +172,7 @@ jobs:
           ENVS="PAYUNI_ENV=$PAYUNI_ENV"
           [ -n "$BUCKET" ] && ENVS="$ENVS@EDGE_IMAGE_BUCKET=$BUCKET"
           [ -n "$PAYUNI_METHODS" ] && ENVS="$ENVS@PAYUNI_METHODS=$(echo "$PAYUNI_METHODS" | tr -d ' ')"
+          [ -n "$PAYUNI_INVOICE" ] && ENVS="$ENVS@PAYUNI_INVOICE=$(echo "$PAYUNI_INVOICE" | tr -d ' ')"
           ENVS="^@^$ENVS"
           SQL_FLAG=""
           [ -n "$CLOUDSQL" ] && SQL_FLAG="--add-cloudsql-instances=$(echo "$CLOUDSQL" | tr -d '[:space:]')"

@@ -12,7 +12,7 @@ import { pool, tx } from "../db";
 import { currentSchedule, displayPlate, normalizePlate } from "../edge/service";
 import type { InvoiceChoice } from "../invoice";
 import { MAX_CANDIDATES, maskPlate, matchPlates, normalizeQuery } from "./plateSearch";
-import { buildUppForm, loadPayuniConfig, parkingMethods, mapQueryResult, queryRows, queryTrade, type OrderOutcome, type PayuniConfig } from "./payuni/client";
+import { buildUppForm, invoiceEnabled, loadPayuniConfig, parkingMethods, mapQueryResult, queryRows, queryTrade, type OrderOutcome, type PayuniConfig } from "./payuni/client";
 
 export class PayError extends Error {
   constructor(message: string, public status = 422, public code = "invalid") { super(message); }
@@ -196,6 +196,7 @@ export async function checkout(a: {
       merTradeNo: orderNo, amount, prodDesc: `${site.name} 停車費 ${displayPlate(q.plate_no)}`,
       returnUrl: `${a.origin}/api/payments/payuni/return?${qs}`, notifyUrl: `${a.origin}/api/payments/payuni/notify?${qs}`,
       backUrl: `${a.origin}/pay?${qs}`, expireSec: QUOTE_TTL_MIN * 60, methods: parkingMethods(process.env),
+      invoice: invoiceEnabled(process.env, site.code),
     });
     return { orderNo, amount, form: { action: form.action, fields: form.fields as unknown as Record<string, string> } };
   });
