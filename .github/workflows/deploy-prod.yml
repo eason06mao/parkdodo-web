@@ -73,6 +73,7 @@ jobs:
           PAYUNI_SITES: ${{ vars.PROD_PAYUNI_SITES }}
           PAYUNI_ENV: ${{ vars.PROD_PAYUNI_ENV || 'sandbox' }}
           PAYUNI_METHODS: ${{ vars.PROD_PAYUNI_METHODS }}
+          PAYUNI_INVOICE: ${{ vars.PROD_PAYUNI_INVOICE }}
           ALERTS: ${{ vars.PROD_ALERTS }}
           PUBLIC_BASE_URL: ${{ vars.PROD_PUBLIC_BASE_URL }}
         run: |
@@ -88,6 +89,7 @@ jobs:
           # 環境變數以 @ 分隔（gcloud 的 ^@^ 語法），因為 PAYUNI_METHODS 的值含逗號
           ENVS="PAYUNI_ENV=$PAYUNI_ENV@EDGE_IMAGE_BUCKET=$BUCKET"
           [ -n "$PAYUNI_METHODS" ] && ENVS="$ENVS@PAYUNI_METHODS=$(echo "$PAYUNI_METHODS" | tr -d ' ')"
+          [ -n "$PAYUNI_INVOICE" ] && ENVS="$ENVS@PAYUNI_INVOICE=$(echo "$PAYUNI_INVOICE" | tr -d ' ')"
           [ -n "$PUBLIC_BASE_URL" ] && ENVS="$ENVS@PUBLIC_BASE_URL=$PUBLIC_BASE_URL"
           gcloud run deploy "$SERVICE" \
             --image "$IMAGE" --region "$REGION" \

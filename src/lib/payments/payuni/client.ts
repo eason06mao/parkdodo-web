@@ -63,6 +63,20 @@ export function parkingMethods(env: Record<string, string | undefined>): UppMeth
   return picked.length ? picked : DEFAULT_PARKING_METHODS;
 }
 
+/**
+ * 付款時是否請統一金流一併開立電子發票（UPP 參數 TradeInvoice=1，《UPP Ver 2.0》請求參數）。
+ * 環境變數 PAYUNI_INVOICE：「on」= 全部站點；或站點代碼清單（例 "TXG001,TXG002"）；沒設定 = 關閉。
+ * ⚠️ 商店必須先在統一金流後台啟用電子發票（光貿），否則付款會被拒絕（錯誤碼 UPP02085「商店尚未啟用電子發票」）。
+ * 每個商店各自註冊光貿，所以可以一站一站打開。
+ */
+export function invoiceEnabled(env: Record<string, string | undefined>, siteCode?: string | null): boolean {
+  const v = (env.PAYUNI_INVOICE ?? "").trim();
+  if (!v) return false;
+  if (/^(on|all|true|1)$/i.test(v)) return true;
+  if (!siteCode) return false;
+  return v.split(",").map((x) => x.trim().toUpperCase()).includes(siteCode.toUpperCase());
+}
+
 export function buildUppForm(cfg: PayuniConfig, order: {
   merTradeNo: string;      // payment_orders.order_no：[A-Za-z0-9_-]，最長 25；10 分鐘內不可重複
   amount: number;          // 新台幣正整數
@@ -72,6 +86,7 @@ export function buildUppForm(cfg: PayuniConfig, order: {
   backUrl?: string;        // 付款頁「返回商店」按鈕
   methods?: UppMethod[];   // 指定付款方式；未帶則依 PAYUNi 後台商店設定
   expireSec?: number;      // 付款頁截止秒數 60–600，預設 600；配合報價有效期
+  invoice?: boolean;       // 請統一金流一併開立電子發票（TradeInvoice=1）；見 invoiceEnabled()
 }) {
   if (!/^[A-Za-z0-9_-]{1,25}$/.test(order.merTradeNo)) throw new Error("MerTradeNo 只能是英數、底線、連字號，最長 25 字");
   if (!Number.isInteger(order.amount) || order.amount <= 0) throw new Error("金額必須是正整數");
@@ -84,6 +99,7 @@ export function buildUppForm(cfg: PayuniConfig, order: {
       MerTradeNo: order.merTradeNo, TradeAmt: order.amount, ProdDesc: order.prodDesc,
       ReturnURL: order.returnUrl, NotifyURL: order.notifyUrl, BackURL: order.backUrl,
       TradeLExpireSec: order.expireSec, Lang: "zh-tw", ...methods,
+      ...(order.invoice ? { TradeInvoice: 1 } : {}),
     }, "2.0"),
   };
 }
